@@ -1,4 +1,4 @@
-import { SLOTS, loadRecords, saveRecords, parseYouTubeId } from './records.js';
+import { SLOTS, loadRecords, saveRecords, loadCrate, saveCrate, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
@@ -132,12 +132,20 @@ buildWeather();
 /* ---------------- shelf ---------------- */
 
 let records = loadRecords();
-let current = null;   // slot index of the record on the turntable
+let crate = loadCrate();
+let crateIndex = 0;   // which crate record is showing in the flip-through
+let current = null;   // the record on the turntable: { from: 'shelf' | 'crate', index }
 let phase = 'idle';   // idle | moving | loading | playing | paused | ended | error | returning
 let busy = false;
 
+// Where records come from: a shelf spot, or the crate on the floor.
+const CRATE_SPOT = { x: 818, y: 690 };
+const recordOf = (ref) => (ref ? (ref.from === 'crate' ? crate[ref.index] : records[ref.index]) : null);
+const originOf = (ref) => (ref.from === 'crate' ? CRATE_SPOT : SLOTS[ref.index]);
+const isCurrent = (from, index) => current !== null && current.from === from && current.index === index;
+
 function renderShelf() {
-  setPosterRecords(records);
+  setPosterRecords([...records, ...crate]);
   const shelf = $('#shelf');
   shelf.replaceChildren();
   SLOTS.forEach((slot, i) => {
@@ -165,7 +173,7 @@ function renderShelf() {
       });
       button.appendChild(img);
       button.setAttribute('aria-label', `Play ${record.title} by ${record.artist}`);
-      if (i === current) button.classList.add('is-out');
+      if (isCurrent('shelf', i)) button.classList.add('is-out');
     } else {
       button.classList.add('empty');
       const plus = document.createElement('span');
@@ -188,9 +196,9 @@ async function onSleeve(i) {
     openDialog(i);
     return;
   }
-  if (busy || i === current) return;
+  if (busy || isCurrent('shelf', i)) return;
   if (current !== null) await putBack();
-  await playSlot(i);
+  await playRecord({ from: 'shelf', index: i });
 }
 
 /* ---------------- record animation ---------------- */
@@ -204,17 +212,17 @@ function animate(frames, duration, easing) {
   return vinylWrap.animate(frames, { duration: reduceMotion ? 1 : duration, easing, fill: 'forwards' }).finished;
 }
 
-function pathTo(i) {
-  const { x, y } = SLOTS[i];
+function pathTo(ref) {
+  const { x, y } = originOf(ref);
   const dx = PLATTER.x - (x + 50);
   const dy = PLATTER.y - (y + 50);
   const mid = `translate(${Math.round(dx / 2)}px, ${Math.round(Math.min(dy / 2, -62) - 110)}px) scale(1.15, 0.85)`;
   return { end: `translate(${dx}px, ${dy}px) ${LANDED}`, mid };
 }
 
-async function moveToPlatter(i) {
-  const { x, y } = SLOTS[i];
-  const { end, mid } = pathTo(i);
+async function moveToPlatter(ref) {
+  const { x, y } = originOf(ref);
+  const { end, mid } = pathTo(ref);
   vinylWrap.getAnimations().forEach((a) => a.cancel());
   vinylWrap.style.left = `${x + 2}px`;
   vinylWrap.style.top = `${y + 2}px`;
@@ -231,8 +239,8 @@ async function moveToPlatter(i) {
   ], 1400, 'cubic-bezier(.45, 0, .2, 1)');
 }
 
-async function moveToSleeve(i) {
-  const { end, mid } = pathTo(i);
+async function moveToSleeve(ref) {
+  const { end, mid } = pathTo(ref);
   await animate([
     { transform: end },
     { transform: mid, offset: 0.5 },
@@ -294,16 +302,17 @@ function showTv(title, sub) {
   $('#tv-idle').hidden = false;
 }
 
-async function playSlot(i) {
+async function playRecord(ref) {
   busy = true;
-  current = i;
+  current = ref;
   phase = 'moving';
-  const record = records[i];
+  const record = recordOf(ref);
   $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})`;
   renderShelf();
+  renderCrate();
   updateCard();
 
-  await moveToPlatter(i);
+  await moveToPlatter(ref);
   phase = 'loading';
   setDeck({ needle: true });
   showTv('Tuning in…', record.title);
@@ -336,6 +345,7 @@ async function putBack() {
   phase = 'idle';
   busy = false;
   renderShelf();
+  renderCrate();
   updateCard();
 }
 
@@ -359,7 +369,7 @@ function formatTime(seconds) {
 
 function updateCard() {
   stage.dataset.phase = phase; // the listener reacts to this in CSS
-  const record = current !== null ? records[current] : null;
+  const record = recordOf(current);
   $('#np-kicker').textContent = KICKERS[phase] || '';
   $('#np-title').textContent = record ? record.title : 'Pick a record';
   $('#np-sub').textContent = record
@@ -375,6 +385,7 @@ function updateCard() {
 
   $('#np-back').disabled = record === null || busy;
   $('#np-remove').hidden = record === null;
+  $('#np-remove').textContent = current?.from === 'crate' ? 'Remove from crate' : 'Remove from shelf';
   $('#np-remove').disabled = busy;
 
   if (!record) {
@@ -401,13 +412,135 @@ $('#np-back').addEventListener('click', () => {
 
 $('#np-remove').addEventListener('click', async () => {
   if (busy || current === null) return;
-  const slot = current;
-  const record = records[slot];
-  if (!window.confirm(`Take “${record.title}” off the shelf?`)) return;
+  const ref = current;
+  const record = recordOf(ref);
+  const where = ref.from === 'crate' ? 'out of the crate' : 'off the shelf';
+  if (!window.confirm(`Take “${record.title}” ${where}?`)) return;
   await putBack();
-  records[slot] = null;
+  if (ref.from === 'crate') takeFromCrate(ref.index);
+  else {
+    records[ref.index] = null;
+    saveRecords(records);
+  }
+  renderShelf();
+});
+
+/* ---------------- the record crate ---------------- */
+
+const crateDialog = $('#crate-dialog');
+
+// Remove a record from the crate, keeping the turntable's reference pointing at the right one.
+function takeFromCrate(index) {
+  const [record] = crate.splice(index, 1);
+  if (current?.from === 'crate' && current.index > index) current.index -= 1;
+  crateIndex = Math.max(0, Math.min(crateIndex, crate.length - 1));
+  saveCrate(crate);
+  renderCrate();
+  return record;
+}
+
+function coverUrl(record) {
+  return `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})`;
+}
+
+function renderCrate() {
+  // The tops of the first few records peek out of the crate in the room.
+  const peeks = [0, 1, 2, 3].map((k) => {
+    const sleeve = document.createElement('span');
+    sleeve.className = 'crate-sleeve';
+    if (crate[k]) sleeve.style.backgroundImage = coverUrl(crate[k]);
+    else sleeve.classList.add('blank');
+    return sleeve;
+  });
+  $('#crate-sleeves').replaceChildren(...peeks);
+  $('#crate').setAttribute('aria-label', crate.length
+    ? `Flip through the record crate, ${crate.length} record${crate.length === 1 ? '' : 's'}`
+    : 'Open the record crate');
+  if (crateDialog.open) renderCrateBrowser();
+}
+
+function renderCrateBrowser(direction = '') {
+  const empty = crate.length === 0;
+  const record = crate[crateIndex];
+  $('#crate-browser').hidden = empty;
+  $('#crate-info').hidden = empty;
+  $('#crate-empty').hidden = !empty;
+  $('#crate-actions').hidden = empty;
+  if (empty) return;
+
+  const cover = $('#crate-cover');
+  cover.style.backgroundImage = coverUrl(record);
+  cover.classList.remove('flip-next', 'flip-prev');
+  if (direction) {
+    void cover.offsetWidth;
+    cover.classList.add(direction === 'next' ? 'flip-next' : 'flip-prev');
+  }
+  $('#crate-rec-title').textContent = record.title;
+  $('#crate-rec-artist').textContent = record.artist;
+  $('#crate-count').textContent = `${crateIndex + 1} of ${crate.length}`;
+  $('#crate-prev').disabled = crate.length < 2;
+  $('#crate-next').disabled = crate.length < 2;
+
+  const playing = isCurrent('crate', crateIndex);
+  const play = $('#crate-play');
+  play.disabled = playing || busy;
+  play.textContent = playing ? 'On the turntable' : 'Play';
+  const hasSpace = records.some((r) => !r);
+  const toShelf = $('#crate-to-shelf');
+  toShelf.disabled = playing || !hasSpace;
+  toShelf.title = hasSpace ? '' : 'The shelf is full';
+  $('#crate-remove').disabled = playing;
+}
+
+function openCrate() {
+  renderCrateBrowser();
+  crateDialog.showModal();
+  (crate.length ? $('#crate-play:not(:disabled)') || $('#crate-next') : $('#crate-add')).focus();
+}
+
+function flip(step) {
+  if (crate.length < 2) return;
+  crateIndex = (crateIndex + step + crate.length) % crate.length;
+  renderCrateBrowser(step > 0 ? 'next' : 'prev');
+}
+
+$('#crate').addEventListener('click', openCrate);
+$('#crate-close').addEventListener('click', () => crateDialog.close());
+$('#crate-prev').addEventListener('click', () => flip(-1));
+$('#crate-next').addEventListener('click', () => flip(1));
+crateDialog.addEventListener('keydown', (event) => {
+  if (event.target.closest('button') && event.key === 'Enter') return;
+  if (event.key === 'ArrowLeft') { event.preventDefault(); flip(-1); }
+  if (event.key === 'ArrowRight') { event.preventDefault(); flip(1); }
+});
+
+$('#crate-play').addEventListener('click', async () => {
+  const index = crateIndex;
+  if (busy || isCurrent('crate', index)) return;
+  crateDialog.close();
+  if (current !== null) await putBack();
+  await playRecord({ from: 'crate', index });
+});
+
+$('#crate-to-shelf').addEventListener('click', () => {
+  const slot = records.findIndex((r) => !r);
+  if (slot < 0 || isCurrent('crate', crateIndex)) return;
+  records[slot] = takeFromCrate(crateIndex);
   saveRecords(records);
   renderShelf();
+});
+
+$('#crate-remove').addEventListener('click', () => {
+  const record = crate[crateIndex];
+  if (!record || isCurrent('crate', crateIndex)) return;
+  if (!window.confirm(`Take “${record.title}” out of the crate?`)) return;
+  takeFromCrate(crateIndex);
+  renderShelf();
+});
+
+$('#crate-add').addEventListener('click', () => {
+  crateDialog.close();
+  openDialog('crate');
 });
 
 /* ---------------- add a record ---------------- */
@@ -416,10 +549,11 @@ const dialog = $('#add-dialog');
 const form = $('#add-form');
 const errorBox = $('#f-error');
 const submit = $('#f-submit');
-let addSlot = null;
+let addTarget = null; // a shelf spot number, or 'crate'
 
-function openDialog(i) {
-  addSlot = i;
+function openDialog(target) {
+  addTarget = target;
+  submit.textContent = target === 'crate' ? 'Put it in the crate' : 'Put it on the shelf';
   form.reset();
   errorBox.textContent = '';
   dialog.showModal();
@@ -443,18 +577,26 @@ form.addEventListener('submit', async (event) => {
   submit.textContent = 'Finding the cover…';
 
   const cover = await findCover(artist, title);
-  records[addSlot] = {
+  const record = {
     id,
     artist: artist || 'Unknown artist',
     title: title || 'Untitled record',
     cover: cover || youtubeThumb(id),
   };
-  saveRecords(records);
+  if (addTarget === 'crate') {
+    crate.push(record);
+    crateIndex = crate.length - 1;
+    saveCrate(crate);
+    renderCrate();
+  } else {
+    records[addTarget] = record;
+    saveRecords(records);
+  }
   renderShelf();
 
   submit.disabled = false;
-  submit.textContent = 'Put it on the shelf';
   dialog.close();
+  if (addTarget === 'crate') openCrate();
 });
 
 /* ---------------- start ---------------- */
@@ -462,5 +604,6 @@ form.addEventListener('submit', async (event) => {
 buildStars();
 buildLights();
 renderShelf();
+renderCrate();
 updateCard();
 loadYouTubeApi().catch(() => { /* reported when a record is played */ });

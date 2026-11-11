@@ -45,6 +45,24 @@ export function saveRecords(records) {
   }
 }
 
+// The crate holds any number of extra records, saved separately from the shelf.
+const CRATE_KEY = 'record-room:crate:v1';
+
+export function loadCrate() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CRATE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.filter(isRecord) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCrate(crate) {
+  try {
+    localStorage.setItem(CRATE_KEY, JSON.stringify(crate));
+  } catch { /* still works until the page reloads */ }
+}
+
 function isRecord(r) {
   return Boolean(r && typeof r.id === 'string' && /^[\w-]{11}$/.test(r.id));
 }

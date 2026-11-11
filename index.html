@@ -279,6 +279,12 @@
     <span class="pet-heart" aria-hidden="true">♥</span>
   </button>
 
+  <!-- Record crate on the floor (click to flip through) -->
+  <button type="button" class="crate" id="crate" aria-label="Open the record crate">
+    <span class="crate-sleeves" id="crate-sleeves"></span>
+    <span class="crate-box"><span class="crate-handle"></span></span>
+  </button>
+
   <!-- Cabinet, turntable, lamp -->
   <div class="lamp-glow"></div>
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
@@ -419,6 +425,37 @@
       <button type="submit" class="primary" id="f-submit">Put it on the shelf</button>
     </div>
   </form>
+</dialog>
+
+<!-- Flip through the record crate -->
+<dialog class="add-dialog crate-dialog" id="crate-dialog" aria-labelledby="crate-title">
+  <div class="crate-head">
+    <h2 id="crate-title">Record crate</h2>
+    <button type="button" class="decor-close" id="crate-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <p class="hint" id="crate-empty">The crate is empty. Fill it with records you want to keep without using a shelf spot. It holds as many as you like.</p>
+  <div class="crate-browser" id="crate-browser">
+    <button type="button" class="flip" id="crate-prev" aria-label="Previous record">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="crate-stack"><div class="crate-cover" id="crate-cover"></div></div>
+    <button type="button" class="flip" id="crate-next" aria-label="Next record">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="crate-info" id="crate-info" aria-live="polite">
+    <p class="crate-rec-title" id="crate-rec-title"></p>
+    <p class="crate-rec-artist" id="crate-rec-artist"></p>
+    <p class="crate-count" id="crate-count"></p>
+  </div>
+  <div class="dialog-actions crate-actions" id="crate-actions">
+    <button type="button" class="ghost" id="crate-remove">Remove</button>
+    <button type="button" class="ghost" id="crate-to-shelf">Move to shelf</button>
+    <button type="button" class="primary" id="crate-play">Play</button>
+  </div>
+  <button type="button" class="crate-add" id="crate-add">+ Add a record to the crate</button>
 </dialog>
 
 <!-- Decorate the room (built by js/decor.js) -->
