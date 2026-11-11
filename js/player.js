@@ -56,6 +56,12 @@ export function createPlayer(elementId, { onState, onError } = {}) {
     play() { if (ready) player.playVideo(); },
     pause() { if (ready) player.pauseVideo(); },
     stop() { if (ready) player.stopVideo(); },
+    // The playing video's title and channel, from the official player.
+    videoData() {
+      if (!ready || !player.getVideoData) return null;
+      const data = player.getVideoData();
+      return data && data.title ? { title: data.title, channel: data.author } : null;
+    },
     progress() {
       if (!ready) return { time: 0, duration: 0 };
       return { time: player.getCurrentTime() || 0, duration: player.getDuration() || 0 };

@@ -587,12 +587,12 @@
 <dialog class="add-dialog" id="add-dialog" aria-labelledby="add-title">
   <form id="add-form" novalidate>
     <h2 id="add-title">Add a record</h2>
-    <p class="hint">Paste a YouTube link for the song or the full album. The cover comes from Apple's iTunes catalog when it can find a match.</p>
+    <p class="hint">Paste a YouTube link for a song or a full album. Leave the names blank to use the video's title. The cover comes from Apple's iTunes catalog.</p>
     <label for="f-link">YouTube link</label>
     <input id="f-link" name="link" type="url" placeholder="https://www.youtube.com/watch?v=…" required autocomplete="off">
     <label for="f-artist">Artist</label>
     <input id="f-artist" name="artist" type="text" autocomplete="off">
-    <label for="f-album">Album or song</label>
+    <label for="f-album">Song or album</label>
     <input id="f-album" name="album" type="text" autocomplete="off">
     <p class="form-error" id="f-error" role="alert"></p>
     <div class="dialog-actions">

@@ -1,5 +1,5 @@
 import { SLOTS, loadRecords, saveRecords, loadCrate, saveCrate, parseYouTubeId } from './records.js';
-import { findCover, youtubeThumb } from './covers.js';
+import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
@@ -333,6 +333,7 @@ const player = createPlayer('yt-player', {
   onState(state) {
     if (current === null || phase === 'returning') return;
     if (state === 1) {
+      if (phase !== 'playing') upgradeCover(current);
       phase = 'playing';
       setDeck({ spinning: true, needle: true });
       $('#tv-idle').hidden = true;
@@ -355,6 +356,29 @@ const player = createPlayer('yt-player', {
   },
 });
 let errorText = '';
+
+// A record that still shows a video thumbnail gets another try at a real cover once it
+// plays, using the title and channel the YouTube player reports.
+const triedCovers = new Set();
+async function upgradeCover(ref) {
+  const record = recordOf(ref);
+  if (!record || !isThumbnail(record.cover) || triedCovers.has(record.id)) return;
+  triedCovers.add(record.id);
+  const info = player.videoData();
+  if (!info) return;
+  const guess = guessFromVideo(info.title, info.channel);
+  const known = record.artist !== 'Unknown artist' && record.title !== 'Untitled record';
+  const cover = (known && await findCover(record.artist, record.title)) || await findCover(guess.artist, guess.title);
+  if (!cover || recordOf(ref) !== record) return;
+  record.cover = cover;
+  if (!known) Object.assign(record, { artist: guess.artist || record.artist, title: guess.title || record.title });
+  saveRecords(records);
+  saveCrate(crate);
+  renderShelf();
+  renderCrate();
+  updateCard();
+  $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(cover)})`;
+}
 
 function showTv(title, sub) {
   $('#tv-title').textContent = title;
@@ -636,11 +660,20 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  const artist = $('#f-artist').value.trim();
-  const title = $('#f-album').value.trim();
+  let artist = $('#f-artist').value.trim();
+  let title = $('#f-album').value.trim();
   submit.disabled = true;
   submit.textContent = 'Finding the cover…';
 
+  // Left blank? Use the video's own title and channel when YouTube shares them.
+  if (!artist || !title) {
+    const info = await fetchVideoInfo(id);
+    if (info) {
+      const guess = guessFromVideo(info.title, info.channel);
+      artist ||= guess.artist;
+      title ||= guess.title;
+    }
+  }
   const cover = await findCover(artist, title);
   const record = {
     id,
