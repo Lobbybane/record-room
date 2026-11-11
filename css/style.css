@@ -120,6 +120,7 @@ html, body {
   font-family: 'Pacifico', cursive;
   font-size: 42px;
   line-height: 1;
+  z-index: 19;
   white-space: nowrap;
   color: var(--neon-text, #FFE3EF);
   text-shadow: 0 0 6px var(--neon, #F28DB2), 0 0 18px var(--neon, #F28DB2), 0 0 34px var(--neon, #F28DB2);
@@ -132,7 +133,25 @@ html, body {
   85% { opacity: .6; }
 }
 
-.lamp-glow { position: absolute; left: 1210px; top: 440px; width: 0; height: 0; box-shadow: 0 0 120px 70px rgba(255, 184, 120, .28); }
+.lamp-glow { position: absolute; left: 1210px; top: 440px; width: 0; height: 0; box-shadow: 0 0 120px 70px rgba(255, 184, 120, .28); transition: opacity .5s ease; }
+.lamp-shade { fill: #FFB38A; transition: fill .4s ease; }
+.lamp-bulb { fill: #FFE2C4; transition: fill .4s ease; }
+.lamp-switch {
+  position: absolute; left: 1166px; top: 404px; z-index: 6;
+  width: 86px; height: 128px; padding: 0; border: 0; border-radius: 12px;
+  background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.lamp-switch:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; }
+/* Dark everywhere except the window, which still lets the city light in. */
+.room-dim {
+  z-index: 18; pointer-events: none; opacity: 0; transition: opacity .5s ease;
+  background: radial-gradient(ellipse 360px 270px at calc(630px - var(--fx)) calc(250px - var(--fy)), transparent 62%, rgba(8, 6, 24, .34) 100%);
+}
+.stage[data-lamp="off"] .lamp-glow { opacity: 0; }
+.stage[data-lamp="off"] .lamp-shade { fill: #6E5A80; }
+.stage[data-lamp="off"] .lamp-bulb { fill: #8A7A96; }
+.stage[data-lamp="off"] .room-dim { opacity: 1; }
 .power-led { fill: #4A3A6E; transition: fill .3s ease; }
 .stage.is-on .power-led { fill: var(--cyan); }
 .steam { opacity: .55; }

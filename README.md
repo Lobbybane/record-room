@@ -23,7 +23,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 - Click a **+** spot on a shelf to add a record. Paste a YouTube link (song or full album) and type the artist and album so the cover can be found.
 - Click a record to play it. **Put it back** returns it to the shelf, and clicking another record swaps them.
 - **Decorate** (top right) changes the time of day (or Auto, which follows your clock), the weather, the neon sign's words and color, the pet, and the listener's sweater, hair and skin.
-- Click the cat or dog to wake it up for a moment. The person in the armchair nods along while a record plays.
+- Click the lamp to switch it off and on. Click the cat or dog to wake it up for a moment. The person in the armchair nods along while a record plays.
 - Your shelf and decorations are saved in this browser.
 
 ## How it's organized

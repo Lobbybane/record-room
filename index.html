@@ -250,9 +250,10 @@
     </g>
     <rect x="1206" y="452" width="6" height="76" fill="#15132B"/>
     <ellipse cx="1209" cy="528" rx="18" ry="4" fill="#15132B"/>
-    <polygon points="1186,412 1232,412 1246,454 1172,454" fill="#FFB38A"/>
-    <ellipse cx="1209" cy="454" rx="37" ry="5" fill="#FFE2C4"/>
+    <polygon class="lamp-shade" points="1186,412 1232,412 1246,454 1172,454"/>
+    <ellipse class="lamp-bulb" cx="1209" cy="454" rx="37" ry="5"/>
   </svg>
+  <button type="button" class="lamp-switch" id="lamp-switch" aria-label="Lamp" aria-pressed="true"></button>
 
   <!-- TV with the YouTube player (must stay visible) -->
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
@@ -337,6 +338,7 @@
   <!-- Glow, vignette, grain -->
   <div class="window-glow"></div>
   <div class="storm-flash full-screen"></div>
+  <div class="room-dim full-screen"></div>
   <div class="vignette full-screen"></div>
   <svg class="grain full-screen" aria-hidden="true">
     <filter id="grain" x="0" y="0" width="100%" height="100%">
