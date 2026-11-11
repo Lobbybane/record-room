@@ -28,6 +28,10 @@ export const OPTIONS = {
     label: 'Pet',
     choices: { cat: 'Cat', dog: 'Dog', none: 'No pet' },
   },
+  tank: {
+    label: 'Fish tank',
+    choices: { on: 'On', off: 'Off' },
+  },
   coat: {
     label: 'Coat',
     swatches: {
@@ -82,6 +86,7 @@ export const DEFAULTS = {
   neonText: 'side a',
   neonColor: 'pink',
   pet: 'cat',
+  tank: 'on',
   coat: 'ginger',
   sweater: 'peach',
   hair: 'plum',
@@ -155,6 +160,7 @@ export function initDecor(stage, { onSky }) {
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
+    stage.dataset.tank = decor.tank;
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
@@ -231,7 +237,7 @@ function buildPanel(form, decor) {
   const sections = [
     ['Room', ['time', 'weather']],
     ['Neon sign', ['neonText', 'neonColor']],
-    ['Pet', ['pet', 'coat']],
+    ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
   ];
 

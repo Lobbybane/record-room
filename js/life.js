@@ -21,6 +21,19 @@ export function initPets(stage) {
   }
 }
 
+// Click the fish tank to sprinkle food; the fish swim up for it.
+export function initFishTank() {
+  const tank = document.getElementById('fish-tank');
+  let timer = null;
+  tank.addEventListener('click', () => {
+    tank.classList.remove('fed');
+    void tank.offsetWidth;
+    tank.classList.add('fed');
+    clearTimeout(timer);
+    timer = setTimeout(() => tank.classList.remove('fed'), 4500);
+  });
+}
+
 // Click the lamp to switch it on or off; the room dims when it's off.
 export function initLamp(decor) {
   const button = document.getElementById('lamp-switch');
