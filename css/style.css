@@ -19,20 +19,27 @@
 html, body {
   margin: 0;
   height: 100%;
-  background: #100D22;
+  background: #241E48;
   color: var(--text);
   font-family: 'Nunito', system-ui, sans-serif;
   overflow: hidden;
 }
 
+/* Fixed to the visible screen (100vh runs under the iPhone Safari toolbar). */
 .viewport {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
 }
 
 .stage {
   --s: 1;
+  /* The whole screen measured in stage pixels (set in js/main.js). The room stays
+     1280 x 820 in the middle; the wall and floor carry on to the screen edges. */
+  --fw: 1280px;
+  --fh: 820px;
+  --pad-x: calc((var(--fw) - 1280px) / 2);
+  --pad-y: calc((var(--fh) - 820px) / 2);
   --sky: linear-gradient(180deg, #1A1640 0%, #3B2F6B 40%, #8A5A9E 68%, #F28DB2 86%, #FFB38A 100%);
   --far-city: #5A4585;
   --moon-cut: #1F1A45;
@@ -43,10 +50,8 @@ html, body {
   top: 50%;
   width: 1280px;
   height: 820px;
-  overflow: hidden;
   transform: translate(-50%, -50%) scale(var(--s));
   transform-origin: 50% 50%;
-  background: linear-gradient(180deg, #241E48 0%, #2E2558 60%, #352B63 100%);
 }
 
 .stage[data-sky="midnight"] {
@@ -67,8 +72,18 @@ html, body {
 }
 
 /* ---------- room ---------- */
-.baseboard { position: absolute; left: 0; top: 594px; width: 1280px; height: 12px; background: var(--night); }
-.floor { position: absolute; left: 0; top: 606px; width: 1280px; height: 214px; background: linear-gradient(180deg, #3A2B52 0%, #2A1F3D 100%); }
+/* Wall, baseboard and floor reach past the stage to fill the whole screen. */
+.wall {
+  position: absolute;
+  left: calc(-1 * var(--pad-x));
+  top: calc(-1 * var(--pad-y));
+  width: var(--fw);
+  height: calc(594px + var(--pad-y));
+  background: linear-gradient(180deg, #241E48 var(--pad-y), #2E2558 calc(var(--pad-y) + 492px), #352B63 calc(var(--pad-y) + 820px));
+}
+.baseboard { position: absolute; left: calc(-1 * var(--pad-x)); top: 594px; width: var(--fw); height: 12px; background: var(--night); }
+.floor { position: absolute; left: calc(-1 * var(--pad-x)); top: 606px; width: var(--fw); height: calc(214px + var(--pad-y)); background: linear-gradient(180deg, #3A2B52 0, #2A1F3D 214px); }
+.floor-lines { overflow: visible; }
 .spill { fill: var(--spill); opacity: .10; transition: fill .8s ease; }
 
 .curtain-rod { position: absolute; left: 316px; top: 50px; width: 628px; height: 8px; border-radius: 4px; background: var(--ink); }
@@ -352,7 +367,7 @@ html, body {
 button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 /* ---------- room controls ---------- */
-.room-controls { position: absolute; right: 24px; top: 18px; z-index: 36; display: flex; gap: 8px; }
+.room-controls { position: absolute; right: calc(24px - var(--pad-x)); top: calc(18px - var(--pad-y)); z-index: 36; display: flex; gap: 8px; }
 .pill {
   min-height: 36px;
   padding: 0 14px;
@@ -369,8 +384,9 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 /* ---------- overlays ---------- */
 .window-glow { position: absolute; inset: 0; z-index: 20; pointer-events: none; background: radial-gradient(ellipse 520px 380px at 630px 250px, var(--glow), transparent 70%); }
-.vignette { position: absolute; inset: 0; z-index: 21; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(10, 8, 25, .55) 100%); }
-.grain { z-index: 22; mix-blend-mode: soft-light; opacity: .55; }
+.full-screen { position: absolute; left: calc(-1 * var(--pad-x)); top: calc(-1 * var(--pad-y)); width: var(--fw); height: var(--fh); }
+.vignette { z-index: 21; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(10, 8, 25, .55) 100%); }
+.grain { z-index: 22; pointer-events: none; mix-blend-mode: soft-light; opacity: .55; }
 
 /* ---------- add dialog ---------- */
 .add-dialog {
