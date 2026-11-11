@@ -932,6 +932,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .bat, .bat path, .pumpkin-glow, .love-hearts span { animation: none; }
   .firework { animation: none; opacity: .8; }
   .weed, .tank-bubble, .fish, .fish svg { animation: none; }
+  .l1 .fish { transform: translateX(16px); } .l2 .fish { transform: translateX(72px); } .l3 .fish { transform: translateX(44px); }
   .listener-fx span { animation: none !important; display: none !important; }
   .rain line, .vinyl.spinning, .fairy, .neon-sign, .train, .drop, .drop::after, .flake, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .listener-body, .stage.is-on .listener-head, .stage.is-on .listener-foot, .pet-body, .pet.awake .pet-tail { animation: none; }
   .tonearm, .sleeve, .crate-sleeve { transition: none; }

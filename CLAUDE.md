@@ -17,22 +17,26 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 - The scene is a fixed 1280 × 820 stage scaled to fit the window (`--s` CSS variable set in `js/main.js`). All positions are stage pixels.
 - The whole room always stays visible. Spare screen space is filled by the wall, baseboard, floor, vignette and grain, which stretch to the screen edges using `--fx` / `--fy` / `--fw` / `--fh` (the screen's left, top, width and height in stage pixels). The stage centre is `--cx` / `--cy`. While the Decorate panel is open the room refits into the space beside it (or above it on phones). The Decorate button sits in the screen's top-right corner. The page is `position: fixed` so iPhone Safari's toolbar can't hide the bottom.
 - `index.html` — the room markup and SVG shapes.
-- `css/style.css` — styling, plus small animations (rain, record spin, tonearm).
-- `js/main.js` — fits the stage, builds the city, the shelf, the record animation (Web Animations API), playback states and the now-spinning card, and the add-a-record dialog.
-- `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-pet` (cat, dog, none) and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings.
-- `js/life.js` — pets wake when clicked, the lamp switch (saved as `lamp` in the decor settings, not shown in the panel; off dims the room except the window), snowflakes and raindrops on the glass.
-- The listener in the armchair is SVG in `index.html`; `.stage.is-on` (music playing) makes their head bob and foot tap.
-- `js/records.js` — the six shelf spots (`SLOTS`), saving to `localStorage`, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
+- `css/style.css` — styling and all animations (weather, city, pets, fish, listener, holidays, record spin, tonearm), plus the reduced-motion fallbacks.
+- `js/main.js` — fits the stage (wide layout, or the phone layout: room on top, `.tv-set` and `.np-card` enlarged below via `--tv-t` / `--card-t`, page scrolls with `#scroll-spacer`), builds the city, the shelf, the crate, the record animation (Web Animations API), playback states (`data-phase` on the stage) and the now-spinning card, and the add-a-record dialog. The record on the turntable is `current = { from: 'shelf' | 'crate', index }`; `recordOf()` / `originOf()` resolve it.
+- `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-holiday` (winter, halloween, valentine, newyear, none — `holidayForDate()`), `data-pet`, `data-tank`, `data-lamp`, `data-posters` and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings. `lamp` isn't in the panel; the lamp itself is the switch.
+- `js/life.js` — pets wake when clicked, fish tank feeding, lamp switch, city windows switching on and off, snowflakes and raindrops on the glass.
+- `js/posters.js` — the two wall posters: covers from shelf and crate records (kept as art until the image loads).
+- `js/records.js` — the six shelf spots (`SLOTS`), `STARTERS` for a first visit, the crate (`loadCrate` / `saveCrate`), saving, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
 - `js/covers.js` — iTunes cover lookup.
 - `js/player.js` — YouTube IFrame API wrapper.
+- The listener in the armchair is SVG in `index.html`; CSS reacts to `data-phase` (dozing Zs, eyes open, notes, "?") and `.stage.is-on` (head bob, foot tap).
+- Reduced motion: every animation has a still fallback in the `prefers-reduced-motion` block at the end of `css/style.css`.
 
-Records are stored per browser in `localStorage` under `record-room:records:v1`; settings under `record-room:settings:v1`.
+Records are stored per browser in `localStorage` under `record-room:records:v1`, the crate under `record-room:crate:v1`, settings under `record-room:settings:v1`.
 
 Run locally: `python3 -m http.server 8000`, then open http://localhost:8000. YouTube won't play from a `file://` page.
 
-## Planned features (in this order, one pull request each)
+## Built so far
 
-Lamp switch (done), city details, listener reacting, fish tank with moving fish, posters from your record covers, starter shelf, holiday themes, crate to flip through, phone layout. Bobby wants to pause between features in case his Claude usage limit is close: build one, open its pull request, then stop and wait for "next".
+Fit-to-screen, Decorate panel (time, weather, holidays, posters, neon, pets, fish tank, listener looks), listener in an armchair who reacts to playback, cat/dog that wake, fish tank with feeding, lamp switch, city details (windows, cars, plane, train), posters from covers, starter shelf, holiday themes by date, record crate, phone layout.
+
+Bobby said not to wait between features; still commit and push after each one so nothing is lost if a session ends.
 
 ## Working with Bobby
 
@@ -44,15 +48,16 @@ Lamp switch (done), city details, listener reacting, fish tank with moving fish,
 
 ## Ideas list (not built yet)
 
-- Built: time of day + Auto, weather (rain, storm, snow, clear), neon text and color, cat or dog that wakes when clicked, listener in an armchair with custom colors, twinkling lights, neon flicker, passing train, raindrops on the glass
-- Needle-drop crackle before a song starts
+- Needle-drop crackle and a room-sounds mixer (rain, city, purring) under the music
 - Vinyl speed and tonearm position that follow real track progress
-- Flickering city windows, more pet types (fish tank, bird), listener reacting to song changes
-- Rain and city ambience layer to mix under the music
-- Holiday themes (snow and colored lights in December, pumpkins in October)
-- More shelf space, crates to flip through, Side A / Side B for albums
-- Phone layout, and a bigger TV mode on small screens (YouTube wants the player at least 200 × 200 px; it currently shrinks with the window)
+- Share-your-room link; "now playing" picture for social media
+- Side A / Side B albums, playlist mode (next record plays when one ends), sort/search
+- Window views (beach, mountain cabin, forest), furniture and rug choices, saved looks
+- Listener sips from a mug, cat walks along the sill, parallax city
+- Landscape phones still show the small TV; a "big TV" button could help there
+- Full-screen button, keyboard shortcuts, add-to-home-screen icon
 
 ## Known gaps
 
-- Playback was never tested from the build machine (it can't reach YouTube); check it in a real browser after changes.
+- Playback was never tested from the build machine (it can't reach YouTube or its thumbnails); check it in a real browser after changes.
+- The starter record ids in `js/records.js` (Lofi Girl and Chillhop live streams) couldn't be checked from the build machine; replace any that don't play.
