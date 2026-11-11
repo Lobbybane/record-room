@@ -1,6 +1,8 @@
 import { SLOTS, loadRecords, saveRecords, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
+import { initDecor } from './decor.js';
+import { initPets, buildWeather } from './life.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -10,21 +12,42 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reduceMotion ?
 /* ---------------- fit the 1280 x 820 stage to the window ---------------- */
 
 // The whole room is always visible; any spare screen space is filled by the
-// wall and floor, which CSS stretches using --fw / --fh (screen size in stage px).
+// wall and floor. CSS gets the screen's edges in stage pixels (--fx, --fy, --fw, --fh).
+// While the Decorate panel is open, the room fits into the space beside or above it.
 const viewport = stage.parentElement;
+const decorPanel = $('#decor-panel');
 
 function fitStage() {
   const width = viewport.clientWidth;
   const height = viewport.clientHeight;
   if (!width || !height) return;
-  const scale = Number(Math.min(width / 1280, height / 820).toFixed(4));
+  let roomWidth = width;
+  let roomHeight = height;
+  if (decorPanel.open) {
+    const panel = decorPanel.getBoundingClientRect();
+    if (panel.width >= width - 1) roomHeight = Math.max(120, height - panel.height);
+    else roomWidth = Math.max(200, width - panel.width);
+  }
+  const scale = Number(Math.min(roomWidth / 1280, roomHeight / 820).toFixed(4));
+  const centerX = roomWidth / 2;
+  const centerY = roomHeight / 2;
+  const px = (n) => `${n.toFixed(1)}px`;
   stage.style.setProperty('--s', scale);
-  // +2 covers rounding so no hairline shows at the screen edges.
-  stage.style.setProperty('--fw', `${Math.ceil(width / scale) + 2}px`);
-  stage.style.setProperty('--fh', `${Math.ceil(height / scale) + 2}px`);
+  stage.style.setProperty('--cx', px(centerX));
+  stage.style.setProperty('--cy', px(centerY));
+  // 1px of slack on every side so no hairline shows at the screen edges.
+  stage.style.setProperty('--fx', px(640 - centerX / scale - 1));
+  stage.style.setProperty('--fy', px(410 - centerY / scale - 1));
+  stage.style.setProperty('--fw', px(width / scale + 2));
+  stage.style.setProperty('--fh', px(height / scale + 2));
 }
-if ('ResizeObserver' in window) new ResizeObserver(fitStage).observe(viewport);
+if ('ResizeObserver' in window) {
+  const observer = new ResizeObserver(fitStage);
+  observer.observe(viewport);
+  observer.observe(decorPanel);
+}
 window.addEventListener('resize', fitStage);
+decorPanel.addEventListener('close', fitStage);
 fitStage();
 
 /* ---------------- the city outside ---------------- */
@@ -36,8 +59,12 @@ function seeded(seed) {
   };
 }
 
-function buildCity(night) {
+// How many city windows are lit at each time of day.
+const LIT = { sunrise: 0.18, golden: 0.12, dusk: 0.32, midnight: 0.42 };
+
+function buildCity(sky) {
   const rnd = seeded(11);
+  const lit = LIT[sky] ?? LIT.dusk;
   const specs = [[0, 70, 150], [64, 56, 186], [126, 82, 128], [200, 48, 222], [250, 90, 160], [338, 62, 204], [400, 70, 140], [464, 48, 182]];
   const tones = ['#2E2558', '#352B63', '#2A2350', '#3B2F6B'];
   const container = $('#buildings');
@@ -52,7 +79,7 @@ function buildCity(night) {
     for (let y = 10; y < height - 24; y += 14) {
       for (let x = 7; x < width - 8; x += 12) {
         const r = rnd();
-        if (r < (night ? 0.42 : 0.32)) {
+        if (r < lit) {
           const lit = document.createElement('div');
           lit.className = 'lit';
           Object.assign(lit.style, {
@@ -88,39 +115,18 @@ function buildLights() {
       top: `${Math.round(64 + 96 * t * (1 - t) - 1)}px`,
       background: color,
       boxShadow: `0 0 10px 3px ${color}`,
+      animationDelay: `${(-i * 0.73).toFixed(2)}s`,
     });
     dots.push(dot);
   }
   $('#lights').replaceChildren(...dots);
 }
 
-/* ---------------- sky and rain settings ---------------- */
+/* ---------------- decorating and little details ---------------- */
 
-const SETTINGS_KEY = 'record-room:settings:v1';
-const settings = { sky: 'dusk', rain: true };
-try {
-  Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
-} catch { /* defaults */ }
-
-function applySettings() {
-  stage.dataset.sky = settings.sky === 'midnight' ? 'midnight' : 'dusk';
-  stage.dataset.rain = settings.rain ? 'on' : 'off';
-  const sky = $('#sky-toggle');
-  sky.textContent = settings.sky === 'midnight' ? 'Midnight' : 'Dusk';
-  sky.setAttribute('aria-label', `Sky: ${sky.textContent}. Switch time of day`);
-  $('#rain-toggle').setAttribute('aria-pressed', String(Boolean(settings.rain)));
-  buildCity(settings.sky === 'midnight');
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ }
-}
-
-$('#sky-toggle').addEventListener('click', () => {
-  settings.sky = settings.sky === 'midnight' ? 'dusk' : 'midnight';
-  applySettings();
-});
-$('#rain-toggle').addEventListener('click', () => {
-  settings.rain = !settings.rain;
-  applySettings();
-});
+initDecor(stage, { onSky: buildCity });
+initPets(stage);
+buildWeather();
 
 /* ---------------- shelf ---------------- */
 
@@ -452,7 +458,6 @@ form.addEventListener('submit', async (event) => {
 
 buildStars();
 buildLights();
-applySettings();
 renderShelf();
 updateCard();
 loadYouTubeApi().catch(() => { /* reported when a record is played */ });

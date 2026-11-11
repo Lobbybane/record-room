@@ -15,10 +15,13 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 ## How it works
 
 - The scene is a fixed 1280 × 820 stage scaled to fit the window (`--s` CSS variable set in `js/main.js`). All positions are stage pixels.
-- The whole room always stays visible. Spare screen space is filled by the wall, baseboard, floor, vignette and grain, which stretch to the screen edges using `--fw` / `--fh` (the screen size in stage pixels) and `--pad-x` / `--pad-y`. The Dusk/Rain buttons sit in the screen's top-right corner. The page is `position: fixed` so iPhone Safari's toolbar can't hide the bottom.
+- The whole room always stays visible. Spare screen space is filled by the wall, baseboard, floor, vignette and grain, which stretch to the screen edges using `--fx` / `--fy` / `--fw` / `--fh` (the screen's left, top, width and height in stage pixels). The stage centre is `--cx` / `--cy`. While the Decorate panel is open the room refits into the space beside it (or above it on phones). The Decorate button sits in the screen's top-right corner. The page is `position: fixed` so iPhone Safari's toolbar can't hide the bottom.
 - `index.html` — the room markup and SVG shapes.
 - `css/style.css` — styling, plus small animations (rain, record spin, tonearm).
-- `js/main.js` — builds the city, the shelf, the record animation (Web Animations API), playback states and the now-spinning card, the add-a-record dialog, and the Dusk/Midnight and rain toggles.
+- `js/main.js` — fits the stage, builds the city, the shelf, the record animation (Web Animations API), playback states and the now-spinning card, and the add-a-record dialog.
+- `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-pet` (cat, dog, none) and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings.
+- `js/life.js` — pets wake when clicked, snowflakes and raindrops on the glass.
+- The listener in the armchair is SVG in `index.html`; `.stage.is-on` (music playing) makes their head bob and foot tap.
 - `js/records.js` — the six shelf spots (`SLOTS`), saving to `localStorage`, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
 - `js/covers.js` — iTunes cover lookup.
 - `js/player.js` — YouTube IFrame API wrapper.
@@ -37,9 +40,10 @@ Run locally: `python3 -m http.server 8000`, then open http://localhost:8000. You
 
 ## Ideas list (not built yet)
 
+- Built: time of day + Auto, weather (rain, storm, snow, clear), neon text and color, cat or dog that wakes when clicked, listener in an armchair with custom colors, twinkling lights, neon flicker, passing train, raindrops on the glass
 - Needle-drop crackle before a song starts
 - Vinyl speed and tonearm position that follow real track progress
-- Passing train, flickering city windows, cat that wakes when clicked
+- Flickering city windows, more pet types (fish tank, bird), listener reacting to song changes
 - Rain and city ambience layer to mix under the music
 - Holiday themes (snow and colored lights in December, pumpkins in October)
 - More shelf space, crates to flip through, Side A / Side B for albums

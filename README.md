@@ -22,16 +22,19 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 
 - Click a **+** spot on a shelf to add a record. Paste a YouTube link (song or full album) and type the artist and album so the cover can be found.
 - Click a record to play it. **Put it back** returns it to the shelf, and clicking another record swaps them.
-- The pills in the top right switch the sky between Dusk and Midnight and turn the rain on or off.
-- Your shelf is saved in this browser.
+- **Decorate** (top right) changes the time of day (or Auto, which follows your clock), the weather, the neon sign's words and color, the pet, and the listener's sweater, hair and skin.
+- Click the cat or dog to wake it up for a moment. The person in the armchair nods along while a record plays.
+- Your shelf and decorations are saved in this browser.
 
 ## How it's organized
 
 | File | What it does |
 | --- | --- |
 | `index.html` | The room: wall, window, shelves, turntable, TV, card |
-| `css/style.css` | All styling and the small animations (rain, spin, tonearm) |
-| `js/main.js` | Builds the city, runs the shelf, the record animation and playback |
+| `css/style.css` | All styling and the animations (weather, train, lights, pets, listener, spin, tonearm) |
+| `js/main.js` | Fits the room to the screen, builds the city, runs the shelf, the record animation and playback |
+| `js/decor.js` | The Decorate panel and saving its choices |
+| `js/life.js` | Pets waking up, snowflakes, raindrops on the glass |
 | `js/records.js` | Shelf spots, saving records, reading YouTube links |
 | `js/covers.js` | Cover lookup from the iTunes Search API |
 | `js/player.js` | Wrapper for the YouTube IFrame Player API |
