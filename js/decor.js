@@ -63,6 +63,10 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  season: {
+    label: 'Season',
+    choices: { auto: 'By date', spring: 'Spring', summer: 'Summer', autumn: 'Autumn', winter: 'Winter' },
+  },
   holiday: {
     label: 'Holidays',
     choices: { auto: 'By date', off: 'Off', winter: 'Winter', halloween: 'Halloween', valentine: 'Valentine’s', newyear: 'New Year' },
@@ -107,6 +111,7 @@ export const DEFAULTS = {
   posters: 'records',
   holiday: 'auto',
   sound: 'on',
+  season: 'auto',
 };
 
 const NEON_MAX = 16;
@@ -151,6 +156,15 @@ export function holidayForDate(date) {
   return 'none';
 }
 
+// Northern-hemisphere seasons for "By date".
+export function seasonForDate(date) {
+  const month = date.getMonth() + 1;
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  if (month >= 9 && month <= 11) return 'autumn';
+  return 'winter';
+}
+
 // "Auto" follows the visitor's own clock.
 export function skyForHour(hour) {
   if (hour >= 5 && hour < 9) return 'sunrise';
@@ -187,6 +201,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
+    stage.dataset.season = decor.season === 'auto' ? seasonForDate(new Date()) : decor.season;
     stage.dataset.holiday = decor.holiday === 'auto' ? holidayForDate(new Date())
       : decor.holiday === 'off' ? 'none' : decor.holiday;
 
@@ -247,7 +262,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   });
 
   // Re-check the clock each minute for "Auto".
-  setInterval(() => { if (decor.time === 'auto' || decor.holiday === 'auto') apply(); }, 60_000);
+  setInterval(() => { if ([decor.time, decor.holiday, decor.season].includes('auto')) apply(); }, 60_000);
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
@@ -264,7 +279,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather', 'holiday', 'posters']],
+    ['Room', ['time', 'weather', 'season', 'holiday', 'posters']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
