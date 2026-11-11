@@ -59,6 +59,11 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  // Not in the panel: switched by clicking the lamp.
+  lamp: {
+    label: 'Lamp',
+    choices: { on: 'On', off: 'Off' },
+  },
   skin: {
     label: 'Skin',
     swatches: {
@@ -81,6 +86,7 @@ export const DEFAULTS = {
   sweater: 'peach',
   hair: 'plum',
   skin: 's2',
+  lamp: 'on',
 };
 
 const NEON_MAX = 16;
@@ -133,6 +139,7 @@ function fitNeon(sign) {
 /**
  * Sets up the Decorate panel and applies the saved look.
  * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
+ * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
 export function initDecor(stage, { onSky }) {
   const decor = loadDecor();
@@ -147,6 +154,7 @@ export function initDecor(stage, { onSky }) {
     stage.dataset.sky = sky;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
+    stage.dataset.lamp = decor.lamp;
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
@@ -208,6 +216,15 @@ export function initDecor(stage, { onSky }) {
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
+
+  return {
+    get: (name) => decor[name],
+    set(name, value) {
+      if (!isValid(name, value)) return;
+      decor[name] = value;
+      apply();
+    },
+  };
 }
 
 function buildPanel(form, decor) {

@@ -2,7 +2,7 @@ import { SLOTS, loadRecords, saveRecords, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
-import { initPets, buildWeather } from './life.js';
+import { initPets, initLamp, buildWeather } from './life.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -124,8 +124,9 @@ function buildLights() {
 
 /* ---------------- decorating and little details ---------------- */
 
-initDecor(stage, { onSky: buildCity });
+const decor = initDecor(stage, { onSky: buildCity });
 initPets(stage);
+initLamp(decor);
 buildWeather();
 
 /* ---------------- shelf ---------------- */

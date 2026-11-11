@@ -20,7 +20,7 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 - `css/style.css` — styling, plus small animations (rain, record spin, tonearm).
 - `js/main.js` — fits the stage, builds the city, the shelf, the record animation (Web Animations API), playback states and the now-spinning card, and the add-a-record dialog.
 - `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-pet` (cat, dog, none) and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings.
-- `js/life.js` — pets wake when clicked, snowflakes and raindrops on the glass.
+- `js/life.js` — pets wake when clicked, the lamp switch (saved as `lamp` in the decor settings, not shown in the panel; off dims the room except the window), snowflakes and raindrops on the glass.
 - The listener in the armchair is SVG in `index.html`; `.stage.is-on` (music playing) makes their head bob and foot tap.
 - `js/records.js` — the six shelf spots (`SLOTS`), saving to `localStorage`, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
 - `js/covers.js` — iTunes cover lookup.
@@ -29,6 +29,10 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 Records are stored per browser in `localStorage` under `record-room:records:v1`; settings under `record-room:settings:v1`.
 
 Run locally: `python3 -m http.server 8000`, then open http://localhost:8000. YouTube won't play from a `file://` page.
+
+## Planned features (in this order, one pull request each)
+
+Lamp switch (done), city details, listener reacting, fish tank with moving fish, posters from your record covers, starter shelf, holiday themes, crate to flip through, phone layout. Bobby wants to pause between features in case his Claude usage limit is close: build one, open its pull request, then stop and wait for "next".
 
 ## Working with Bobby
 

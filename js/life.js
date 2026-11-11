@@ -21,6 +21,21 @@ export function initPets(stage) {
   }
 }
 
+// Click the lamp to switch it on or off; the room dims when it's off.
+export function initLamp(decor) {
+  const button = document.getElementById('lamp-switch');
+  const sync = () => {
+    const on = decor.get('lamp') === 'on';
+    button.setAttribute('aria-pressed', String(on));
+    button.title = on ? 'Turn the lamp off' : 'Turn the lamp on';
+  };
+  button.addEventListener('click', () => {
+    decor.set('lamp', decor.get('lamp') === 'on' ? 'off' : 'on');
+    sync();
+  });
+  sync();
+}
+
 export function buildWeather() {
   const rnd = seeded(7);
 
