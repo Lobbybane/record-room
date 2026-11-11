@@ -24,7 +24,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 - Click a record to play it. **Put it back** returns it to the shelf, and clicking another record swaps them.
 - **The crate** on the floor holds as many extra records as you like. Click it to flip through covers, play one, move it to the shelf, or add more.
 - A first visit starts with four lofi radio records on the shelf (the list is at the top of `js/records.js`).
-- **Decorate** (top right) changes the time of day (or Auto, which follows your clock), the weather, holiday decorations (by date, or preview them), the posters, the neon sign's words and color, the pet and fish tank, and the listener's sweater, hair and skin.
+- **Decorate** (top right) changes the room (city bedroom, corner café, mountain cabin, beach house), the time of day (or Auto, which follows your clock), the weather, the season (by date or chosen), holiday decorations (by date, or preview them), the posters, sound effects, the neon sign's words and color, the pet and fish tank, and the listener's sweater, hair and skin.
 - Click the lamp to switch it off and on. Click the cat or dog to wake it up, or the fish tank to feed the fish.
 - The person in the armchair dozes when nothing's on, looks up when a record is coming, and nods along while it plays.
 - On a phone held upright, the room sits at the top with a big TV and the controls below.
@@ -39,6 +39,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 | `js/main.js` | Fits the room to the screen, builds the city, runs the shelf, the record animation and playback |
 | `js/decor.js` | The Decorate panel, saving its choices, holiday dates |
 | `js/life.js` | Pets waking up, fish tank, lamp switch, city windows, snowflakes, raindrops |
+| `js/sounds.js` | Sound effects made in the browser (no sound files) |
 | `js/posters.js` | The two wall posters made from your record covers |
 | `js/records.js` | Shelf spots, starter records, the crate, saving, reading YouTube links |
 | `js/covers.js` | Cover lookup from the iTunes Search API |

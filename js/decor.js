@@ -6,6 +6,10 @@ const KEY = 'record-room:settings:v1';
 // Every choice, in the order the Decorate panel shows them.
 // Swatch values are [main color, second color] used by the CSS variables in applyDecor().
 export const OPTIONS = {
+  room: {
+    label: 'Room',
+    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house' },
+  },
   time: {
     label: 'Time of day',
     choices: { auto: 'Auto', sunrise: 'Sunrise', golden: 'Golden hour', dusk: 'Dusk', midnight: 'Midnight' },
@@ -63,6 +67,10 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  season: {
+    label: 'Season',
+    choices: { auto: 'By date', spring: 'Spring', summer: 'Summer', autumn: 'Autumn', winter: 'Winter' },
+  },
   holiday: {
     label: 'Holidays',
     choices: { auto: 'By date', off: 'Off', winter: 'Winter', halloween: 'Halloween', valentine: 'Valentine’s', newyear: 'New Year' },
@@ -70,6 +78,10 @@ export const OPTIONS = {
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
+  },
+  sound: {
+    label: 'Sound effects',
+    choices: { on: 'On', off: 'Off' },
   },
   // Not in the panel: switched by clicking the lamp.
   lamp: {
@@ -89,6 +101,7 @@ export const OPTIONS = {
 };
 
 export const DEFAULTS = {
+  room: 'bedroom',
   time: 'dusk',
   weather: 'rain',
   neonText: 'side a',
@@ -102,6 +115,8 @@ export const DEFAULTS = {
   lamp: 'on',
   posters: 'records',
   holiday: 'auto',
+  sound: 'on',
+  season: 'auto',
 };
 
 const NEON_MAX = 16;
@@ -146,6 +161,15 @@ export function holidayForDate(date) {
   return 'none';
 }
 
+// Northern-hemisphere seasons for "By date".
+export function seasonForDate(date) {
+  const month = date.getMonth() + 1;
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  if (month >= 9 && month <= 11) return 'autumn';
+  return 'winter';
+}
+
 // "Auto" follows the visitor's own clock.
 export function skyForHour(hour) {
   if (hour >= 5 && hour < 9) return 'sunrise';
@@ -178,10 +202,12 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   function apply() {
     const sky = decor.time === 'auto' ? skyForHour(new Date().getHours()) : decor.time;
     stage.dataset.sky = sky;
+    stage.dataset.room = decor.room;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
+    stage.dataset.season = decor.season === 'auto' ? seasonForDate(new Date()) : decor.season;
     stage.dataset.holiday = decor.holiday === 'auto' ? holidayForDate(new Date())
       : decor.holiday === 'off' ? 'none' : decor.holiday;
 
@@ -242,7 +268,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   });
 
   // Re-check the clock each minute for "Auto".
-  setInterval(() => { if (decor.time === 'auto' || decor.holiday === 'auto') apply(); }, 60_000);
+  setInterval(() => { if ([decor.time, decor.holiday, decor.season].includes('auto')) apply(); }, 60_000);
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
@@ -259,10 +285,12 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather', 'holiday', 'posters']],
+    ['Room', ['room', 'posters']],
+    ['Outside', ['time', 'weather', 'season', 'holiday']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
+    ['Sound', ['sound']],
   ];
 
   for (const [title, names] of sections) {

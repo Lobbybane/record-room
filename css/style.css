@@ -95,10 +95,10 @@ html, body {
   top: var(--fy);
   width: var(--fw);
   height: calc(594px - var(--fy));
-  background: linear-gradient(180deg, #241E48 calc(0px - var(--fy)), #2E2558 calc(492px - var(--fy)), #352B63 calc(820px - var(--fy)));
+  background: var(--wall-pattern), linear-gradient(180deg, var(--wall-a) calc(0px - var(--fy)), var(--wall-b) calc(492px - var(--fy)), var(--wall-c) calc(820px - var(--fy)));
 }
 .baseboard { position: absolute; left: var(--fx); top: 594px; width: var(--fw); height: 12px; background: var(--night); }
-.floor { position: absolute; left: var(--fx); top: 606px; width: var(--fw); height: calc(var(--fy) + var(--fh) - 606px); background: linear-gradient(180deg, #3A2B52 0, #2A1F3D 214px); }
+.floor { position: absolute; left: var(--fx); top: 606px; width: var(--fw); height: calc(var(--fy) + var(--fh) - 606px); background: var(--floor-pattern), linear-gradient(180deg, var(--floor-a) 0, var(--floor-b) 214px); }
 .floor-lines { overflow: visible; }
 .spill { fill: var(--spill); opacity: .10; transition: fill .8s ease; }
 
@@ -372,6 +372,152 @@ html, body {
 .love-hearts { position: absolute; left: 1010px; top: 280px; width: 160px; height: 60px; pointer-events: none; z-index: 19; }
 .love-hearts span { position: absolute; bottom: 0; color: #FF5A7A; font-size: 16px; text-shadow: 0 0 8px rgba(255, 90, 122, .7); opacity: 0; animation: float-up 4s ease-out infinite; }
 .love-hearts span:nth-child(1) { left: 10px; } .love-hearts span:nth-child(2) { left: 70px; animation-delay: 1.3s; font-size: 20px; } .love-hearts span:nth-child(3) { left: 130px; animation-delay: 2.6s; }
+
+/* ---------- seasons (data-season is set in js/decor.js) ---------- */
+.stage { --leaf-a: #F7B8D0; --leaf-b: #FFE0EA; --fall-a: #F7B8D0; --fall-b: #FFD6E4; }
+.stage[data-season="summer"] { --leaf-a: #3E8E7E; --leaf-b: #6CC29A; }
+.stage[data-season="autumn"] { --leaf-a: #E8742C; --leaf-b: #F2B33D; --fall-a: #E8742C; --fall-b: #C8443C; }
+.branch-wood { stroke: #4A3A62; }
+.branch .la { fill: var(--leaf-a); }
+.branch .lb { fill: var(--leaf-b); }
+.branch-snow, .stage[data-season="winter"] .leaves { display: none; }
+.stage[data-season="winter"]:is([data-weather="snow"], [data-holiday="winter"]) .branch-snow { display: inline; }
+.stage[data-season="spring"] .branch .lb { fill: #FFFFFF; opacity: .85; }
+
+/* Petals and leaves drift down on clear days, hurry in the rain, blow sideways in a storm, and hide when it snows. */
+.season-fall, .fireflies, .stuck, .frost { display: none; position: absolute; inset: 0; pointer-events: none; }
+.stage:is([data-season="spring"], [data-season="autumn"]):not([data-weather="snow"]) .season-fall { display: block; }
+.fall-item { position: absolute; top: -12px; width: 7px; height: 5px; border-radius: 60% 40% 60% 40%; background: var(--fall-a); opacity: .9; animation: fall-drift 11s linear infinite; }
+.fall-item:nth-child(3n) { background: var(--fall-b); }
+.stage[data-season="autumn"] .fall-item { width: 9px; height: 6px; border-radius: 0 80% 0 80%; }
+.stage[data-season="autumn"] .fall-item:nth-child(4n+1) { background: #F2B33D; }
+@keyframes fall-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(18px, 85px) rotate(120deg); }
+  50% { transform: translate(-6px, 170px) rotate(200deg); }
+  75% { transform: translate(14px, 255px) rotate(300deg); }
+  100% { transform: translate(0, 340px) rotate(400deg); }
+}
+.stage[data-weather="rain"] .fall-item:nth-child(odd) { display: none; }
+.stage[data-weather="rain"] .fall-item { animation-duration: 5s !important; }
+.stage[data-weather="storm"] .fall-item { animation-name: blow; animation-duration: 2.6s !important; }
+@keyframes blow {
+  0% { transform: translate(-60px, 0) rotate(0deg); }
+  100% { transform: translate(420px, 260px) rotate(720deg); }
+}
+
+/* On wet glass, a few petals or leaves stick to the window. */
+.stage:is([data-season="spring"], [data-season="autumn"]):is([data-weather="rain"], [data-weather="storm"]) .stuck { display: block; }
+.stuck i { position: absolute; width: 9px; height: 6px; border-radius: 60% 40% 60% 40%; background: var(--fall-a); opacity: .8; }
+.stuck i:nth-child(2n) { background: var(--fall-b); }
+.stage[data-season="autumn"] .stuck i { width: 12px; height: 8px; border-radius: 0 80% 0 80%; }
+
+/* Summer nights: fireflies. */
+.stage[data-season="summer"]:is([data-sky="dusk"], [data-sky="midnight"]):is([data-weather="clear"]) .fireflies { display: block; }
+.firefly { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #FAFFB8; box-shadow: 0 0 10px 5px rgba(240, 255, 140, .7); animation: firefly 7s ease-in-out infinite; }
+@keyframes firefly {
+  0%, 100% { transform: translate(0, 0); opacity: .2; }
+  30% { opacity: 1; }
+  50% { transform: translate(16px, -12px); opacity: .3; }
+  70% { opacity: .95; }
+  85% { transform: translate(-8px, 6px); }
+}
+
+/* Winter: frost creeps in from the corners of the glass. */
+.stage[data-season="winter"] .frost { display: block; }
+.frost {
+  background:
+    radial-gradient(ellipse 120px 90px at 0 100%, rgba(235, 242, 255, .55), transparent 70%),
+    radial-gradient(ellipse 120px 90px at 100% 100%, rgba(235, 242, 255, .5), transparent 70%),
+    radial-gradient(ellipse 90px 60px at 100% 0, rgba(235, 242, 255, .35), transparent 70%),
+    radial-gradient(ellipse 70px 50px at 0 0, rgba(235, 242, 255, .3), transparent 70%);
+}
+.stage[data-season="winter"][data-weather="snow"] .snow-cap { display: block; }
+
+/* ---------- rooms (data-room is set in js/decor.js) ---------- */
+.stage {
+  --wall-a: #241E48; --wall-b: #2E2558; --wall-c: #352B63; --wall-pattern: none;
+  --floor-a: #3A2B52; --floor-b: #2A1F3D; --floor-pattern: none;
+}
+.stage[data-room="cafe"] {
+  --wall-a: #34203C; --wall-b: #43283F; --wall-c: #4C2E44;
+  --wall-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='28'%3E%3Cg fill='none' stroke='%23140c1c' stroke-opacity='.45' stroke-width='2'%3E%3Cpath d='M0 1H56M0 15H56M14 1V15M42 15V28'/%3E%3C/g%3E%3C/svg%3E");
+  --floor-a: #3E2E3E; --floor-b: #2C2030;
+  --floor-pattern: conic-gradient(rgba(255, 240, 230, .07) 25%, transparent 0 50%, rgba(255, 240, 230, .07) 0 75%, transparent 0) 0 0 / 44px 44px;
+}
+.stage[data-room="cabin"] {
+  --wall-a: #3A2A3E; --wall-b: #45313F; --wall-c: #4C3642;
+  --wall-pattern: repeating-linear-gradient(180deg, rgba(255, 220, 190, .05) 0 3px, transparent 3px 24px, rgba(10, 6, 16, .35) 24px 28px);
+  --floor-a: #3E2C34; --floor-b: #2A1E26;
+  --floor-pattern: repeating-linear-gradient(90deg, transparent 0 86px, rgba(10, 6, 16, .3) 86px 89px);
+}
+.stage[data-room="beach"] {
+  --wall-a: #1F3048; --wall-b: #263C56; --wall-c: #2C4560;
+  --wall-pattern: repeating-linear-gradient(180deg, transparent 0 34px, rgba(8, 14, 28, .3) 34px 36px);
+  --floor-a: #4A4258; --floor-b: #383046;
+  --floor-pattern: repeating-linear-gradient(90deg, transparent 0 64px, rgba(10, 8, 20, .25) 64px 66px);
+}
+
+/* Window views: city for the bedroom and café, mountains for the cabin, the sea for the beach house. */
+.view { position: absolute; inset: 0; }
+.view-mountains, .view-sea { display: none; }
+.stage[data-room="cabin"] .view-city, .stage[data-room="beach"] .view-city { display: none; }
+.stage[data-room="cabin"] .view-mountains, .stage[data-room="beach"] .view-sea { display: block; }
+.ridge-far { fill: var(--far-city); }
+.snowcap { fill: #F4F0FF; opacity: .8; }
+.ridge-near { fill: #2E2558; }
+.pines-back { fill: #241E48; }
+.pines-front { fill: #15132B; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .ridge-near { fill: #5A4A80; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .pines-back { fill: #3B2F6B; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .cabin-lights { display: none; }
+
+.island { fill: var(--far-city); }
+.sea { position: absolute; left: 0; right: 0; top: 204px; bottom: 0; background: linear-gradient(180deg, rgba(60, 52, 120, .7), rgba(21, 19, 43, .97)); }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .sea { background: linear-gradient(180deg, rgba(180, 120, 160, .55), rgba(59, 47, 107, .95)); }
+.glow-path { position: absolute; left: 380px; top: 206px; width: 48px; height: 116px; background: repeating-linear-gradient(180deg, rgba(255, 241, 214, .55) 0 2px, transparent 2px 7px); -webkit-mask-image: linear-gradient(180deg, #000, transparent); mask-image: linear-gradient(180deg, #000, transparent); animation: shimmer 2.4s ease-in-out infinite; }
+.stage[data-sky="sunrise"] .glow-path { left: 272px; }
+.stage[data-sky="golden"] .glow-path { left: 340px; background: repeating-linear-gradient(180deg, rgba(255, 214, 150, .65) 0 2px, transparent 2px 7px); }
+@keyframes shimmer { 50% { opacity: .55; transform: scaleX(1.15); } }
+.waves { position: absolute; left: 0; right: 0; top: 212px; bottom: 0; background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(220, 232, 255, .08) 14px 15px); animation: waves 6s linear infinite; }
+@keyframes waves { to { background-position: 0 30px; } }
+.boat { position: absolute; left: 0; top: 184px; animation: sail 70s linear infinite; animation-delay: -20s; }
+@keyframes sail { from { transform: translateX(-40px); } to { transform: translateX(540px); } }
+.rock { fill: #15132B; }
+.palm { fill: #15132B; }
+.lamp-room { fill: #FFF1C8; }
+.beam { display: none; position: absolute; left: 290px; top: 118px; width: 180px; height: 34px; transform-origin: 100% 50%; background: linear-gradient(270deg, rgba(255, 241, 200, .55), rgba(255, 241, 200, 0)); clip-path: polygon(100% 45%, 0 0, 0 100%, 100% 55%); animation: beam 6s ease-in-out infinite; }
+.stage:is([data-sky="dusk"], [data-sky="midnight"]) .beam { display: block; }
+@keyframes beam { 0%, 100% { transform: rotate(-8deg) scaleX(.6); opacity: .3; } 50% { transform: rotate(6deg) scaleX(1); opacity: 1; } }
+
+/* Room decorations on the wall. */
+.room-prop { display: none; }
+.stage[data-room="cafe"] .chalkboard, .stage[data-room="cabin"] :is(.cabin-sign, .throw),
+.stage[data-room="beach"] :is(.life-ring, .shells) { display: block; }
+.throw { display: none; }
+.chalkboard {
+  position: absolute; left: 962px; top: 26px; width: 150px; height: 72px; padding: 10px 12px;
+  border: 6px solid #8A5A4A; border-radius: 4px; background: #23302C;
+  box-shadow: 0 8px 16px rgba(10, 8, 25, .45);
+  color: rgba(244, 240, 230, .9); text-align: center;
+}
+.chalk-title { display: block; font: 18px/1.1 'Pacifico', cursive; }
+.chalk-sub { display: block; margin-top: 4px; font: 600 10px 'Nunito', sans-serif; opacity: .75; }
+.cabin-sign {
+  position: absolute; left: 976px; top: 40px; padding: 6px 18px 8px;
+  border-radius: 10px; background: linear-gradient(180deg, #8A5A4A, #6E4438);
+  box-shadow: inset 0 0 0 3px #5A362C, 0 8px 16px rgba(10, 8, 25, .45);
+  font: 26px 'Pacifico', cursive; color: #F2D9B8; text-shadow: 0 1px 0 #3E2420;
+}
+.life-ring {
+  position: absolute; left: 1010px; top: 22px; width: 70px; height: 70px; border-radius: 50%;
+  background: conic-gradient(#C8443C 0 45deg, #F4ECFF 45deg 90deg, #C8443C 90deg 135deg, #F4ECFF 135deg 180deg, #C8443C 180deg 225deg, #F4ECFF 225deg 270deg, #C8443C 270deg 315deg, #F4ECFF 315deg);
+  -webkit-mask: radial-gradient(circle, transparent 20px, #000 21px); mask: radial-gradient(circle, transparent 20px, #000 21px);
+  box-shadow: 0 8px 16px rgba(10, 8, 25, .4);
+  transform: rotate(-8deg);
+}
+.stage[data-room="beach"] .curtain-left, .stage[data-room="beach"] .curtain-right { filter: hue-rotate(-40deg) saturate(.8); }
+.stage[data-room="cabin"] .curtain-left, .stage[data-room="cabin"] .curtain-right { filter: hue-rotate(40deg) saturate(.7) brightness(.9); }
 
 /* ---------- city through the glass ---------- */
 .glass {
@@ -929,6 +1075,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .car, .plane { display: none; }
+  .glow-path, .waves, .boat, .beam { animation: none; }
+  .fall-item, .firefly { animation: none; top: var(--y); }
   .bat, .bat path, .pumpkin-glow, .love-hearts span { animation: none; }
   .firework { animation: none; opacity: .8; }
   .weed, .tank-bubble, .fish, .fish svg { animation: none; }

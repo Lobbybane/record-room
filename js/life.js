@@ -1,4 +1,5 @@
 // Small living details: pets that wake when clicked, snowflakes, raindrops on the glass.
+import { sfx } from './sounds.js';
 
 function seeded(seed) {
   return () => {
@@ -11,6 +12,8 @@ export function initPets(stage) {
   for (const pet of stage.querySelectorAll('.pet')) {
     let timer = null;
     pet.addEventListener('click', () => {
+      if (pet.classList.contains('pet-cat')) sfx.purr();
+      else sfx.thump();
       // Restart the heart animation on every click.
       pet.classList.remove('awake');
       void pet.offsetWidth;
@@ -26,6 +29,7 @@ export function initFishTank() {
   const tank = document.getElementById('fish-tank');
   let timer = null;
   tank.addEventListener('click', () => {
+    sfx.bubbles();
     tank.classList.remove('fed');
     void tank.offsetWidth;
     tank.classList.add('fed');
@@ -43,6 +47,7 @@ export function initLamp(decor) {
     button.title = on ? 'Turn the lamp off' : 'Turn the lamp on';
   };
   button.addEventListener('click', () => {
+    sfx.click();
     decor.set('lamp', decor.get('lamp') === 'on' ? 'off' : 'on');
     sync();
   });
@@ -97,4 +102,42 @@ export function buildWeather() {
     drops.push(drop);
   }
   document.getElementById('drops').replaceChildren(...drops);
+
+  // Seasonal petals or leaves falling past the window.
+  const falling = [];
+  for (let i = 0; i < 14; i++) {
+    const item = document.createElement('i');
+    item.className = 'fall-item';
+    Object.assign(item.style, {
+      left: `${Math.round(rnd() * 470)}px`,
+      animationDuration: `${(8 + rnd() * 7).toFixed(1)}s`,
+      animationDelay: `${(-rnd() * 15).toFixed(1)}s`,
+    });
+    item.style.setProperty('--y', `${Math.round(20 + rnd() * 280)}px`);
+    falling.push(item);
+  }
+  document.getElementById('season-fall').replaceChildren(...falling);
+
+  // Petals or leaves stuck to wet glass.
+  const stuck = [[60, 120, 20], [190, 210, -30], [300, 80, 45], [420, 160, 10], [250, 260, -15], [470, 50, 60], [120, 250, 30]];
+  document.getElementById('stuck').replaceChildren(...stuck.map(([x, y, r]) => {
+    const item = document.createElement('i');
+    Object.assign(item.style, { left: `${x}px`, top: `${y}px`, transform: `rotate(${r}deg)` });
+    return item;
+  }));
+
+  // Summer fireflies over the street.
+  const flies = [];
+  for (let i = 0; i < 9; i++) {
+    const fly = document.createElement('div');
+    fly.className = 'firefly';
+    Object.assign(fly.style, {
+      left: `${Math.round(30 + rnd() * 450)}px`,
+      top: `${Math.round(180 + rnd() * 120)}px`,
+      animationDuration: `${(5 + rnd() * 4).toFixed(1)}s`,
+      animationDelay: `${(-rnd() * 9).toFixed(1)}s`,
+    });
+    flies.push(fly);
+  }
+  document.getElementById('fireflies').replaceChildren(...flies);
 }
