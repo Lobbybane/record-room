@@ -1199,3 +1199,61 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .ios-page.to-left, .ios-page.to-right { animation: none; display: none; }
   .ios-switch, .ios-switch::after { transition: none; }
 }
+
+/* ---------- the café (data-room="cafe") ---------- */
+.cafe-only { display: none; }
+.stage[data-room="cafe"] .cafe-only { display: block; }
+.stage[data-room="cafe"] :is(.curtain, .poster, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
+.stage[data-room="cafe"] .lamp-switch { left: 622px; top: -12px; width: 60px; height: 46px; }
+/* The neon sign hangs in the window like a shop sign. */
+.stage[data-room="cafe"] .neon-sign { left: 700px; top: 288px; transform: rotate(0deg); }
+
+.barista-arm { transform-box: view-box; transform-origin: 1166px 458px; animation: steam-pitcher 3.4s ease-in-out infinite; }
+@keyframes steam-pitcher { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg) translateY(-2px); } }
+.barista-head { transform-box: view-box; transform-origin: 1146px 440px; animation: barista-look 9s ease-in-out infinite; }
+@keyframes barista-look { 0%, 60%, 100% { transform: rotate(0deg); } 70%, 88% { transform: rotate(-8deg); } }
+.espresso-brand { font: 9px 'Pacifico', cursive; fill: #4A3A6E; }
+.machine-steam, .cup-steam { opacity: .5; animation: steam-rise 2.6s ease-out infinite; }
+.cup-steam { animation-delay: -1.2s; }
+@keyframes steam-rise { 0% { transform: translateY(4px); opacity: 0; } 30% { opacity: .55; } 100% { transform: translateY(-10px); opacity: 0; } }
+.pour { animation: pour 6s steps(1) infinite; }
+@keyframes pour { 0%, 40% { opacity: 1; } 41%, 100% { opacity: 0; } }
+.cafe-chalk { font: 600 9px 'Nunito', sans-serif; fill: rgba(244, 240, 230, .85); }
+.cafe-chalk.small { font-size: 9px; }
+.cafe-chalk.tiny { font-size: 6px; fill: #2A2440; }
+
+.laptop-light { fill: rgba(150, 190, 255, .2); animation: screen-flicker 5s ease-in-out infinite; }
+@keyframes screen-flicker { 50% { opacity: .7; } }
+.typist { transform-box: view-box; transform-origin: 495px 476px; animation: typing .45s steps(2) infinite; }
+@keyframes typing { 50% { transform: translateY(-.8px); } }
+.typist-head { transform-box: view-box; transform-origin: 495px 368px; animation: nod 4s ease-in-out infinite; }
+@keyframes nod { 50% { transform: rotate(4deg); } }
+.sipper .arm-up { opacity: 0; animation: sip 11s steps(1) infinite; }
+.sipper .arm-down { animation: sip-down 11s steps(1) infinite; }
+@keyframes sip { 0%, 64% { opacity: 0; } 65%, 82% { opacity: 1; } 83%, 100% { opacity: 0; } }
+@keyframes sip-down { 0%, 64% { opacity: 1; } 65%, 82% { opacity: 0; } 83%, 100% { opacity: 1; } }
+
+.orderer-body { transform-box: view-box; transform-origin: 896px 604px; animation: sway 6s ease-in-out infinite; }
+@keyframes sway { 50% { transform: rotate(1deg); } }
+.phone-glow { animation: screen-flicker 3s ease-in-out infinite; }
+
+.pendant-cone { fill: url(#cone-light); }
+.pendant-bulb { fill: #FFE2C4; filter: drop-shadow(0 0 6px #FFB347); }
+.stage[data-lamp="off"] .pendant-cone { display: none; }
+.stage[data-lamp="off"] .pendant-bulb { fill: #8A7A96; filter: none; }
+
+.menu-board {
+  position: absolute; left: 958px; top: 232px; width: 196px; padding: 10px 14px 12px;
+  border: 6px solid #8A5A4A; border-radius: 4px; background: #23302C;
+  box-shadow: 0 8px 16px rgba(10, 8, 25, .45);
+  color: rgba(244, 240, 230, .88);
+}
+.menu-title { font: 22px/1 'Pacifico', cursive; text-align: center; margin-bottom: 6px; }
+.menu-board ul { margin: 0; padding: 0; list-style: none; }
+.menu-board li { display: flex; gap: 6px; font: 600 11px/1.55 'Nunito', sans-serif; }
+.menu-board li span:first-child { flex: 1 1 auto; overflow: hidden; white-space: nowrap; }
+.menu-board li span:first-child::after { content: ' ..............................'; opacity: .45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .orderer-body, .phone-glow { animation: none; }
+}
