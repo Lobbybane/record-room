@@ -108,14 +108,11 @@ function buildLights() {
   const dots = [];
   for (let i = 0; i < 13; i++) {
     const t = i / 12;
-    const color = i % 3 === 1 ? '#F7A9C8' : '#FFD38A';
     const dot = document.createElement('div');
     dot.className = 'fairy';
     Object.assign(dot.style, {
       left: `${Math.round(352 + t * 556 - 4)}px`,
       top: `${Math.round(64 + 96 * t * (1 - t) - 1)}px`,
-      background: color,
-      boxShadow: `0 0 10px 3px ${color}`,
       animationDelay: `${(-i * 0.73).toFixed(2)}s`,
     });
     dots.push(dot);

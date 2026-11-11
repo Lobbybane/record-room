@@ -63,6 +63,10 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  holiday: {
+    label: 'Holidays',
+    choices: { auto: 'By date', off: 'Off', winter: 'Winter', halloween: 'Halloween', valentine: 'Valentine’s', newyear: 'New Year' },
+  },
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
@@ -97,6 +101,7 @@ export const DEFAULTS = {
   skin: 's2',
   lamp: 'on',
   posters: 'records',
+  holiday: 'auto',
 };
 
 const NEON_MAX = 16;
@@ -128,6 +133,17 @@ function saveDecor(decor) {
   try {
     localStorage.setItem(KEY, JSON.stringify(decor));
   } catch { /* private mode: still works until reload */ }
+}
+
+// Which holiday decorations "By date" shows today ('none' outside the holidays).
+export function holidayForDate(date) {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if ((month === 12 && day === 31) || (month === 1 && day === 1)) return 'newyear';
+  if (month === 12) return 'winter';
+  if (month === 10) return 'halloween';
+  if (month === 2 && day <= 14) return 'valentine';
+  return 'none';
 }
 
 // "Auto" follows the visitor's own clock.
@@ -166,6 +182,8 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
+    stage.dataset.holiday = decor.holiday === 'auto' ? holidayForDate(new Date())
+      : decor.holiday === 'off' ? 'none' : decor.holiday;
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
@@ -224,7 +242,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   });
 
   // Re-check the clock each minute for "Auto".
-  setInterval(() => { if (decor.time === 'auto') apply(); }, 60_000);
+  setInterval(() => { if (decor.time === 'auto' || decor.holiday === 'auto') apply(); }, 60_000);
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
@@ -241,7 +259,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather', 'posters']],
+    ['Room', ['time', 'weather', 'holiday', 'posters']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],

@@ -309,6 +309,67 @@ html, body {
 .fish-tank.fed .food { display: block; }
 .fish-tank.fed .fish-lane { top: 4px; }
 
+/* ---------- holiday themes (data-holiday is set in js/decor.js) ---------- */
+.fairy { --b: #FFD38A; background: var(--b); box-shadow: 0 0 10px 3px var(--b); }
+.fairy:nth-child(3n+2) { --b: #F7A9C8; }
+.stage[data-holiday="winter"] .fairy:nth-child(4n+1) { --b: #FF5A6E; }
+.stage[data-holiday="winter"] .fairy:nth-child(4n+2) { --b: #7EF2B8; }
+.stage[data-holiday="winter"] .fairy:nth-child(4n+3) { --b: #FFD38A; }
+.stage[data-holiday="winter"] .fairy:nth-child(4n) { --b: #6FB8FF; }
+.stage[data-holiday="halloween"] .fairy:nth-child(3n+1) { --b: #FF9A3C; }
+.stage[data-holiday="halloween"] .fairy:nth-child(3n+2) { --b: #B79CFF; }
+.stage[data-holiday="halloween"] .fairy:nth-child(3n) { --b: #9CF27E; }
+.stage[data-holiday="valentine"] .fairy:nth-child(3n+1) { --b: #FF5A7A; }
+.stage[data-holiday="valentine"] .fairy:nth-child(3n+2) { --b: #F7A9C8; }
+.stage[data-holiday="valentine"] .fairy:nth-child(3n) { --b: #FFF0F5; }
+.stage[data-holiday="newyear"] .fairy:nth-child(2n+1) { --b: #FFD38A; }
+.stage[data-holiday="newyear"] .fairy:nth-child(2n) { --b: #F4ECFF; }
+
+.holiday-garland, .holiday-garland .berries, .holiday-garland .garland-hearts,
+.snow-cap, .pumpkin, .pumpkin-glow, .bat, .firework, .love-hearts { display: none; }
+.stage:is([data-holiday="winter"], [data-holiday="valentine"]) .holiday-garland { display: block; }
+.garland { stroke: #2E6E66; }
+.berries { fill: #FF5A6E; }
+.stage[data-holiday="winter"] .berries { display: inline; }
+.stage[data-holiday="valentine"] .garland { stroke: #F7A9C8; stroke-width: 2; }
+.stage[data-holiday="valentine"] .garland-hearts { display: inline; fill: #FF5A7A; }
+
+.snow-cap { position: absolute; left: 342px; top: 411px; width: 576px; height: 9px; border-radius: 6px 6px 2px 2px; background: #F4F6FF; box-shadow: 0 2px 0 rgba(180, 190, 230, .5); }
+.stage[data-holiday="winter"] :is(.snow-cap, .snow) { display: block; }
+
+.stage[data-holiday="halloween"] :is(.pumpkin, .pumpkin-glow) { display: block; }
+.pumpkin-glow { position: absolute; left: 470px; top: 404px; width: 0; height: 0; box-shadow: 0 0 40px 22px rgba(255, 154, 60, .35); animation: candle 2.6s ease-in-out infinite; }
+@keyframes candle { 50% { opacity: .6; } }
+.stage[data-holiday="halloween"] .moon { background: #FFC98A; box-shadow: 0 0 34px 10px rgba(255, 170, 90, .45); }
+.stage[data-holiday="halloween"] .bat { display: block; }
+.bat { position: absolute; left: 0; top: 0; animation: bat-fly 17s linear infinite; }
+.bat path { transform-origin: 20px 8px; animation: flap .28s ease-in-out infinite alternate; }
+@keyframes flap { to { transform: scaleY(.45); } }
+@keyframes bat-fly {
+  0% { transform: translate(-40px, 120px); }
+  20% { transform: translate(140px, 60px); }
+  40% { transform: translate(300px, 100px); }
+  60%, 100% { transform: translate(560px, 40px); }
+}
+
+.stage[data-holiday="newyear"] .firework { display: block; }
+.firework { position: absolute; width: 5px; height: 5px; border-radius: 50%; opacity: 0; animation: burst 4.2s ease-out infinite; }
+.fw1 { left: 110px; top: 70px; color: #FFD38A; }
+.fw2 { left: 300px; top: 46px; color: #F28DB2; animation-delay: 1.4s; }
+.fw3 { left: 430px; top: 96px; color: #6FE3F2; animation-delay: 2.8s; }
+.firework { filter: drop-shadow(0 0 3px currentColor); background: currentColor; box-shadow: 26px 0px 0 0 currentColor, 23px 13px 0 0 currentColor, 13px 23px 0 0 currentColor, 0px 26px 0 0 currentColor, -13px 23px 0 0 currentColor, -23px 13px 0 0 currentColor, -26px 0px 0 0 currentColor, -23px -13px 0 0 currentColor, -13px -23px 0 0 currentColor, 0px -26px 0 0 currentColor, 13px -23px 0 0 currentColor, 23px -13px 0 0 currentColor; }
+@keyframes burst {
+  0% { opacity: 0; transform: scale(.1); }
+  6% { opacity: 1; }
+  40% { opacity: 1; transform: scale(1.35); }
+  60%, 100% { opacity: 0; transform: scale(1.5) translateY(5px); }
+}
+
+.stage[data-holiday="valentine"] .love-hearts { display: block; }
+.love-hearts { position: absolute; left: 1010px; top: 280px; width: 160px; height: 60px; pointer-events: none; z-index: 19; }
+.love-hearts span { position: absolute; bottom: 0; color: #FF5A7A; font-size: 16px; text-shadow: 0 0 8px rgba(255, 90, 122, .7); opacity: 0; animation: float-up 4s ease-out infinite; }
+.love-hearts span:nth-child(1) { left: 10px; } .love-hearts span:nth-child(2) { left: 70px; animation-delay: 1.3s; font-size: 20px; } .love-hearts span:nth-child(3) { left: 130px; animation-delay: 2.6s; }
+
 /* ---------- city through the glass ---------- */
 .glass {
   position: absolute;
@@ -470,7 +531,7 @@ html, body {
   background: linear-gradient(115deg, transparent 28%, rgba(255,255,255,.07) 29%, rgba(255,255,255,.07) 38%, transparent 39%, transparent 44%, rgba(255,255,255,.05) 45%, rgba(255,255,255,.05) 48%, transparent 49%);
 }
 
-.fairy { position: absolute; width: 9px; height: 9px; border-radius: 50%; animation: twinkle 4.4s ease-in-out infinite; }
+.fairy { position: absolute; width: 9px; height: 9px; border-radius: 50%; animation: twinkle 4.4s ease-in-out infinite; transition: background .6s ease, box-shadow .6s ease; }
 @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 
 /* ---------- shelf and sleeves ---------- */
@@ -790,6 +851,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .car, .plane { display: none; }
+  .bat, .bat path, .pumpkin-glow, .love-hearts span { animation: none; }
+  .firework { animation: none; opacity: .8; }
   .weed, .tank-bubble, .fish, .fish svg { animation: none; }
   .listener-fx span { animation: none !important; display: none !important; }
   .rain line, .vinyl.spinning, .fairy, .neon-sign, .train, .drop, .drop::after, .flake, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .listener-body, .stage.is-on .listener-head, .stage.is-on .listener-foot, .pet-body, .pet.awake .pet-tail { animation: none; }

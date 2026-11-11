@@ -94,6 +94,8 @@
     <div class="sun"></div>
     <div class="shooting-star"></div>
     <div class="plane"></div>
+    <div class="firework fw1"></div><div class="firework fw2"></div><div class="firework fw3"></div>
+    <svg class="bat" viewBox="0 0 40 16" width="26" height="11" aria-hidden="true"><path d="M20 6 Q17 2 13 3 Q10 0 6 2 Q3 1 0 5 Q5 5 7 9 Q10 7 13 10 Q16 8 20 12 Q24 8 27 10 Q30 7 33 9 Q35 5 40 5 Q37 1 34 2 Q30 0 27 3 Q23 2 20 6 Z" fill="#15132B"/></svg>
     <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
       <path class="far-city" d="M0 322 V150 H30 V128 H52 V156 H84 V112 H96 V96 H104 V112 H118 V146 H160 V120 H190 V160 H226 V84 H232 V70 H238 V84 H246 V140 H290 V108 H326 V150 H356 V124 H392 V158 H430 V100 H448 V88 H456 V100 H470 V140 H512 V322 Z"/>
     </svg>
@@ -148,8 +150,26 @@
   </svg>
   <div id="lights"></div>
 
+  <!-- Holiday decorations (shown by data-holiday on the stage) -->
+  <svg class="layer holiday-garland" aria-hidden="true" viewBox="0 0 1280 820">
+    <path class="garland" d="M318 56 Q358 78 398 56 Q438 78 478 56 Q518 78 558 56 Q598 78 638 56 Q678 78 718 56 Q758 78 798 56 Q838 78 878 56 Q918 78 942 56" fill="none" stroke-width="7" stroke-linecap="round"/>
+    <g class="berries"><circle cx="358" cy="68" r="4"/><circle cx="438" cy="68" r="4"/><circle cx="518" cy="68" r="4"/><circle cx="598" cy="68" r="4"/><circle cx="678" cy="68" r="4"/><circle cx="758" cy="68" r="4"/><circle cx="838" cy="68" r="4"/><circle cx="912" cy="66" r="4"/></g>
+    <g class="garland-hearts">
+      <path d="M358 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M438 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M518 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M598 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/>
+      <path d="M678 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M758 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M838 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M912 62 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/>
+    </g>
+  </svg>
+
   <!-- Sill with plant and cat -->
   <div class="sill"></div>
+  <div class="snow-cap"></div>
+  <div class="pumpkin-glow"></div>
+  <svg class="layer pumpkin" aria-hidden="true" viewBox="0 0 1280 820">
+    <path d="M470 384 q2 -8 8 -10" fill="none" stroke="#3E8E7E" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="458" cy="403" rx="12" ry="15" fill="#E8742C"/><ellipse cx="482" cy="403" rx="12" ry="15" fill="#E8742C"/>
+    <ellipse cx="470" cy="403" rx="13" ry="16" fill="#FF8A3C"/>
+    <g fill="#FFD38A"><polygon points="460,398 466,398 463,392"/><polygon points="474,398 480,398 477,392"/><path d="M458 406 h24 l-3 6 h-4 l-2 -3 -2 3 h-4 l-2 -3 -2 3 h-2 z"/></g>
+  </svg>
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
     <g fill="#3E8E7E">
       <ellipse cx="392" cy="372" rx="10" ry="24" transform="rotate(-28 392 372)"/>
@@ -225,6 +245,7 @@
     </g>
   </svg>
   <div class="neon-sign" id="neon-sign" aria-hidden="true">side a</div>
+  <div class="love-hearts" aria-hidden="true"><span>♥</span><span>♥</span><span>♥</span></div>
 
   <!-- What the listener is feeling: Zs when dozing, notes while a record plays -->
   <div class="listener-fx" aria-hidden="true">
