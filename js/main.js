@@ -4,6 +4,7 @@ import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
 import { sfx, setSoundEnabled, initThunder } from './sounds.js';
+import { confirmDialog } from './ui.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -37,8 +38,9 @@ function fitStage() {
   let roomHeight = height;
   if (decorPanel.open) {
     const panel = decorPanel.getBoundingClientRect();
-    if (panel.width >= width - 1) roomHeight = Math.max(120, height - panel.height);
-    else roomWidth = Math.max(200, width - panel.width);
+    // A bottom sheet on phones, a floating sheet on the right elsewhere.
+    if (panel.left < 2) roomHeight = Math.max(120, panel.top);
+    else roomWidth = Math.max(200, panel.left - 8);
   }
   const scale = Number(Math.min(roomWidth / 1280, roomHeight / 820).toFixed(4));
   const centerX = roomWidth / 2;
@@ -499,8 +501,8 @@ $('#np-remove').addEventListener('click', async () => {
   if (busy || current === null) return;
   const ref = current;
   const record = recordOf(ref);
-  const where = ref.from === 'crate' ? 'out of the crate' : 'off the shelf';
-  if (!window.confirm(`Take “${record.title}” ${where}?`)) return;
+  const where = ref.from === 'crate' ? 'Remove from Crate?' : 'Remove from Shelf?';
+  if (!await confirmDialog({ title: where, message: `“${record.title}” by ${record.artist}` })) return;
   await putBack();
   if (ref.from === 'crate') takeFromCrate(ref.index);
   else {
@@ -569,7 +571,7 @@ function renderCrateBrowser(direction = '') {
   const playing = isCurrent('crate', crateIndex);
   const play = $('#crate-play');
   play.disabled = playing || busy;
-  play.textContent = playing ? 'On the turntable' : 'Play';
+  play.textContent = playing ? 'On the Turntable' : 'Play';
   const hasSpace = records.some((r) => !r);
   const toShelf = $('#crate-to-shelf');
   toShelf.disabled = playing || !hasSpace;
@@ -619,10 +621,10 @@ $('#crate-to-shelf').addEventListener('click', () => {
   renderShelf();
 });
 
-$('#crate-remove').addEventListener('click', () => {
+$('#crate-remove').addEventListener('click', async () => {
   const record = crate[crateIndex];
   if (!record || isCurrent('crate', crateIndex)) return;
-  if (!window.confirm(`Take “${record.title}” out of the crate?`)) return;
+  if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
   takeFromCrate(crateIndex);
   renderShelf();
 });
@@ -642,7 +644,8 @@ let addTarget = null; // a shelf spot number, or 'crate'
 
 function openDialog(target) {
   addTarget = target;
-  submit.textContent = target === 'crate' ? 'Put it in the crate' : 'Put it on the shelf';
+  submit.textContent = 'Add';
+  $('#add-title').textContent = target === 'crate' ? 'Add to Crate' : 'Add to Shelf';
   form.reset();
   errorBox.textContent = '';
   dialog.showModal();
@@ -663,7 +666,7 @@ form.addEventListener('submit', async (event) => {
   let artist = $('#f-artist').value.trim();
   let title = $('#f-album').value.trim();
   submit.disabled = true;
-  submit.textContent = 'Finding the cover…';
+  submit.textContent = 'Adding…';
 
   // Left blank? Use the video's own title and channel when YouTube shares them.
   if (!artist || !title) {
@@ -693,6 +696,7 @@ form.addEventListener('submit', async (event) => {
   renderShelf();
 
   submit.disabled = false;
+  submit.textContent = 'Add';
   dialog.close();
   if (addTarget === 'crate') openCrate();
 });
