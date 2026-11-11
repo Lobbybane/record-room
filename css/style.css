@@ -558,9 +558,31 @@ html, body {
   92%, 100% { opacity: 0; transform: translate(220px, 72px) rotate(18deg); }
 }
 
-.building { position: absolute; }
-.lit { position: absolute; width: 5px; height: 7px; transition: opacity 1.2s ease; }
+/* The city (drawn by js/city.js). Building colours follow the time of day. */
+.stage { --bld-1: #2E2558; --bld-2: #352B63; --bld-3: #2A2350; --bld-4: #3B2F6B; --roof: #221C44; }
+.stage[data-sky="midnight"] { --bld-1: #262050; --bld-2: #2C2458; --bld-3: #221C48; --bld-4: #31285E; --roof: #1A1638; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) { --bld-1: #4A3A72; --bld-2: #55447E; --bld-3: #463868; --bld-4: #5E4A88; --roof: #3B2F62; }
+.city-svg { position: absolute; left: 0; top: 0; width: 512px; height: 322px; overflow: visible; }
+.bld.t1 { fill: var(--bld-1); } .bld.t2 { fill: var(--bld-2); } .bld.t3 { fill: var(--bld-3); } .bld.t4 { fill: var(--bld-4); }
+.cornice { fill: rgba(255, 255, 255, .09); }
+.win { fill: rgba(200, 190, 255, .07); }
+.lit { transition: opacity 1.2s ease; }
 .lit.dark { opacity: .06 !important; }
+.far-light { fill: #FFD38A; opacity: .35; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .far-light { opacity: .12; }
+.roof-fill { fill: var(--roof); }
+.roof-line { fill: none; stroke: var(--roof); stroke-width: 2; stroke-linecap: round; }
+.roof-line.thin { stroke-width: 1.2; }
+.roof-band { fill: none; stroke: rgba(0, 0, 0, .3); stroke-width: 1; }
+.beacon { fill: #FF5A6E; animation: beacon 2.2s steps(1) infinite; }
+.beacon.slow { animation-duration: 3.1s; }
+@keyframes beacon { 50% { opacity: .15; } }
+.sign-board { fill: rgba(16, 12, 34, .9); }
+.sign-text { font: 700 10px 'M PLUS Rounded 1c', sans-serif; letter-spacing: .08em; }
+.sign-text.big { font-size: 12px; letter-spacing: .1em; }
+.sign-text.tiny { font-size: 4.6px; letter-spacing: .14em; opacity: .85; }
+.sign-v .sign-text { font-size: 9px; letter-spacing: 0; }
+.sign-pink.sign-v { animation: neon-flicker 13s infinite; }
 
 /* Cars on the street below, and a plane crossing the sky. */
 .car { position: absolute; top: 311px; left: 0; width: 16px; height: 3px; }
@@ -578,38 +600,6 @@ html, body {
 .plane::after { content: ''; position: absolute; left: 6px; top: 0; width: 3px; height: 3px; border-radius: 50%; background: #FF5A6E; box-shadow: 0 0 6px 2px rgba(255, 90, 110, .7); animation: blink 1.2s steps(1) infinite; }
 @keyframes fly { 0% { transform: translate(540px, 14px); } 45%, 100% { transform: translate(-30px, -6px); } }
 @keyframes blink { 50% { opacity: 0; } }
-
-.neon {
-  position: absolute;
-  border-radius: 4px;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-weight: 700;
-}
-.neon-records {
-  left: 208px; top: 122px; padding: 6px 3px;
-  border: 1.5px solid var(--pink);
-  box-shadow: 0 0 10px rgba(242, 141, 178, .8);
-  writing-mode: vertical-rl;
-  font-size: 12px; letter-spacing: .22em;
-  color: #FFE3EF;
-  text-shadow: 0 0 6px var(--pink), 0 0 14px var(--pink);
-}
-.neon-24h {
-  left: 348px; top: 140px; padding: 2px 6px;
-  border: 1.5px solid var(--cyan);
-  box-shadow: 0 0 10px rgba(111, 227, 242, .8);
-  font-size: 12px; letter-spacing: .12em;
-  color: #E3FBFF;
-  text-shadow: 0 0 6px var(--cyan), 0 0 14px var(--cyan);
-}
-.neon-cafe {
-  left: 68px; top: 150px; padding: 2px 6px;
-  border: 1.5px solid var(--peach);
-  box-shadow: 0 0 10px rgba(255, 179, 138, .8);
-  font-size: 11px; letter-spacing: .12em;
-  color: #FFF0E6;
-  text-shadow: 0 0 6px var(--peach), 0 0 14px var(--peach);
-}
 
 .track { position: absolute; left: 0; top: 268px; width: 512px; height: 8px; background: var(--ink); }
 .pillar { position: absolute; top: 276px; width: 10px; height: 46px; background: var(--ink); }
@@ -950,6 +940,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .car, .plane { display: none; }
+  .beacon, .sign { animation: none !important; }
   .glow-path, .waves, .boat, .beam { animation: none; }
   .fall-item, .firefly { animation: none; top: var(--y); }
   .bat, .bat path, .pumpkin-glow, .love-hearts span { animation: none; }

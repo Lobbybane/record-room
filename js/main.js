@@ -6,6 +6,7 @@ import { setPosterMode, setPosterRecords } from './posters.js';
 import { sfx, setSoundEnabled, initThunder } from './sounds.js';
 import { confirmDialog } from './ui.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
+import { buildCity as drawCity } from './city.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -113,38 +114,9 @@ function seeded(seed) {
   };
 }
 
-// How many city windows are lit at each time of day.
-const LIT = { sunrise: 0.18, golden: 0.12, dusk: 0.32, midnight: 0.42 };
-
+// The city outside is drawn by js/city.js; it is redrawn when the time of day changes.
 function buildCity(sky) {
-  const rnd = seeded(11);
-  const lit = LIT[sky] ?? LIT.dusk;
-  const specs = [[0, 70, 150], [64, 56, 186], [126, 82, 128], [200, 48, 222], [250, 90, 160], [338, 62, 204], [400, 70, 140], [464, 48, 182]];
-  const tones = ['#2E2558', '#352B63', '#2A2350', '#3B2F6B'];
-  const container = $('#buildings');
-  container.replaceChildren();
-
-  specs.forEach(([left, width, height], i) => {
-    const building = document.createElement('div');
-    building.className = 'building';
-    Object.assign(building.style, {
-      left: `${left}px`, top: `${322 - height}px`, width: `${width}px`, height: `${height}px`, background: tones[i % tones.length],
-    });
-    for (let y = 10; y < height - 24; y += 14) {
-      for (let x = 7; x < width - 8; x += 12) {
-        const r = rnd();
-        if (r < lit) {
-          const lit = document.createElement('div');
-          lit.className = 'lit';
-          Object.assign(lit.style, {
-            left: `${x}px`, top: `${y}px`, background: r < 0.06 ? '#6FE3F2' : '#FFD38A', opacity: (0.55 + r).toFixed(2),
-          });
-          building.appendChild(lit);
-        }
-      }
-    }
-    container.appendChild(building);
-  });
+  drawCity($('#buildings'), sky);
 }
 
 function buildStars() {
