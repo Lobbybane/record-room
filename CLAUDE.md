@@ -19,8 +19,11 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 - `index.html` — the room markup and SVG shapes.
 - `css/style.css` — styling and all animations (weather, city, pets, fish, listener, holidays, record spin, tonearm), plus the reduced-motion fallbacks.
 - `js/main.js` — fits the stage (wide layout, or the phone layout: room on top, `.tv-set` and `.np-card` enlarged below via `--tv-t` / `--card-t`, page scrolls with `#scroll-spacer`), builds the city, the shelf, the crate, the record animation (Web Animations API), playback states (`data-phase` on the stage) and the now-spinning card, and the add-a-record dialog. The record on the turntable is `current = { from: 'shelf' | 'crate', index }`; `recordOf()` / `originOf()` resolve it.
-- `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-holiday` (winter, halloween, valentine, newyear, none — `holidayForDate()`), `data-pet`, `data-tank`, `data-lamp`, `data-posters` and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings. `lamp` isn't in the panel; the lamp itself is the switch.
+- `js/decor.js` — the Decorate panel (`OPTIONS`, `DEFAULTS`). Applies choices as `data-room` (bedroom, cafe, cabin, beach), `data-sky` (sunrise, golden, dusk, midnight), `data-weather` (rain, storm, snow, clear), `data-season` (spring, summer, autumn, winter — `seasonForDate()`, northern hemisphere), `data-holiday` (winter, halloween, valentine, newyear, none — `holidayForDate()`), `data-pet`, `data-tank`, `data-lamp`, `data-posters` and CSS variables (`--neon`, `--fur`, `--sweater`, `--hair`, `--skin`…) on the stage. Auto time follows the visitor's clock. Migrates the old `{ sky, rain }` settings. `lamp` isn't in the panel; the lamp itself is the switch.
 - `js/life.js` — pets wake when clicked, fish tank feeding, lamp switch, city windows switching on and off, snowflakes and raindrops on the glass.
+- `js/sounds.js` — sound effects made with the Web Audio API (no files): `sfx.swoosh/crackle/click/bubbles/purr/thump/flick/thunder`. Audio unlocks on the first click; thunder follows the `.lightning` CSS animation. Off via Decorate > Sound.
+- Rooms: each room sets `--wall-*` / `--floor-*` variables and patterns, shows one `.room-prop`, and picks a window view (`.view-city`, `.view-mountains`, `.view-sea`). Records, pets and controls keep the same positions in every room.
+- Seasons: the `.branch` outside the window, `.season-fall` (petals/leaves; faster in rain, blown in storms, hidden in snow), `.stuck` (on wet glass), `.fireflies` (summer clear nights), `.frost` (winter).
 - `js/posters.js` — the two wall posters: covers from shelf and crate records (kept as art until the image loads).
 - `js/records.js` — the six shelf spots (`SLOTS`), `STARTERS` for a first visit, the crate (`loadCrate` / `saveCrate`), saving, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
 - `js/covers.js` — iTunes cover lookup.
@@ -34,7 +37,7 @@ Run locally: `python3 -m http.server 8000`, then open http://localhost:8000. You
 
 ## Built so far
 
-Fit-to-screen, Decorate panel (time, weather, holidays, posters, neon, pets, fish tank, listener looks), listener in an armchair who reacts to playback, cat/dog that wake, fish tank with feeding, lamp switch, city details (windows, cars, plane, train), posters from covers, starter shelf, holiday themes by date, record crate, phone layout.
+Fit-to-screen, Decorate panel (room, time, weather, season, holidays, posters, neon, pets, fish tank, listener looks, sound), sound effects, seasons, café/cabin/beach rooms, listener in an armchair who reacts to playback, cat/dog that wake, fish tank with feeding, lamp switch, city details (windows, cars, plane, train), posters from covers, starter shelf, holiday themes by date, record crate, phone layout.
 
 Bobby said not to wait between features; still commit and push after each one so nothing is lost if a session ends.
 
@@ -48,11 +51,12 @@ Bobby said not to wait between features; still commit and push after each one so
 
 ## Ideas list (not built yet)
 
-- Needle-drop crackle and a room-sounds mixer (rain, city, purring) under the music
+- Room-sounds mixer (rain, city, purring) to loop under the music
+- Southern-hemisphere option for seasons; seasonal touches inside the rooms
 - Vinyl speed and tonearm position that follow real track progress
 - Share-your-room link; "now playing" picture for social media
 - Side A / Side B albums, playlist mode (next record plays when one ends), sort/search
-- Window views (beach, mountain cabin, forest), furniture and rug choices, saved looks
+- More rooms (rooftop, forest treehouse), furniture and rug choices, saved looks
 - Listener sips from a mug, cat walks along the sill, parallax city
 - Landscape phones still show the small TV; a "big TV" button could help there
 - Full-screen button, keyboard shortcuts, add-to-home-screen icon
