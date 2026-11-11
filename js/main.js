@@ -9,10 +9,21 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reduceMotion ?
 
 /* ---------------- fit the 1280 x 820 stage to the window ---------------- */
 
+// The whole room is always visible; any spare screen space is filled by the
+// wall and floor, which CSS stretches using --fw / --fh (screen size in stage px).
+const viewport = stage.parentElement;
+
 function fitStage() {
-  const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 820);
-  stage.style.setProperty('--s', scale.toFixed(4));
+  const width = viewport.clientWidth;
+  const height = viewport.clientHeight;
+  if (!width || !height) return;
+  const scale = Number(Math.min(width / 1280, height / 820).toFixed(4));
+  stage.style.setProperty('--s', scale);
+  // +2 covers rounding so no hairline shows at the screen edges.
+  stage.style.setProperty('--fw', `${Math.ceil(width / scale) + 2}px`);
+  stage.style.setProperty('--fh', `${Math.ceil(height / scale) + 2}px`);
 }
+if ('ResizeObserver' in window) new ResizeObserver(fitStage).observe(viewport);
 window.addEventListener('resize', fitStage);
 fitStage();
 

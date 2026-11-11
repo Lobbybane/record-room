@@ -15,6 +15,7 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 ## How it works
 
 - The scene is a fixed 1280 × 820 stage scaled to fit the window (`--s` CSS variable set in `js/main.js`). All positions are stage pixels.
+- The whole room always stays visible. Spare screen space is filled by the wall, baseboard, floor, vignette and grain, which stretch to the screen edges using `--fw` / `--fh` (the screen size in stage pixels) and `--pad-x` / `--pad-y`. The Dusk/Rain buttons sit in the screen's top-right corner. The page is `position: fixed` so iPhone Safari's toolbar can't hide the bottom.
 - `index.html` — the room markup and SVG shapes.
 - `css/style.css` — styling, plus small animations (rain, record spin, tonearm).
 - `js/main.js` — builds the city, the shelf, the record animation (Web Animations API), playback states and the now-spinning card, the add-a-record dialog, and the Dusk/Midnight and rain toggles.
