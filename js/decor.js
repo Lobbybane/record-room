@@ -6,6 +6,10 @@ const KEY = 'record-room:settings:v1';
 // Every choice, in the order the Decorate panel shows them.
 // Swatch values are [main color, second color] used by the CSS variables in applyDecor().
 export const OPTIONS = {
+  room: {
+    label: 'Room',
+    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house' },
+  },
   time: {
     label: 'Time of day',
     choices: { auto: 'Auto', sunrise: 'Sunrise', golden: 'Golden hour', dusk: 'Dusk', midnight: 'Midnight' },
@@ -97,6 +101,7 @@ export const OPTIONS = {
 };
 
 export const DEFAULTS = {
+  room: 'bedroom',
   time: 'dusk',
   weather: 'rain',
   neonText: 'side a',
@@ -197,6 +202,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   function apply() {
     const sky = decor.time === 'auto' ? skyForHour(new Date().getHours()) : decor.time;
     stage.dataset.sky = sky;
+    stage.dataset.room = decor.room;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
@@ -279,7 +285,8 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather', 'season', 'holiday', 'posters']],
+    ['Room', ['room', 'posters']],
+    ['Outside', ['time', 'weather', 'season', 'holiday']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
