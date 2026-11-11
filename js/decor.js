@@ -1,6 +1,8 @@
 // Decorating the room: time of day, weather, neon sign, pet and the listener's look.
 // Choices are saved in this browser and applied as data attributes and CSS variables on the stage.
 
+import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
+
 const KEY = 'record-room:settings:v1';
 
 // Every choice, in the order the Decorate panel shows them.
@@ -72,8 +74,22 @@ export const OPTIONS = {
     choices: { auto: 'By date', spring: 'Spring', summer: 'Summer', autumn: 'Autumn', winter: 'Winter' },
   },
   holiday: {
-    label: 'Holidays',
-    choices: { auto: 'By date', off: 'Off', winter: 'Winter', halloween: 'Halloween', valentine: 'Valentine’s', newyear: 'New Year' },
+    label: 'Decorations',
+    select: true,
+    choices: {
+      auto: 'By date',
+      off: 'Off',
+      ...Object.fromEntries(Object.entries(HOLIDAYS).map(([key, name]) => [key, `Preview: ${name}`])),
+    },
+  },
+  celebrate: {
+    label: 'Celebrate (used by “By date”)',
+    multi: true,
+    choices: HOLIDAYS,
+  },
+  hats: {
+    label: 'Holiday hats for the listener and pets',
+    choices: { on: 'On', off: 'Off' },
   },
   posters: {
     label: 'Posters',
@@ -117,13 +133,18 @@ export const DEFAULTS = {
   holiday: 'auto',
   sound: 'on',
   season: 'auto',
+  celebrate: Object.keys(HOLIDAYS),
+  hats: 'on',
 };
 
 const NEON_MAX = 16;
 
 function isValid(name, value) {
   const option = OPTIONS[name];
-  return Boolean(option && Object.hasOwn(option.choices || option.swatches, value));
+  if (!option) return false;
+  const keys = option.choices || option.swatches;
+  if (option.multi) return Array.isArray(value) && value.every((v) => Object.hasOwn(keys, v));
+  return Object.hasOwn(keys, value);
 }
 
 export function loadDecor() {
@@ -138,7 +159,13 @@ export function loadDecor() {
 
   const decor = { ...DEFAULTS };
   for (const name of Object.keys(OPTIONS)) {
-    if (isValid(name, saved[name])) decor[name] = saved[name];
+    if (isValid(name, saved[name])) decor[name] = Array.isArray(saved[name]) ? [...saved[name]] : saved[name];
+  }
+  // Holidays added after a visitor saved their list start switched on for them.
+  if (Array.isArray(saved.celebrateKnown)) {
+    for (const key of Object.keys(HOLIDAYS)) {
+      if (!saved.celebrateKnown.includes(key) && !decor.celebrate.includes(key)) decor.celebrate.push(key);
+    }
   }
   if (typeof saved.neonText === 'string') decor.neonText = saved.neonText.slice(0, NEON_MAX);
   return decor;
@@ -146,19 +173,8 @@ export function loadDecor() {
 
 function saveDecor(decor) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(decor));
+    localStorage.setItem(KEY, JSON.stringify({ ...decor, celebrateKnown: Object.keys(HOLIDAYS) }));
   } catch { /* private mode: still works until reload */ }
-}
-
-// Which holiday decorations "By date" shows today ('none' outside the holidays).
-export function holidayForDate(date) {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  if ((month === 12 && day === 31) || (month === 1 && day === 1)) return 'newyear';
-  if (month === 12) return 'winter';
-  if (month === 10) return 'halloween';
-  if (month === 2 && day <= 14) return 'valentine';
-  return 'none';
 }
 
 // Northern-hemisphere seasons for "By date".
@@ -208,8 +224,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
     stage.dataset.season = decor.season === 'auto' ? seasonForDate(new Date()) : decor.season;
-    stage.dataset.holiday = decor.holiday === 'auto' ? holidayForDate(new Date())
-      : decor.holiday === 'off' ? 'none' : decor.holiday;
+    applyHolidays(stage, decor);
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
@@ -240,6 +255,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
   form.addEventListener('input', (event) => {
     const { name, value } = event.target;
     if (name === 'neonText') decor.neonText = value.slice(0, NEON_MAX);
+    else if (name === 'celebrate') decor.celebrate = [...form.querySelectorAll('input[name="celebrate"]:checked')].map((i) => i.value);
     else if (isValid(name, value)) decor[name] = value;
     else return;
     apply();
@@ -286,7 +302,8 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
 function buildPanel(form, decor) {
   const sections = [
     ['Room', ['room', 'posters']],
-    ['Outside', ['time', 'weather', 'season', 'holiday']],
+    ['Outside', ['time', 'weather', 'season']],
+    ['Holidays', ['holiday', 'holidayNote', 'celebrate', 'hats']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
@@ -299,8 +316,61 @@ function buildPanel(form, decor) {
     const heading = document.createElement('h3');
     heading.textContent = title;
     section.appendChild(heading);
-    for (const name of names) section.appendChild(name === 'neonText' ? neonField(decor) : group(name, decor));
+    for (const name of names) section.appendChild(field(name, decor));
     form.appendChild(section);
+  }
+}
+
+function field(name, decor) {
+  if (name === 'neonText') return neonField(decor);
+  if (name === 'holidayNote') {
+    const note = document.createElement('p');
+    note.className = 'decor-note';
+    note.id = 'holiday-note';
+    note.setAttribute('aria-live', 'polite');
+    return note;
+  }
+  if (OPTIONS[name].select) return selectField(name, decor);
+  return group(name, decor);
+}
+
+function selectField(name, decor) {
+  const wrap = document.createElement('div');
+  wrap.className = 'decor-field';
+  const label = document.createElement('label');
+  label.htmlFor = `decor-${name}`;
+  label.textContent = OPTIONS[name].label;
+  const select = document.createElement('select');
+  Object.assign(select, { id: `decor-${name}`, name });
+  for (const [value, text] of Object.entries(OPTIONS[name].choices)) {
+    select.append(new Option(text, value, false, decor[name] === value));
+  }
+  wrap.append(label, select);
+  return wrap;
+}
+
+// Holiday decorations on the stage: which holidays, the hat, the menorah's candles, and the panel's note.
+function applyHolidays(stage, decor) {
+  const now = new Date();
+  const holidays = decor.holiday === 'auto' ? holidaysForDate(now, decor.celebrate)
+    : decor.holiday === 'off' ? [] : [decor.holiday];
+  stage.dataset.holiday = holidays.length ? holidays.join(' ') : 'none';
+  const hatHoliday = holidays.find((h) => HAT_FOR[h]);
+  stage.dataset.hat = decor.hats === 'on' && hatHoliday ? hatHoliday : 'none';
+
+  // One more menorah candle each night of Hanukkah (all eight when previewing).
+  const night = holidays.includes('hanukkah') ? (hanukkahNight(now) || 8) : 0;
+  stage.querySelectorAll('.menorah .flame').forEach((flame, i) => flame.classList.toggle('lit', i < night));
+
+  const note = document.getElementById('holiday-note');
+  if (note) {
+    const names = holidays.map((h) => HOLIDAYS[h]);
+    const next = nextHoliday(now, decor.celebrate);
+    const parts = [];
+    if (decor.holiday === 'auto' && names.length) parts.push(`Now: ${names.join(' & ')}`);
+    if (decor.holiday !== 'auto' && decor.holiday !== 'off') parts.push('Previewing. Choose “By date” to follow the calendar.');
+    if (next) parts.push(`Next: ${HOLIDAYS[next.key]} in ${next.days} day${next.days === 1 ? '' : 's'}`);
+    note.textContent = parts.join(' · ');
   }
 }
 
@@ -335,7 +405,8 @@ function group(name, decor) {
     const wrap = document.createElement('label');
     wrap.className = color ? 'swatch' : 'chip';
     const input = document.createElement('input');
-    Object.assign(input, { type: 'radio', name, value, checked: decor[name] === value });
+    const checked = option.multi ? decor[name].includes(value) : decor[name] === value;
+    Object.assign(input, { type: option.multi ? 'checkbox' : 'radio', name, value, checked });
     const face = document.createElement('span');
     if (color) {
       face.className = 'swatch-dot';

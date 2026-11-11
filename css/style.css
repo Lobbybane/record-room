@@ -315,36 +315,36 @@ html, body {
 /* ---------- holiday themes (data-holiday is set in js/decor.js) ---------- */
 .fairy { --b: #FFD38A; background: var(--b); box-shadow: 0 0 10px 3px var(--b); }
 .fairy:nth-child(3n+2) { --b: #F7A9C8; }
-.stage[data-holiday="winter"] .fairy:nth-child(4n+1) { --b: #FF5A6E; }
-.stage[data-holiday="winter"] .fairy:nth-child(4n+2) { --b: #7EF2B8; }
-.stage[data-holiday="winter"] .fairy:nth-child(4n+3) { --b: #FFD38A; }
-.stage[data-holiday="winter"] .fairy:nth-child(4n) { --b: #6FB8FF; }
-.stage[data-holiday="halloween"] .fairy:nth-child(3n+1) { --b: #FF9A3C; }
-.stage[data-holiday="halloween"] .fairy:nth-child(3n+2) { --b: #B79CFF; }
-.stage[data-holiday="halloween"] .fairy:nth-child(3n) { --b: #9CF27E; }
-.stage[data-holiday="valentine"] .fairy:nth-child(3n+1) { --b: #FF5A7A; }
-.stage[data-holiday="valentine"] .fairy:nth-child(3n+2) { --b: #F7A9C8; }
-.stage[data-holiday="valentine"] .fairy:nth-child(3n) { --b: #FFF0F5; }
-.stage[data-holiday="newyear"] .fairy:nth-child(2n+1) { --b: #FFD38A; }
-.stage[data-holiday="newyear"] .fairy:nth-child(2n) { --b: #F4ECFF; }
+.stage[data-holiday~="winter"] .fairy:nth-child(4n+1) { --b: #FF5A6E; }
+.stage[data-holiday~="winter"] .fairy:nth-child(4n+2) { --b: #7EF2B8; }
+.stage[data-holiday~="winter"] .fairy:nth-child(4n+3) { --b: #FFD38A; }
+.stage[data-holiday~="winter"] .fairy:nth-child(4n) { --b: #6FB8FF; }
+.stage[data-holiday~="halloween"] .fairy:nth-child(3n+1) { --b: #FF9A3C; }
+.stage[data-holiday~="halloween"] .fairy:nth-child(3n+2) { --b: #B79CFF; }
+.stage[data-holiday~="halloween"] .fairy:nth-child(3n) { --b: #9CF27E; }
+.stage[data-holiday~="valentine"] .fairy:nth-child(3n+1) { --b: #FF5A7A; }
+.stage[data-holiday~="valentine"] .fairy:nth-child(3n+2) { --b: #F7A9C8; }
+.stage[data-holiday~="valentine"] .fairy:nth-child(3n) { --b: #FFF0F5; }
+.stage[data-holiday~="newyear"] .fairy:nth-child(2n+1) { --b: #FFD38A; }
+.stage[data-holiday~="newyear"] .fairy:nth-child(2n) { --b: #F4ECFF; }
 
-.holiday-garland, .holiday-garland .berries, .holiday-garland .garland-hearts,
-.snow-cap, .pumpkin, .pumpkin-glow, .bat, .firework, .love-hearts { display: none; }
-.stage:is([data-holiday="winter"], [data-holiday="valentine"]) .holiday-garland { display: block; }
+.holiday-garland > *, .holiday-window > *, .holiday-shelf > *, .holiday-sill > *,
+.snow-cap, .pumpkin, .pumpkin-glow, .bat, .firework, .love-hearts, .ghost, .rainbow { display: none; }
+.stage:is([data-holiday~="winter"], [data-holiday~="valentine"]) .garland { display: inline; }
 .garland { stroke: #2E6E66; }
 .berries { fill: #FF5A6E; }
-.stage[data-holiday="winter"] .berries { display: inline; }
-.stage[data-holiday="valentine"] .garland { stroke: #F7A9C8; stroke-width: 2; }
-.stage[data-holiday="valentine"] .garland-hearts { display: inline; fill: #FF5A7A; }
+.stage[data-holiday~="valentine"] .garland { stroke: #F7A9C8; stroke-width: 2; }
+.berries { fill: #FF5A6E; }
+.garland-hearts { fill: #FF5A7A; }
 
 .snow-cap { position: absolute; left: 342px; top: 411px; width: 576px; height: 9px; border-radius: 6px 6px 2px 2px; background: #F4F6FF; box-shadow: 0 2px 0 rgba(180, 190, 230, .5); }
-.stage[data-holiday="winter"] :is(.snow-cap, .snow) { display: block; }
+.stage[data-holiday~="winter"] :is(.snow-cap, .snow) { display: block; }
 
-.stage[data-holiday="halloween"] :is(.pumpkin, .pumpkin-glow) { display: block; }
+.stage[data-holiday~="halloween"] :is(.pumpkin, .pumpkin-glow) { display: block; }
 .pumpkin-glow { position: absolute; left: 470px; top: 404px; width: 0; height: 0; box-shadow: 0 0 40px 22px rgba(255, 154, 60, .35); animation: candle 2.6s ease-in-out infinite; }
 @keyframes candle { 50% { opacity: .6; } }
-.stage[data-holiday="halloween"] .moon { background: #FFC98A; box-shadow: 0 0 34px 10px rgba(255, 170, 90, .45); }
-.stage[data-holiday="halloween"] .bat { display: block; }
+.stage[data-holiday~="halloween"] .moon { background: #FFC98A; box-shadow: 0 0 34px 10px rgba(255, 170, 90, .45); }
+.stage[data-holiday~="halloween"] .bat { display: block; }
 .bat { position: absolute; left: 0; top: 0; animation: bat-fly 17s linear infinite; }
 .bat path { transform-origin: 20px 8px; animation: flap .28s ease-in-out infinite alternate; }
 @keyframes flap { to { transform: scaleY(.45); } }
@@ -355,7 +355,7 @@ html, body {
   60%, 100% { transform: translate(560px, 40px); }
 }
 
-.stage[data-holiday="newyear"] .firework { display: block; }
+.stage[data-holiday~="newyear"] .firework { display: block; }
 .firework { position: absolute; width: 5px; height: 5px; border-radius: 50%; opacity: 0; animation: burst 4.2s ease-out infinite; }
 .fw1 { left: 110px; top: 70px; color: #FFD38A; }
 .fw2 { left: 300px; top: 46px; color: #F28DB2; animation-delay: 1.4s; }
@@ -368,7 +368,7 @@ html, body {
   60%, 100% { opacity: 0; transform: scale(1.5) translateY(5px); }
 }
 
-.stage[data-holiday="valentine"] .love-hearts { display: block; }
+.stage[data-holiday~="valentine"] .love-hearts { display: block; }
 .love-hearts { position: absolute; left: 1010px; top: 280px; width: 160px; height: 60px; pointer-events: none; z-index: 19; }
 .love-hearts span { position: absolute; bottom: 0; color: #FF5A7A; font-size: 16px; text-shadow: 0 0 8px rgba(255, 90, 122, .7); opacity: 0; animation: float-up 4s ease-out infinite; }
 .love-hearts span:nth-child(1) { left: 10px; } .love-hearts span:nth-child(2) { left: 70px; animation-delay: 1.3s; font-size: 20px; } .love-hearts span:nth-child(3) { left: 130px; animation-delay: 2.6s; }
@@ -381,7 +381,7 @@ html, body {
 .branch .la { fill: var(--leaf-a); }
 .branch .lb { fill: var(--leaf-b); }
 .branch-snow, .stage[data-season="winter"] .leaves { display: none; }
-.stage[data-season="winter"]:is([data-weather="snow"], [data-holiday="winter"]) .branch-snow { display: inline; }
+.stage[data-season="winter"]:is([data-weather="snow"], [data-holiday~="winter"]) .branch-snow { display: inline; }
 .stage[data-season="spring"] .branch .lb { fill: #FFFFFF; opacity: .85; }
 
 /* Petals and leaves drift down on clear days, hurry in the rain, blow sideways in a storm, and hide when it snows. */
@@ -1040,7 +1040,16 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   background: rgba(244, 236, 255, .06); color: var(--text);
   font: 400 18px 'Pacifico', cursive;
 }
-.decor-field input:focus { outline: 2px solid var(--pink); outline-offset: 1px; }
+.decor-field input:focus, .decor-field select:focus { outline: 2px solid var(--pink); outline-offset: 1px; }
+.decor-field select {
+  min-height: 44px; padding: 0 12px;
+  border: 1px solid rgba(244, 236, 255, .2); border-radius: 10px;
+  background: #2A2450; color: var(--text);
+  font: 700 14px 'M PLUS Rounded 1c', sans-serif;
+}
+.decor-note { margin: -4px 0 12px; font-size: 13px; line-height: 1.4; color: var(--pink-soft); }
+.decor-note:empty { display: none; }
+.chip input[type="checkbox"]:checked + span::before { content: '✓ '; }
 .decor-chips, .decor-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
 .decor-chips legend, .decor-swatches legend { width: 100%; }
 .chip, .swatch { position: relative; cursor: pointer; }
@@ -1086,4 +1095,106 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .tonearm, .sleeve, .crate-sleeve { transition: none; }
   .crate-cover.flip-next, .crate-cover.flip-prev { animation: none; }
   .flake { top: var(--y); }
+}
+
+/* ---------- more holidays ---------- */
+.stage[data-holiday~="lunar"] .fairy:nth-child(2n+1) { --b: #FF5A4A; }
+.stage[data-holiday~="lunar"] .fairy:nth-child(2n) { --b: #FFD38A; }
+.stage[data-holiday~="stpatricks"] .fairy:nth-child(3n+1) { --b: #7EF2B8; }
+.stage[data-holiday~="stpatricks"] .fairy:nth-child(3n+2) { --b: #3EDC7E; }
+.stage[data-holiday~="stpatricks"] .fairy:nth-child(3n) { --b: #FFD38A; }
+.stage[data-holiday~="easter"] .fairy:nth-child(4n+1) { --b: #F7A9C8; }
+.stage[data-holiday~="easter"] .fairy:nth-child(4n+2) { --b: #C9B3FF; }
+.stage[data-holiday~="easter"] .fairy:nth-child(4n+3) { --b: #9FE8D0; }
+.stage[data-holiday~="easter"] .fairy:nth-child(4n) { --b: #FFF1A8; }
+.stage[data-holiday~="july4"] .fairy:nth-child(3n+1) { --b: #FF5A6E; }
+.stage[data-holiday~="july4"] .fairy:nth-child(3n+2) { --b: #F4ECFF; }
+.stage[data-holiday~="july4"] .fairy:nth-child(3n) { --b: #6FB8FF; }
+.stage[data-holiday~="diwali"] .fairy:nth-child(3n+1) { --b: #FFB347; }
+.stage[data-holiday~="diwali"] .fairy:nth-child(3n+2) { --b: #FFD38A; }
+.stage[data-holiday~="diwali"] .fairy:nth-child(3n) { --b: #FF8A3C; }
+.stage[data-holiday~="thanksgiving"] .fairy:nth-child(3n+1) { --b: #FF9A3C; }
+.stage[data-holiday~="thanksgiving"] .fairy:nth-child(3n+2) { --b: #F2B33D; }
+.stage[data-holiday~="thanksgiving"] .fairy:nth-child(3n) { --b: #E86A4A; }
+.stage[data-holiday~="hanukkah"] .fairy:nth-child(2n+1) { --b: #6FB8FF; }
+.stage[data-holiday~="hanukkah"] .fairy:nth-child(2n) { --b: #F4ECFF; }
+
+/* Garlands, bunting and lanterns along the curtain rod. */
+.stage:is([data-holiday~="july4"], [data-holiday~="newyear"], [data-holiday~="easter"], [data-holiday~="thanksgiving"], [data-holiday~="stpatricks"]) .bunting-string,
+.stage[data-holiday~="july4"] .bunting-july4,
+.stage[data-holiday~="newyear"] .bunting-newyear,
+.stage[data-holiday~="easter"] .garland-eggs,
+.stage[data-holiday~="thanksgiving"] .garland-leaves,
+.stage[data-holiday~="stpatricks"] .garland-shamrocks,
+.stage[data-holiday~="diwali"] .garland-marigold,
+.stage[data-holiday~="lunar"] .lanterns,
+.stage[data-holiday~="winter"] .berries,
+.stage[data-holiday~="valentine"] .garland-hearts { display: inline; }
+.bunting-newyear text { font: 700 11px 'M PLUS Rounded 1c', sans-serif; fill: #2A2040; }
+.lantern { transform-box: fill-box; transform-origin: 50% 0; animation: lantern-sway 4s ease-in-out infinite; }
+.lantern:nth-child(2) { animation-delay: -1.3s; }
+.lantern:nth-child(3) { animation-delay: -2.6s; }
+@keyframes lantern-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+/* On the window, the shelf and the sill. */
+.stage[data-holiday~="winter"] :is(.wreath, .xmas-tree, .stockings) { display: inline; }
+.stage[data-holiday~="winter"] .shelf-plant { display: none; }
+.stage[data-holiday~="halloween"] .cobweb { display: inline; }
+.stage[data-holiday~="halloween"] .ghost { display: block; }
+.stage[data-holiday~="hanukkah"] .menorah,
+.stage[data-holiday~="diwali"] .diyas,
+.stage[data-holiday~="easter"] .easter-basket,
+.stage[data-holiday~="thanksgiving"] .pie,
+.stage[data-holiday~="stpatricks"] .pot-of-gold { display: inline; }
+.menorah .flame { display: none; fill: #FFD38A; filter: drop-shadow(0 0 4px #FFB347); }
+.menorah .flame.lit, .menorah .flame.shamash { display: inline; }
+.diya-flame { fill: #FFD38A; filter: drop-shadow(0 0 5px #FFB347); transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.6s ease-in-out infinite; }
+.diya-glow { fill: url(#diya-glow); }
+@keyframes flicker { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(.85, 1.15); } 70% { transform: scale(1.1, .9); } }
+.ghost { position: absolute; left: 944px; top: 320px; z-index: 7; animation: ghost-float 5s ease-in-out infinite; }
+@keyframes ghost-float { 0%, 100% { transform: translateY(0) rotate(-3deg); opacity: .85; } 50% { transform: translateY(-14px) rotate(3deg); opacity: .55; } }
+
+/* Through the glass: a rainbow for St. Patrick's Day, fireworks for celebrations. */
+.stage[data-holiday~="stpatricks"] .rainbow { display: block; }
+.rainbow {
+  position: absolute; left: 50px; top: 80px; width: 420px; height: 210px; border-radius: 210px 210px 0 0; opacity: .5;
+  background: radial-gradient(circle at 50% 100%, transparent 56%, #FF5A6E 56% 60%, #FF9A3C 60% 64%, #FFD38A 64% 68%, #7EF2B8 68% 72%, #6FB8FF 72% 76%, #B79CFF 76% 80%, transparent 80%);
+}
+.stage:is([data-holiday~="july4"], [data-holiday~="lunar"], [data-holiday~="diwali"]) .firework { display: block; }
+.stage[data-holiday~="july4"] .fw1 { color: #FF5A6E; }
+.stage[data-holiday~="july4"] .fw2 { color: #F4ECFF; }
+.stage[data-holiday~="july4"] .fw3 { color: #6FB8FF; }
+.stage[data-holiday~="lunar"] :is(.fw1, .fw3) { color: #FF5A4A; }
+.stage[data-holiday~="lunar"] .fw2 { color: #FFD38A; }
+.stage[data-holiday~="diwali"] .firework { color: #FFD38A; }
+.stage[data-holiday~="diwali"] .fw2 { color: #FF9A3C; }
+
+/* Holiday hats (data-hat names the holiday; see HAT_FOR in js/holidays.js). */
+.hat, .pet-hat { display: none; }
+.stage[data-hat="winter"] .hat-santa,
+.stage[data-hat="halloween"] .hat-witch,
+.stage[data-hat="valentine"] .hat-hearts,
+.stage:is([data-hat="newyear"], [data-hat="july4"], [data-hat="lunar"]) .hat-party,
+.stage[data-hat="diwali"] .hat-flower,
+.stage[data-hat="stpatricks"] .hat-leprechaun,
+.stage[data-hat="easter"] .hat-bunny,
+.stage:is([data-hat="thanksgiving"], [data-hat="hanukkah"]) .hat-beanie,
+.stage:not([data-hat="none"]):not([data-hat="halloween"]) .pet-hat-cone,
+.stage[data-hat="halloween"] .pet-hat-witch { display: inline; }
+.stage { --hat-a: #E04848; --hat-b: #F4F4FA; }
+.stage[data-hat="valentine"] { --hat-a: #FF5A7A; }
+.stage[data-hat="newyear"] { --hat-a: #FFD38A; --hat-b: #F4ECFF; }
+.stage[data-hat="july4"] { --hat-a: #4A7BD0; --hat-b: #FF5A6E; }
+.stage[data-hat="lunar"] { --hat-a: #E8402C; --hat-b: #FFD38A; }
+.stage[data-hat="diwali"] { --hat-a: #FF9A3C; --hat-b: #FFD34A; }
+.stage[data-hat="stpatricks"] { --hat-a: #3EAE6E; --hat-b: #FFD38A; }
+.stage[data-hat="easter"] { --hat-a: #C9B3FF; }
+.stage[data-hat="thanksgiving"] { --hat-a: #E8742C; --hat-b: #F2B33D; }
+.stage[data-hat="hanukkah"] { --hat-a: #4A7BD0; --hat-b: #F4ECFF; }
+.hat-a { fill: var(--hat-a); }
+.hat-b { fill: var(--hat-b); }
+.hat-b-stroke { stroke: var(--hat-b); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lantern, .diya-flame, .ghost { animation: none; }
 }
