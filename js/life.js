@@ -36,6 +36,19 @@ export function initLamp(decor) {
   sync();
 }
 
+// City windows switch off and on now and then, like people going to bed or getting up.
+export function initCityLife() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  setInterval(() => {
+    const lit = document.querySelectorAll('#buildings .lit');
+    if (!lit.length) return;
+    const dark = document.querySelectorAll('#buildings .lit.dark');
+    // Keep roughly one window in twelve dark at a time.
+    if (dark.length > lit.length / 12) dark[Math.floor(Math.random() * dark.length)].classList.remove('dark');
+    lit[Math.floor(Math.random() * lit.length)].classList.toggle('dark');
+  }, 1400);
+}
+
 export function buildWeather() {
   const rnd = seeded(7);
 

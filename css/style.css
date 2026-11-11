@@ -260,7 +260,25 @@ html, body {
 }
 
 .building { position: absolute; }
-.lit { position: absolute; width: 5px; height: 7px; }
+.lit { position: absolute; width: 5px; height: 7px; transition: opacity 1.2s ease; }
+.lit.dark { opacity: .06 !important; }
+
+/* Cars on the street below, and a plane crossing the sky. */
+.car { position: absolute; top: 311px; left: 0; width: 16px; height: 3px; }
+.car::before, .car::after { content: ''; position: absolute; top: 0; width: 4px; height: 3px; border-radius: 2px; }
+.car::before { left: 0; } .car::after { left: 9px; }
+.car-east { animation: drive-east 11s linear infinite; }
+.car-east::before, .car-east::after { background: #FFF4D6; box-shadow: 0 0 6px 2px rgba(255, 236, 190, .7), 14px 0 14px 2px rgba(255, 236, 190, .25); }
+.car-east.late { top: 315px; animation-duration: 15s; animation-delay: -6s; }
+.car-west { top: 313px; animation: drive-west 13s linear infinite; animation-delay: -4s; }
+.car-west::before, .car-west::after { background: #FF5A6E; box-shadow: 0 0 6px 2px rgba(255, 90, 110, .6); }
+@keyframes drive-east { 0% { transform: translateX(-40px); } 60%, 100% { transform: translateX(540px); } }
+@keyframes drive-west { 0% { transform: translateX(540px); } 70%, 100% { transform: translateX(-40px); } }
+
+.plane { position: absolute; top: 46px; left: 0; width: 3px; height: 3px; border-radius: 50%; background: #F4ECFF; opacity: .8; animation: fly 46s linear infinite; animation-delay: -30s; }
+.plane::after { content: ''; position: absolute; left: 6px; top: 0; width: 3px; height: 3px; border-radius: 50%; background: #FF5A6E; box-shadow: 0 0 6px 2px rgba(255, 90, 110, .7); animation: blink 1.2s steps(1) infinite; }
+@keyframes fly { 0% { transform: translate(540px, 14px); } 45%, 100% { transform: translate(-30px, -6px); } }
+@keyframes blink { 50% { opacity: 0; } }
 
 .neon {
   position: absolute;
@@ -682,6 +700,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .car, .plane { display: none; }
   .rain line, .vinyl.spinning, .fairy, .neon-sign, .train, .drop, .drop::after, .flake, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .listener-body, .stage.is-on .listener-head, .stage.is-on .listener-foot, .pet-body, .pet.awake .pet-tail { animation: none; }
   .tonearm, .sleeve { transition: none; }
   .flake { top: var(--y); }
