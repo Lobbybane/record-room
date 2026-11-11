@@ -71,6 +71,10 @@ export const OPTIONS = {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
   },
+  sound: {
+    label: 'Sound effects',
+    choices: { on: 'On', off: 'Off' },
+  },
   // Not in the panel: switched by clicking the lamp.
   lamp: {
     label: 'Lamp',
@@ -102,6 +106,7 @@ export const DEFAULTS = {
   lamp: 'on',
   posters: 'records',
   holiday: 'auto',
+  sound: 'on',
 };
 
 const NEON_MAX = 16;
@@ -263,6 +268,7 @@ function buildPanel(form, decor) {
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
+    ['Sound', ['sound']],
   ];
 
   for (const [title, names] of sections) {

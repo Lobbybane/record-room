@@ -1,4 +1,5 @@
 // Small living details: pets that wake when clicked, snowflakes, raindrops on the glass.
+import { sfx } from './sounds.js';
 
 function seeded(seed) {
   return () => {
@@ -11,6 +12,8 @@ export function initPets(stage) {
   for (const pet of stage.querySelectorAll('.pet')) {
     let timer = null;
     pet.addEventListener('click', () => {
+      if (pet.classList.contains('pet-cat')) sfx.purr();
+      else sfx.thump();
       // Restart the heart animation on every click.
       pet.classList.remove('awake');
       void pet.offsetWidth;
@@ -26,6 +29,7 @@ export function initFishTank() {
   const tank = document.getElementById('fish-tank');
   let timer = null;
   tank.addEventListener('click', () => {
+    sfx.bubbles();
     tank.classList.remove('fed');
     void tank.offsetWidth;
     tank.classList.add('fed');
@@ -43,6 +47,7 @@ export function initLamp(decor) {
     button.title = on ? 'Turn the lamp off' : 'Turn the lamp on';
   };
   button.addEventListener('click', () => {
+    sfx.click();
     decor.set('lamp', decor.get('lamp') === 'on' ? 'off' : 'on');
     sync();
   });

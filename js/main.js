@@ -3,6 +3,7 @@ import { findCover, youtubeThumb } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
+import { sfx, setSoundEnabled, initThunder } from './sounds.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -172,7 +173,14 @@ function buildLights() {
 
 /* ---------------- decorating and little details ---------------- */
 
-const decor = initDecor(stage, { onSky: buildCity, onApply: (d) => setPosterMode(d.posters) });
+const decor = initDecor(stage, {
+  onSky: buildCity,
+  onApply: (d) => {
+    setPosterMode(d.posters);
+    setSoundEnabled(d.sound === 'on');
+  },
+});
+initThunder(stage);
 initPets(stage);
 initLamp(decor);
 initCityLife();
@@ -280,6 +288,7 @@ async function moveToPlatter(ref) {
   vinylWrap.hidden = false;
 
   // Slide out of the sleeve, then arc across the room and settle onto the platter.
+  sfx.swoosh();
   await animate([{ transform: 'translate(0px, 0px)' }, { transform: 'translate(0px, -62px)' }], 650, 'ease-out');
   vinylWrap.style.zIndex = '30';
   await animate([
@@ -291,6 +300,7 @@ async function moveToPlatter(ref) {
 
 async function moveToSleeve(ref) {
   const { end, mid } = pathTo(ref);
+  sfx.swoosh();
   await animate([
     { transform: end },
     { transform: mid, offset: 0.5 },
@@ -365,6 +375,7 @@ async function playRecord(ref) {
   await moveToPlatter(ref);
   phase = 'loading';
   setDeck({ needle: true });
+  sfx.crackle();
   showTv('Tuning in…', record.title);
   updateCard();
   await wait(700);
@@ -550,11 +561,15 @@ function openCrate() {
 
 function flip(step) {
   if (crate.length < 2) return;
+  sfx.flick();
   crateIndex = (crateIndex + step + crate.length) % crate.length;
   renderCrateBrowser(step > 0 ? 'next' : 'prev');
 }
 
-$('#crate').addEventListener('click', openCrate);
+$('#crate').addEventListener('click', () => {
+  sfx.flick();
+  openCrate();
+});
 $('#crate-close').addEventListener('click', () => crateDialog.close());
 $('#crate-prev').addEventListener('click', () => flip(-1));
 $('#crate-next').addEventListener('click', () => flip(1));
