@@ -31,6 +31,9 @@ html, body {
   inset: 0;
   overflow: hidden;
 }
+/* The phone layout scrolls if the room, TV and card don't all fit. */
+.viewport.scrolls { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.scroll-spacer { width: 1px; height: 0; pointer-events: none; }
 
 .stage {
   --s: 1;
@@ -624,6 +627,10 @@ html, body {
 .stage.needle-down .tonearm { transform: rotate(0deg); }
 
 /* ---------- TV ---------- */
+.tv-set { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.stage[data-layout="phone"] .tv-set { z-index: 30; transform: var(--tv-t); transform-origin: 0 0; }
+.stage[data-layout="phone"] .np-card { transform: var(--card-t); transform-origin: 0 0; }
+.stage[data-layout="phone"] .tv-antenna { display: none; }
 .tv { position: absolute; left: 50px; top: 528px; width: 360px; height: 266px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18), 0 14px 26px rgba(10,8,25,.45); }
 .tv-bezel { position: absolute; left: 66px; top: 542px; width: 328px; height: 208px; border-radius: 16px; background: #2B2440; }
 .tv-screen { position: absolute; left: 70px; top: 546px; width: 320px; height: 200px; border-radius: 14px; overflow: hidden; background: #000; }

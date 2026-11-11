@@ -313,11 +313,14 @@
   </svg>
   <button type="button" class="lamp-switch" id="lamp-switch" aria-label="Lamp" aria-pressed="true"></button>
 
-  <!-- TV with the YouTube player (must stay visible) -->
+  <!-- TV with the YouTube player (must stay visible). On phones the whole set is enlarged. -->
+  <div class="tv-set">
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
-    <line x1="230" y1="528" x2="184" y2="468" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
-    <line x1="230" y1="528" x2="290" y2="462" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="184" cy="468" r="4" fill="#15132B"/><circle cx="290" cy="462" r="4" fill="#15132B"/>
+    <g class="tv-antenna">
+      <line x1="230" y1="528" x2="184" y2="468" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+      <line x1="230" y1="528" x2="290" y2="462" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="184" cy="468" r="4" fill="#15132B"/><circle cx="290" cy="462" r="4" fill="#15132B"/>
+    </g>
     <rect x="80" y="792" width="30" height="14" rx="3" fill="#15132B"/>
     <rect x="350" y="792" width="30" height="14" rx="3" fill="#15132B"/>
   </svg>
@@ -336,6 +339,7 @@
     <div class="knob"></div><div class="knob"></div>
     <div class="grille"></div>
     <div class="tv-led"></div>
+  </div>
   </div>
 
   <!-- Shelf of records (buttons are generated) -->
@@ -406,6 +410,7 @@
     <rect width="100%" height="100%" filter="url(#grain)"/>
   </svg>
 </div>
+<div class="scroll-spacer" id="scroll-spacer"></div>
 </main>
 
 <!-- Add a record -->

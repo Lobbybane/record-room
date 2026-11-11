@@ -24,7 +24,25 @@ function render() {
   document.querySelectorAll('.poster').forEach((poster, i) => {
     const art = poster.querySelector('.poster-art');
     const record = mode === 'records' ? picks[i] : null;
-    art.style.backgroundImage = record ? `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})` : '';
-    poster.classList.toggle('has-cover', Boolean(record));
+    const url = record ? record.cover || youtubeThumb(record.id) : '';
+    poster.dataset.url = url;
+    if (!url) {
+      showArt(poster, art);
+      return;
+    }
+    // Keep the built-in art until the cover has actually loaded.
+    const img = new Image();
+    img.onload = () => {
+      if (poster.dataset.url !== url) return;
+      art.style.backgroundImage = `url(${JSON.stringify(url)})`;
+      poster.classList.add('has-cover');
+    };
+    img.onerror = () => { if (poster.dataset.url === url) showArt(poster, art); };
+    img.src = url;
   });
+}
+
+function showArt(poster, art) {
+  art.style.backgroundImage = '';
+  poster.classList.remove('has-cover');
 }

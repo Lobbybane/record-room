@@ -15,13 +15,23 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reduceMotion ?
 // The whole room is always visible; any spare screen space is filled by the
 // wall and floor. CSS gets the screen's edges in stage pixels (--fx, --fy, --fw, --fh).
 // While the Decorate panel is open, the room fits into the space beside or above it.
+// On a phone held upright, the room sits at the top with a big TV and the card below it.
 const viewport = stage.parentElement;
 const decorPanel = $('#decor-panel');
+const spacer = $('#scroll-spacer');
+const card = $('.np-card');
 
 function fitStage() {
   const width = viewport.clientWidth;
   const height = viewport.clientHeight;
   if (!width || !height) return;
+  if (width <= 600 && height >= width * 1.3) {
+    fitPhone(width, height);
+    return;
+  }
+  stage.dataset.layout = 'wide';
+  viewport.classList.remove('scrolls');
+  spacer.style.height = '0px';
   let roomWidth = width;
   let roomHeight = height;
   if (decorPanel.open) {
@@ -41,6 +51,46 @@ function fitStage() {
   stage.style.setProperty('--fy', px(410 - centerY / scale - 1));
   stage.style.setProperty('--fw', px(width / scale + 2));
   stage.style.setProperty('--fh', px(height / scale + 2));
+}
+
+function fitPhone(width, height) {
+  const px = (n) => `${n.toFixed(1)}px`;
+  const scale = Number((width / 1280).toFixed(4));
+  const top = 48; // room for the Decorate button
+  const cx = width / 2;
+  const cy = top + 410 * scale;
+  // Screen pixels <-> stage pixels.
+  const toStageX = (x) => 640 + (x - cx) / scale;
+  const toStageY = (y) => 410 + (y - cy) / scale;
+
+  // Enlarge the TV so YouTube's player is at least 200px tall, and centre it under the room.
+  // The TV body spans x 50-410 and y 528-806 in stage pixels; the antenna reaches up to y 462.
+  const k = Math.max((width - 24) / (360 * scale), 206 / (200 * scale));
+  const tvTop = top + 820 * scale - 6;
+  const tvX = toStageX((width - 360 * scale * k) / 2) - 50 * k;
+  const tvY = toStageY(tvTop) - 528 * k;
+  const tvBottom = tvTop + (806 - 528) * scale * k;
+
+  // The now-spinning card goes full width under the TV.
+  const kc = (width - 24) / (320 * scale);
+  const cardTop = tvBottom + 14;
+  const cardX = toStageX(12) - 930;
+  const cardY = toStageY(cardTop) - 652;
+  const contentBottom = cardTop + card.offsetHeight * scale * kc + 20;
+
+  stage.dataset.layout = 'phone';
+  stage.style.setProperty('--s', scale);
+  stage.style.setProperty('--cx', px(cx));
+  stage.style.setProperty('--cy', px(cy));
+  stage.style.setProperty('--tv-t', `translate(${px(tvX)}, ${px(tvY)}) scale(${k.toFixed(4)})`);
+  stage.style.setProperty('--card-t', `translate(${px(cardX)}, ${px(cardY)}) scale(${kc.toFixed(4)})`);
+  const fullHeight = Math.max(height, contentBottom);
+  stage.style.setProperty('--fx', px(640 - cx / scale - 1));
+  stage.style.setProperty('--fy', px(410 - cy / scale - 1));
+  stage.style.setProperty('--fw', px(width / scale + 2));
+  stage.style.setProperty('--fh', px(fullHeight / scale + 2));
+  viewport.classList.toggle('scrolls', contentBottom > height);
+  spacer.style.height = px(fullHeight);
 }
 if ('ResizeObserver' in window) {
   const observer = new ResizeObserver(fitStage);
