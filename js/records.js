@@ -1,4 +1,5 @@
 // The shelf: where each sleeve sits on the stage, and saving records in this browser.
+import { youtubeThumb } from './covers.js';
 
 // Top-left corner of each 100 x 100 sleeve, in stage pixels (1280 x 820).
 export const SLOTS = [
@@ -12,10 +13,23 @@ export const SLOTS = [
 
 const KEY = 'record-room:records:v1';
 
+// A first-time visitor's shelf starts with these, so there's something to play straight away.
+// They are Lofi Girl and Chillhop live radio streams. To change them, swap the 11-character
+// YouTube id (the part after "watch?v=") and the names. Visitors can remove them like any record.
+export const STARTERS = [
+  { id: 'jfKfPfyJRdk', artist: 'Lofi Girl', title: 'lofi hip hop radio' },
+  { id: 'rUxyKA_-grg', artist: 'Lofi Girl', title: 'beats to sleep/chill to' },
+  { id: '4xDzrJKXOOY', artist: 'Lofi Girl', title: 'synthwave radio' },
+  { id: '5yx6BWlEVcY', artist: 'Chillhop Music', title: 'jazzy & lofi hip hop radio' },
+];
+
 export function loadRecords() {
   let saved = [];
   try {
-    const parsed = JSON.parse(localStorage.getItem(KEY) || '[]');
+    const stored = localStorage.getItem(KEY);
+    // Nothing saved yet means a first visit: put the starter records on the shelf.
+    if (stored === null) saved = STARTERS.map((r) => ({ ...r, cover: youtubeThumb(r.id) }));
+    const parsed = JSON.parse(stored || 'null');
     if (Array.isArray(parsed)) saved = parsed;
   } catch {
     // Storage blocked or corrupted: start with an empty shelf.
