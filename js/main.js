@@ -7,6 +7,7 @@ import { sfx, setSoundEnabled, initThunder } from './sounds.js';
 import { confirmDialog } from './ui.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 import { buildCity as drawCity } from './city.js';
+import { initWeather } from './weather.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -155,6 +156,7 @@ const decor = initDecor(stage, {
   },
 });
 initThunder(stage);
+initWeather(stage);
 initPets(stage);
 initLamp(decor);
 initCityLife();
