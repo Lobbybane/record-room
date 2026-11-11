@@ -154,9 +154,6 @@
         <path class="far-city" d="M0 322 V150 H30 V128 H52 V156 H84 V112 H96 V96 H104 V112 H118 V146 H160 V120 H190 V160 H226 V84 H232 V70 H238 V84 H246 V140 H290 V108 H326 V150 H356 V124 H392 V158 H430 V100 H448 V88 H456 V100 H470 V140 H512 V322 Z"/>
       </svg>
       <div id="buildings"></div>
-      <div class="neon neon-records">RECORDS</div>
-      <div class="neon neon-24h">24H</div>
-      <div class="neon neon-cafe">CAFE</div>
       <div class="track"></div>
       <div class="pillar" style="left:40px"></div>
       <div class="pillar" style="left:180px"></div>
@@ -209,31 +206,9 @@
     </svg>
     <div class="season-fall" id="season-fall"></div>
     <div class="fireflies" id="fireflies"></div>
-    <svg class="layer-glass rain" aria-hidden="true" viewBox="0 0 512 322">
-      <g stroke="#D2E1FF" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="14 34">
-        <line x1="20" y1="-10" x2="-24" y2="332"/>
-        <line x1="60" y1="-10" x2="16" y2="332"/>
-        <line x1="100" y1="-10" x2="56" y2="332"/>
-        <line x1="140" y1="-10" x2="96" y2="332"/>
-        <line x1="180" y1="-10" x2="136" y2="332"/>
-        <line x1="220" y1="-10" x2="176" y2="332"/>
-        <line x1="260" y1="-10" x2="216" y2="332"/>
-        <line x1="300" y1="-10" x2="256" y2="332"/>
-        <line x1="340" y1="-10" x2="296" y2="332"/>
-        <line x1="380" y1="-10" x2="336" y2="332"/>
-        <line x1="420" y1="-10" x2="376" y2="332"/>
-        <line x1="460" y1="-10" x2="416" y2="332"/>
-        <line x1="500" y1="-10" x2="456" y2="332"/>
-        <line x1="540" y1="-10" x2="496" y2="332"/>
-      </g>
-      <g fill="#D2E1FF" opacity=".5">
-        <circle cx="88" cy="62" r="2.4"/><circle cx="214" cy="40" r="2"/><circle cx="300" cy="190" r="2.6"/>
-        <circle cx="140" cy="210" r="2"/><circle cx="452" cy="232" r="2.4"/><circle cx="36" cy="180" r="1.8"/>
-      </g>
-    </svg>
-    <div class="snow" id="snow"></div>
+    <canvas class="weather-canvas" id="weather-sky" aria-hidden="true"></canvas>
     <div class="lightning"></div>
-    <div class="drops" id="drops"></div>
+    <canvas class="weather-canvas" id="weather-glass" aria-hidden="true"></canvas>
     <div class="stuck" id="stuck"></div>
     <div class="frost"></div>
     <div class="reflection"></div>
@@ -311,6 +286,41 @@
       <g fill="#FFD38A" stroke="#D9A95E" stroke-width="1"><circle cx="466" cy="396" r="5"/><circle cx="476" cy="392" r="5"/><circle cx="486" cy="396" r="5"/><circle cx="472" cy="400" r="5"/><circle cx="482" cy="400" r="5"/></g>
       <path d="M454 400 H498 Q500 418 476 418 Q452 418 454 400 Z" fill="#15132B"/><rect x="452" y="398" width="48" height="5" rx="2.5" fill="#2A2440"/>
     </g>
+  </svg>
+
+  <!-- Café: a window bar with stools, and two customers looking out -->
+  <svg class="layer cafe-only cafe-bar" aria-hidden="true" viewBox="0 0 1280 820">
+    <ellipse class="laptop-light" cx="495" cy="378" rx="46" ry="30"/>
+    <rect x="336" y="410" width="588" height="18" rx="3" fill="#8A5A4A"/>
+    <rect x="336" y="426" width="588" height="8" fill="#6B4436"/>
+    <path d="M470 388 L520 388 L522 410 L468 410 Z" fill="#3B3F5C"/><circle cx="495" cy="398" r="3" fill="#F7A9C8"/>
+    <rect x="676" y="396" width="14" height="14" rx="2" fill="#F4ECFF"/><path d="M690 400 q6 0 6 5 q0 5 -6 5" fill="none" stroke="#F4ECFF" stroke-width="2.5"/>
+    <g class="cup-steam" fill="none" stroke="#F4ECFF" stroke-width="1.6" stroke-linecap="round"><path d="M680 390 q-3 -5 0 -10 q3 -5 0 -10"/><path d="M686 392 q-3 -5 0 -10"/></g>
+    <g class="stool"><ellipse cx="495" cy="478" rx="22" ry="6" fill="#2A2440"/><path d="M482 480 L476 598 M508 480 L514 598" stroke="#2A2440" stroke-width="3"/><ellipse cx="495" cy="544" rx="17" ry="4" fill="none" stroke="#2A2440" stroke-width="2.5"/></g>
+    <g class="stool"><ellipse cx="652" cy="478" rx="22" ry="6" fill="#2A2440"/><path d="M639 480 L633 598 M665 480 L671 598" stroke="#2A2440" stroke-width="3"/><ellipse cx="652" cy="544" rx="17" ry="4" fill="none" stroke="#2A2440" stroke-width="2.5"/></g>
+    <g class="typist">
+      <path d="M486 480 L484 530 M504 480 L506 530" stroke="#3B3F78" stroke-width="10" stroke-linecap="round"/>
+      <path d="M478 534 h12 M500 534 h12" stroke="#F4ECFF" stroke-width="6" stroke-linecap="round"/>
+      <path d="M470 476 Q464 420 476 386 Q495 374 514 386 Q526 420 520 476 Z" fill="#3B4C8A"/>
+      <ellipse cx="495" cy="380" rx="15" ry="7" fill="#2E3C70"/>
+      <g class="typist-head">
+        <circle cx="480" cy="356" r="3.5" fill="#E8B896"/><circle cx="510" cy="356" r="3.5" fill="#E8B896"/>
+        <circle cx="495" cy="354" r="15" fill="#4A3040"/>
+        <path d="M478 352 Q495 326 512 352" fill="none" stroke="#F28DB2" stroke-width="3"/>
+        <rect x="474" y="348" width="7" height="13" rx="3" fill="#F28DB2"/><rect x="509" y="348" width="7" height="13" rx="3" fill="#F28DB2"/>
+      </g>
+    </g>
+    <g class="sipper">
+      <path d="M643 480 L641 530 M661 480 L663 530" stroke="#2C2E5E" stroke-width="10" stroke-linecap="round"/>
+      <path d="M635 534 h12 M657 534 h12" stroke="#6B4436" stroke-width="6" stroke-linecap="round"/>
+      <path d="M628 476 Q622 420 634 388 Q652 376 670 388 Q682 420 676 476 Z" fill="#E89A9A"/>
+      <path d="M640 390 Q652 400 664 390" fill="none" stroke="#C97878" stroke-width="2"/>
+      <circle cx="652" cy="356" r="14" fill="#E8C27A"/><circle cx="652" cy="337" r="7.5" fill="#E8C27A"/>
+      <path d="M640 350 Q652 342 664 350" fill="none" stroke="#D4A95E" stroke-width="1.5"/>
+      <g class="arm-down"><path d="M668 392 L678 412" stroke="#E89A9A" stroke-width="9" stroke-linecap="round"/></g>
+      <g class="arm-up"><path d="M668 392 L680 380 L670 362" fill="none" stroke="#E89A9A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><rect x="664" y="350" width="12" height="12" rx="2" fill="#F4ECFF"/></g>
+    </g>
+    <g class="seats"><ellipse cx="495" cy="477" rx="24" ry="6.5" fill="#2A2440"/><ellipse cx="495" cy="475" rx="22" ry="4" fill="#3B3360"/><ellipse cx="652" cy="477" rx="24" ry="6.5" fill="#2A2440"/><ellipse cx="652" cy="475" rx="22" ry="4" fill="#3B3360"/></g>
   </svg>
   <div class="pumpkin-glow"></div>
   <svg class="layer pumpkin" aria-hidden="true" viewBox="0 0 1280 820">
@@ -409,6 +419,18 @@
     </g>
   </svg>
   <div class="neon-sign" id="neon-sign" aria-hidden="true">side a</div>
+  <!-- Café: the chalkboard menu -->
+  <div class="cafe-only menu-board" aria-hidden="true">
+    <div class="menu-title">menu</div>
+    <ul>
+      <li><span>latte</span><span>4.5</span></li>
+      <li><span>cortado</span><span>4</span></li>
+      <li><span>matcha latte</span><span>5</span></li>
+      <li><span>chai</span><span>4.5</span></li>
+      <li><span>cold brew</span><span>4.5</span></li>
+      <li><span>croissant</span><span>3.5</span></li>
+    </ul>
+  </div>
   <svg class="ghost" viewBox="0 0 40 52" width="40" height="52" aria-hidden="true">
     <path d="M4 50 V20 Q4 2 20 2 Q36 2 36 20 V50 L30 44 L25 50 L20 44 L15 50 L10 44 Z" fill="#F4F0FF" opacity=".9"/>
     <ellipse cx="14" cy="20" rx="3" ry="4" fill="#15132B"/><ellipse cx="26" cy="20" rx="3" ry="4" fill="#15132B"/><ellipse cx="20" cy="30" rx="3" ry="2.5" fill="#15132B"/>
@@ -449,11 +471,74 @@
     <span class="pet-heart" aria-hidden="true">♥</span>
   </button>
 
+  <!-- Café: a customer ordering at the counter -->
+  <svg class="layer cafe-only cafe-orderer" aria-hidden="true" viewBox="0 0 1280 820">
+    <ellipse cx="896" cy="672" rx="30" ry="5" fill="#120F26" opacity=".4"/>
+    <path d="M884 600 L882 666 M904 600 L906 666" stroke="#2A2440" stroke-width="10" stroke-linecap="round"/>
+    <path d="M876 668 h12 M900 668 h14" stroke="#15132B" stroke-width="6" stroke-linecap="round"/>
+    <g class="orderer-body">
+      <path d="M876 604 Q872 520 882 478 Q896 466 910 478 Q918 520 916 604 Z" fill="#D9A95E"/>
+      <path d="M884 478 Q896 492 910 478 L908 494 Q896 502 886 494 Z" fill="#C8443C"/>
+      <path d="M880 480 L912 560" stroke="#6B4436" stroke-width="3"/>
+      <rect x="891" y="456" width="10" height="16" rx="4" fill="#9C6646"/>
+      <circle cx="897" cy="444" r="14" fill="#9C6646"/>
+      <path d="M883 446 Q881 428 897 426 Q912 427 912 440 Q906 434 898 436 Q890 438 884 452 Z" fill="#1E1A3D"/>
+      <path d="M882 440 Q884 420 898 420 Q912 420 913 438 Z" fill="#F2B33D"/><rect x="881" y="436" width="33" height="6" rx="3" fill="#E8955A"/>
+      <path d="M904 446 q2 1.5 4 0" fill="none" stroke="#15132B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M906 452 q2 1 4 -1" fill="none" stroke="#5A2E2A" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M906 490 L916 520 L926 512" fill="none" stroke="#D9A95E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="922" y="500" width="8" height="13" rx="1.5" fill="#15132B" transform="rotate(-12 926 506)"/>
+      <rect class="phone-glow" x="923" y="501.5" width="6" height="10" rx="1" fill="#9FD8FF" transform="rotate(-12 926 506)"/>
+    </g>
+  </svg>
+
   <!-- Record crate on the floor (click to flip through) -->
   <button type="button" class="crate" id="crate" aria-label="Open the record crate">
     <span class="crate-sleeves" id="crate-sleeves"></span>
     <span class="crate-box"><span class="crate-handle"></span></span>
   </button>
+
+  <!-- Café: the barista behind the counter, at the espresso machine -->
+  <svg class="layer cafe-only cafe-back" aria-hidden="true" viewBox="0 0 1280 820">
+    <g class="barista">
+      <path d="M1122 528 Q1120 470 1130 452 Q1146 442 1162 452 Q1172 470 1170 528 Z" fill="#EFE3D0"/>
+      <path d="M1132 528 L1134 468 Q1146 464 1158 468 L1160 528 Z" fill="#2E6E66"/>
+      <path d="M1134 468 L1131 452 M1158 468 L1161 452" stroke="#2E6E66" stroke-width="3"/>
+      <rect x="1141" y="434" width="10" height="16" rx="4" fill="#C98E67"/>
+      <g class="barista-head">
+        <circle cx="1146" cy="423" r="15" fill="#C98E67"/>
+        <path d="M1131 425 Q1129 405 1146 403 Q1163 405 1161 425 Q1156 413 1146 413 Q1136 413 1131 425 Z" fill="#2A1E2E"/>
+        <circle cx="1146" cy="400" r="7" fill="#2A1E2E"/>
+        <path class="barista-eyes" d="M1138 426 q2.5 2.5 5 0 M1149 426 q2.5 2.5 5 0" fill="none" stroke="#2A1E2E" stroke-width="1.6" stroke-linecap="round"/>
+        <ellipse cx="1137" cy="431" rx="3" ry="1.8" fill="#F28DB2" opacity=".5"/><ellipse cx="1155" cy="431" rx="3" ry="1.8" fill="#F28DB2" opacity=".5"/>
+        <path d="M1143 433 q3 2.5 6 0" fill="none" stroke="#7E3A30" stroke-width="1.4" stroke-linecap="round"/>
+      </g>
+      <path d="M1126 458 L1118 498 L1130 510" fill="none" stroke="#EFE3D0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="1132" cy="511" r="4.5" fill="#C98E67"/>
+      <g class="barista-arm">
+        <path d="M1164 458 L1178 486 L1190 478" fill="none" stroke="#EFE3D0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="1192" cy="477" r="4.5" fill="#C98E67"/>
+        <path d="M1186 470 H1200 L1198 486 H1188 Z" fill="#DDE3F0"/><path d="M1200 474 q5 0 4 6" fill="none" stroke="#DDE3F0" stroke-width="2"/>
+      </g>
+    </g>
+    <g class="espresso">
+      <rect x="1180" y="440" width="72" height="8" rx="2" fill="#9AA3BC"/>
+      <rect x="1188" y="432" width="9" height="8" rx="1.5" fill="#F4ECFF"/><rect x="1201" y="432" width="9" height="8" rx="1.5" fill="#F4ECFF"/><rect x="1214" y="432" width="9" height="8" rx="1.5" fill="#F4ECFF"/>
+      <rect x="1178" y="446" width="76" height="82" rx="5" fill="#C9D3E8"/>
+      <rect x="1184" y="452" width="64" height="40" rx="3" fill="#AEB8CF"/>
+      <circle cx="1216" cy="466" r="7" fill="#F4ECFF"/><path d="M1216 466 L1220 461" stroke="#C8443C" stroke-width="1.5"/>
+      <text x="1216" y="486" text-anchor="middle" class="espresso-brand">lofi</text>
+      <rect x="1190" y="494" width="12" height="6" rx="1" fill="#2A2440"/><rect x="1230" y="494" width="12" height="6" rx="1" fill="#2A2440"/>
+      <path d="M1196 500 L1186 508 M1236 500 L1246 508" stroke="#15132B" stroke-width="4" stroke-linecap="round"/>
+      <rect x="1191" y="512" width="10" height="10" rx="2" fill="#F4ECFF"/><rect x="1231" y="512" width="10" height="10" rx="2" fill="#F4ECFF"/>
+      <path class="pour" d="M1196 500 V512 M1236 500 V512" stroke="#6B4436" stroke-width="1.6"/>
+      <rect x="1182" y="522" width="68" height="6" rx="2" fill="#7F89A3"/>
+      <path d="M1180 466 L1186 490" stroke="#9AA3BC" stroke-width="3" stroke-linecap="round"/>
+      <g class="machine-steam" fill="none" stroke="#F4ECFF" stroke-width="2" stroke-linecap="round">
+        <path d="M1188 466 q-5 -8 0 -16 q5 -8 0 -16"/><path d="M1196 462 q-4 -7 0 -14"/>
+      </g>
+    </g>
+  </svg>
 
   <!-- Cabinet, turntable, lamp -->
   <div class="lamp-glow"></div>
@@ -471,17 +556,47 @@
     <ellipse cx="1030" cy="500" rx="72" ry="18" fill="#15132B"/>
     <ellipse cx="1030" cy="500" rx="56" ry="13" fill="none" stroke="#2E2558" stroke-width="1.5"/>
     <circle cx="966" cy="518" r="4" class="power-led"/>
-    <rect x="1150" y="498" width="24" height="30" rx="4" fill="#F4ECFF"/>
-    <path d="M1174 506 q9 0 9 8 q0 8 -9 8" fill="none" stroke="#F4ECFF" stroke-width="3"/>
+    <rect class="mug" x="1150" y="498" width="24" height="30" rx="4" fill="#F4ECFF"/>
+    <path class="mug" d="M1174 506 q9 0 9 8 q0 8 -9 8" fill="none" stroke="#F4ECFF" stroke-width="3"/>
     <g class="steam" stroke="#F4ECFF" stroke-width="2" fill="none" stroke-linecap="round">
       <path d="M1158 490 q-5 -8 0 -16 q5 -8 0 -16"/><path d="M1167 490 q-5 -8 0 -16"/>
     </g>
-    <rect x="1206" y="452" width="6" height="76" fill="#15132B"/>
-    <ellipse cx="1209" cy="528" rx="18" ry="4" fill="#15132B"/>
+    <rect class="lamp-pole" x="1206" y="452" width="6" height="76" fill="#15132B"/>
+    <ellipse class="lamp-pole" cx="1209" cy="528" rx="18" ry="4" fill="#15132B"/>
     <polygon class="lamp-shade" points="1186,412 1232,412 1246,454 1172,454"/>
     <ellipse class="lamp-bulb" cx="1209" cy="454" rx="37" ry="5"/>
   </svg>
   <button type="button" class="lamp-switch" id="lamp-switch" aria-label="Lamp" aria-pressed="true"></button>
+
+
+  <!-- Café: a marble counter top and a pastry case on the front -->
+  <svg class="layer cafe-only cafe-counter" aria-hidden="true" viewBox="0 0 1280 820">
+    <rect x="930" y="538" width="320" height="114" fill="#5A3A32"/>
+    <path d="M930 560 H1250 M930 590 H1250 M930 620 H1250" stroke="#4A2E28" stroke-width="2"/>
+    <rect x="924" y="526" width="332" height="14" rx="3" fill="#EDE6F2"/>
+    <path d="M940 532 q20 -4 40 2 t40 -1 M1080 534 q24 -5 50 1 t44 -2" fill="none" stroke="#C9C0D6" stroke-width="1"/>
+    <rect x="946" y="548" width="208" height="92" rx="5" fill="rgba(200, 230, 255, .14)" stroke="rgba(255, 255, 255, .38)" stroke-width="1.5"/>
+    <path d="M948 594 H1152" stroke="rgba(255, 255, 255, .3)" stroke-width="1.5"/>
+    <g class="pastries">
+      <path d="M958 586 q14 -22 28 0 q-6 -6 -14 -6 q-8 0 -14 6 Z" fill="#E8B060"/><path d="M964 584 l3 -9 M972 580 v-8 M980 584 l-3 -9" stroke="#C88A3E" stroke-width="1.2"/>
+      <path d="M994 586 q14 -22 28 0 q-6 -6 -14 -6 q-8 0 -14 6 Z" fill="#E8B060"/><path d="M1000 584 l3 -9 M1008 580 v-8 M1016 584 l-3 -9" stroke="#C88A3E" stroke-width="1.2"/>
+      <path d="M1034 588 l3 -12 h16 l3 12 Z" fill="#F4ECFF"/><ellipse cx="1045" cy="574" rx="11" ry="7" fill="#8A5A4A"/><circle cx="1041" cy="572" r="1.4" fill="#2A1E2E"/><circle cx="1048" cy="575" r="1.4" fill="#2A1E2E"/>
+      <path d="M1068 588 l3 -12 h16 l3 12 Z" fill="#F4ECFF"/><ellipse cx="1079" cy="574" rx="11" ry="7" fill="#B79CFF"/>
+      <path d="M1104 588 l3 -12 h16 l3 12 Z" fill="#F4ECFF"/><ellipse cx="1115" cy="574" rx="11" ry="7" fill="#F2B33D"/>
+      <path d="M958 634 L986 618 L986 634 Z" fill="#F4ECFF"/><path d="M958 634 L986 618 L986 624 L966 634 Z" fill="#F7A9C8"/><path d="M958 628 L986 612" stroke="#F28DB2" stroke-width="3"/>
+      <path d="M994 634 L1022 618 L1022 634 Z" fill="#6B4436"/><path d="M994 628 L1022 612" stroke="#3E2420" stroke-width="3"/>
+      <circle cx="1046" cy="624" r="10" fill="#E8B060"/><circle cx="1046" cy="624" r="8" fill="#F7A9C8"/><circle cx="1046" cy="624" r="3" fill="rgba(200, 230, 255, .4)"/>
+      <circle cx="1074" cy="624" r="10" fill="#E8B060"/><circle cx="1074" cy="624" r="8" fill="#7E5446"/><circle cx="1074" cy="624" r="3" fill="rgba(200, 230, 255, .4)"/>
+      <circle cx="1102" cy="624" r="10" fill="#E8B060"/><circle cx="1102" cy="624" r="8" fill="#F4ECFF"/><circle cx="1102" cy="624" r="3" fill="rgba(200, 230, 255, .4)"/>
+      <g fill="#F28DB2"><rect x="1043" y="618" width="2" height="1" transform="rotate(30 1043 618)"/><rect x="1050" y="628" width="2" height="1"/><rect x="1098" y="620" width="2" height="1" fill="#6FE3F2"/></g>
+      <path d="M1124 634 q4 -14 14 -14 q10 0 14 14 Z" fill="#C88A3E"/>
+    </g>
+    <path d="M948 552 L960 552 L948 590 Z" fill="rgba(255, 255, 255, .12)"/>
+    <rect x="1170" y="560" width="64" height="30" rx="4" fill="#23302C" stroke="#8A5A4A" stroke-width="3"/>
+    <text x="1202" y="580" text-anchor="middle" class="cafe-chalk small">order here</text>
+    <rect x="1186" y="508" width="20" height="20" rx="3" fill="rgba(200, 230, 255, .25)" stroke="rgba(255, 255, 255, .5)"/>
+    <text x="1196" y="522" text-anchor="middle" class="cafe-chalk tiny">tips</text>
+  </svg>
 
   <!-- TV with the YouTube player (must stay visible). On phones the whole set is enlarged. -->
   <div class="tv-set">
@@ -559,6 +674,12 @@
     </div>
   </section>
 
+  <!-- Café: pendant lamps over the window bar (click the middle one to switch them) -->
+  <svg class="layer cafe-only cafe-pendants" aria-hidden="true" viewBox="0 0 1280 820">
+    <defs><linearGradient id="cone-light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".2"/><stop offset="1" stop-color="#FFD9A8" stop-opacity="0"/></linearGradient></defs>
+    <g class="pendant"><path d="M495 -400 V8" stroke="#15132B" stroke-width="1.5"/><polygon class="pendant-cone" points="483,26 507,26 571,300 419,300"/><path d="M490 8 H500 L510 26 H480 Z" fill="#2E6E66"/><ellipse class="pendant-bulb" cx="495" cy="26" rx="9" ry="2.6"/></g><g class="pendant"><path d="M652 -400 V8" stroke="#15132B" stroke-width="1.5"/><polygon class="pendant-cone" points="640,26 664,26 728,300 576,300"/><path d="M647 8 H657 L667 26 H637 Z" fill="#2E6E66"/><ellipse class="pendant-bulb" cx="652" cy="26" rx="9" ry="2.6"/></g><g class="pendant"><path d="M812 -400 V8" stroke="#15132B" stroke-width="1.5"/><polygon class="pendant-cone" points="800,26 824,26 888,300 736,300"/><path d="M807 8 H817 L827 26 H797 Z" fill="#2E6E66"/><ellipse class="pendant-bulb" cx="812" cy="26" rx="9" ry="2.6"/></g>
+  </svg>
+
   <!-- Room controls -->
   <div class="room-controls">
     <button type="button" class="pill" id="decor-toggle" aria-expanded="false" aria-controls="decor-panel">
@@ -584,64 +705,76 @@
 </main>
 
 <!-- Add a record -->
-<dialog class="add-dialog" id="add-dialog" aria-labelledby="add-title">
+<dialog class="ios-sheet add-dialog" id="add-dialog" aria-labelledby="add-title">
   <form id="add-form" novalidate>
-    <h2 id="add-title">Add a record</h2>
-    <p class="hint">Paste a YouTube link for the song or the full album. The cover comes from Apple's iTunes catalog when it can find a match.</p>
-    <label for="f-link">YouTube link</label>
-    <input id="f-link" name="link" type="url" placeholder="https://www.youtube.com/watch?v=…" required autocomplete="off">
-    <label for="f-artist">Artist</label>
-    <input id="f-artist" name="artist" type="text" autocomplete="off">
-    <label for="f-album">Album or song</label>
-    <input id="f-album" name="album" type="text" autocomplete="off">
-    <p class="form-error" id="f-error" role="alert"></p>
-    <div class="dialog-actions">
-      <button type="button" class="ghost" id="f-cancel">Cancel</button>
-      <button type="submit" class="primary" id="f-submit">Put it on the shelf</button>
+    <header class="ios-nav">
+      <button type="button" class="ios-nav-btn" id="f-cancel">Cancel</button>
+      <h2 class="ios-nav-title" id="add-title">Add to Shelf</h2>
+      <button type="submit" class="ios-nav-btn strong" id="f-submit">Add</button>
+    </header>
+    <div class="ios-scroll">
+      <p class="ios-footer above">Paste a YouTube link to a song or a full album.</p>
+      <div class="ios-group">
+        <label class="ios-row ios-field"><span class="ios-label">Link</span><input id="f-link" name="link" type="url" placeholder="youtube.com/watch?v=…" required autocomplete="off"></label>
+        <label class="ios-row ios-field"><span class="ios-label">Artist</span><input id="f-artist" name="artist" type="text" placeholder="Optional" autocomplete="off"></label>
+        <label class="ios-row ios-field"><span class="ios-label">Title</span><input id="f-album" name="album" type="text" placeholder="Song or album, optional" autocomplete="off"></label>
+      </div>
+      <p class="ios-footer error form-error" id="f-error" role="alert"></p>
+      <p class="ios-footer">Leave the names blank to use the video’s title. The cover comes from Apple’s iTunes catalog.</p>
     </div>
   </form>
 </dialog>
 
 <!-- Flip through the record crate -->
-<dialog class="add-dialog crate-dialog" id="crate-dialog" aria-labelledby="crate-title">
-  <div class="crate-head">
-    <h2 id="crate-title">Record crate</h2>
-    <button type="button" class="decor-close" id="crate-close" aria-label="Close">
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    </button>
+<dialog class="ios-sheet crate-dialog" id="crate-dialog" aria-labelledby="crate-title">
+  <header class="ios-nav">
+    <span></span>
+    <h2 class="ios-nav-title" id="crate-title">Record Crate</h2>
+    <button type="button" class="ios-nav-btn strong" id="crate-close">Done</button>
+  </header>
+  <div class="ios-scroll">
+    <p class="ios-footer above" id="crate-empty">The crate is empty. Fill it with records you want to keep without using a shelf spot. It holds as many as you like.</p>
+    <div class="crate-browser" id="crate-browser">
+      <button type="button" class="flip" id="crate-prev" aria-label="Previous record">
+        <svg viewBox="0 0 12 20" width="12" height="20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="crate-stack"><div class="crate-cover" id="crate-cover"></div></div>
+      <button type="button" class="flip" id="crate-next" aria-label="Next record">
+        <svg viewBox="0 0 12 20" width="12" height="20" aria-hidden="true"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="crate-info" id="crate-info" aria-live="polite">
+      <p class="crate-rec-title" id="crate-rec-title"></p>
+      <p class="crate-rec-artist" id="crate-rec-artist"></p>
+      <p class="crate-count" id="crate-count"></p>
+    </div>
+    <div class="ios-group" id="crate-actions">
+      <button type="button" class="ios-row ios-action tint" id="crate-play">Play</button>
+      <button type="button" class="ios-row ios-action" id="crate-to-shelf">Move to Shelf</button>
+      <button type="button" class="ios-row ios-action destructive" id="crate-remove">Remove from Crate</button>
+    </div>
+    <div class="ios-group">
+      <button type="button" class="ios-row ios-action tint" id="crate-add">Add a Record…</button>
+    </div>
   </div>
-  <p class="hint" id="crate-empty">The crate is empty. Fill it with records you want to keep without using a shelf spot. It holds as many as you like.</p>
-  <div class="crate-browser" id="crate-browser">
-    <button type="button" class="flip" id="crate-prev" aria-label="Previous record">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div class="crate-stack"><div class="crate-cover" id="crate-cover"></div></div>
-    <button type="button" class="flip" id="crate-next" aria-label="Next record">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+</dialog>
+
+<!-- iOS-style question, e.g. "Remove this record?" (js/ui.js) -->
+<dialog class="ios-alert" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+  <div class="ios-alert-body">
+    <h2 id="confirm-title"></h2>
+    <p id="confirm-message"></p>
   </div>
-  <div class="crate-info" id="crate-info" aria-live="polite">
-    <p class="crate-rec-title" id="crate-rec-title"></p>
-    <p class="crate-rec-artist" id="crate-rec-artist"></p>
-    <p class="crate-count" id="crate-count"></p>
+  <div class="ios-alert-buttons">
+    <button type="button" id="confirm-cancel">Cancel</button>
+    <button type="button" id="confirm-ok" class="destructive">Remove</button>
   </div>
-  <div class="dialog-actions crate-actions" id="crate-actions">
-    <button type="button" class="ghost" id="crate-remove">Remove</button>
-    <button type="button" class="ghost" id="crate-to-shelf">Move to shelf</button>
-    <button type="button" class="primary" id="crate-play">Play</button>
-  </div>
-  <button type="button" class="crate-add" id="crate-add">+ Add a record to the crate</button>
 </dialog>
 
 <!-- Decorate the room (built by js/decor.js) -->
-<dialog class="decor-panel" id="decor-panel" aria-labelledby="decor-title">
-  <div class="decor-head">
-    <h2 id="decor-title">Decorate</h2>
-    <button type="button" class="decor-close" id="decor-close" aria-label="Close">
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-  <form class="decor-body" id="decor-form"></form>
+<dialog class="decor-panel ios-panel" id="decor-panel" aria-labelledby="decor-title">
+  <div class="ios-grabber" aria-hidden="true"></div>
+  <div class="ios-stack"></div>
 </dialog>
 
 <script type="module" src="js/main.js"></script>

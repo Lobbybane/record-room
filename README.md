@@ -37,13 +37,17 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 | `index.html` | The room: wall, window, shelves, turntable, TV, card |
 | `css/style.css` | All styling and the animations (weather, train, lights, pets, listener, spin, tonearm) |
 | `js/main.js` | Fits the room to the screen, builds the city, runs the shelf, the record animation and playback |
-| `js/decor.js` | The Decorate panel, saving its choices, holiday dates |
-| `js/life.js` | Pets waking up, fish tank, lamp switch, city windows, snowflakes, raindrops |
+| `js/decor.js` | The Decorate settings: saving and applying them |
+| `js/panel.js` | The iOS-style Decorate panel |
+| `js/ui.js` | iOS-style alerts |
+| `js/city.js` | The city outside the window, with its neon signs |
+| `js/weather.js` | Rain, snow, lightning and drops on the glass |
+| `js/life.js` | Pets waking up, fish tank, lamp switch, city windows, seasons |
 | `js/holidays.js` | The holiday calendar (which holidays show on which dates) |
 | `js/sounds.js` | Sound effects made in the browser (no sound files) |
 | `js/posters.js` | The two wall posters made from your record covers |
 | `js/records.js` | Shelf spots, starter records, the crate, saving, reading YouTube links |
-| `js/covers.js` | Cover lookup from the iTunes Search API |
+| `js/covers.js` | Cover lookup from the iTunes Search API (songs and albums) |
 | `js/player.js` | Wrapper for the YouTube IFrame Player API |
 
 ## Rules we're following

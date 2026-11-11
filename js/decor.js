@@ -2,6 +2,7 @@
 // Choices are saved in this browser and applied as data attributes and CSS variables on the stage.
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
+import { createPanel } from './panel.js';
 
 const KEY = 'record-room:settings:v1';
 
@@ -21,7 +22,7 @@ export const OPTIONS = {
     choices: { rain: 'Rain', storm: 'Storm', snow: 'Snow', clear: 'Clear' },
   },
   neonColor: {
-    label: 'Neon color',
+    label: 'Color',
     swatches: {
       pink: ['Pink', '#F28DB2', '#FFE3EF'],
       cyan: ['Cyan', '#6FE3F2', '#E3FBFF'],
@@ -83,12 +84,12 @@ export const OPTIONS = {
     },
   },
   celebrate: {
-    label: 'Celebrate (used by “By date”)',
+    label: 'Celebrate',
     multi: true,
     choices: HOLIDAYS,
   },
   hats: {
-    label: 'Holiday hats for the listener and pets',
+    label: 'Holiday hats',
     choices: { on: 'On', off: 'Off' },
   },
   posters: {
@@ -210,7 +211,6 @@ function fitNeon(sign) {
 export function initDecor(stage, { onSky, onApply = () => {} }) {
   const decor = loadDecor();
   const panel = document.getElementById('decor-panel');
-  const form = document.getElementById('decor-form');
   const toggle = document.getElementById('decor-toggle');
   const sign = document.getElementById('neon-sign');
   let shownSky = null;
@@ -248,29 +248,31 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     }
     onApply(decor);
     saveDecor(decor);
+    ui?.refresh();
   }
 
-  buildPanel(form, decor);
-
-  form.addEventListener('input', (event) => {
-    const { name, value } = event.target;
-    if (name === 'neonText') decor.neonText = value.slice(0, NEON_MAX);
-    else if (name === 'celebrate') decor.celebrate = [...form.querySelectorAll('input[name="celebrate"]:checked')].map((i) => i.value);
-    else if (isValid(name, value)) decor[name] = value;
-    else return;
-    apply();
+  const ui = createPanel(panel, {
+    options: OPTIONS,
+    decor,
+    maxText: NEON_MAX,
+    onChange(name, value) {
+      if (name === 'neonText') decor.neonText = String(value).slice(0, NEON_MAX);
+      else if (isValid(name, value)) decor[name] = value;
+      else return;
+      apply();
+    },
   });
-  form.addEventListener('submit', (event) => event.preventDefault());
 
   function setOpen(open) {
     if (open && !panel.open) {
       panel.show();
-      form.querySelector('input:checked, input')?.focus();
+      ui.focusFirst();
     } else if (!open && panel.open) {
       panel.close();
     }
   }
   panel.addEventListener('close', () => {
+    ui.reset();
     toggle.setAttribute('aria-expanded', 'false');
     toggle.focus();
   });
@@ -278,9 +280,9 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     setOpen(!panel.open);
     toggle.setAttribute('aria-expanded', String(panel.open));
   });
-  document.getElementById('decor-close').addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && panel.open && !document.getElementById('add-dialog')?.open) setOpen(false);
+    if (event.key !== 'Escape' || !panel.open || document.querySelector('dialog[open].ios-sheet, dialog[open].ios-alert')) return;
+    if (!ui.back()) setOpen(false);
   });
 
   // Re-check the clock each minute for "Auto".
@@ -297,56 +299,6 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
       apply();
     },
   };
-}
-
-function buildPanel(form, decor) {
-  const sections = [
-    ['Room', ['room', 'posters']],
-    ['Outside', ['time', 'weather', 'season']],
-    ['Holidays', ['holiday', 'holidayNote', 'celebrate', 'hats']],
-    ['Neon sign', ['neonText', 'neonColor']],
-    ['Pets', ['pet', 'coat', 'tank']],
-    ['Listener', ['sweater', 'hair', 'skin']],
-    ['Sound', ['sound']],
-  ];
-
-  for (const [title, names] of sections) {
-    const section = document.createElement('section');
-    section.className = 'decor-section';
-    const heading = document.createElement('h3');
-    heading.textContent = title;
-    section.appendChild(heading);
-    for (const name of names) section.appendChild(field(name, decor));
-    form.appendChild(section);
-  }
-}
-
-function field(name, decor) {
-  if (name === 'neonText') return neonField(decor);
-  if (name === 'holidayNote') {
-    const note = document.createElement('p');
-    note.className = 'decor-note';
-    note.id = 'holiday-note';
-    note.setAttribute('aria-live', 'polite');
-    return note;
-  }
-  if (OPTIONS[name].select) return selectField(name, decor);
-  return group(name, decor);
-}
-
-function selectField(name, decor) {
-  const wrap = document.createElement('div');
-  wrap.className = 'decor-field';
-  const label = document.createElement('label');
-  label.htmlFor = `decor-${name}`;
-  label.textContent = OPTIONS[name].label;
-  const select = document.createElement('select');
-  Object.assign(select, { id: `decor-${name}`, name });
-  for (const [value, text] of Object.entries(OPTIONS[name].choices)) {
-    select.append(new Option(text, value, false, decor[name] === value));
-  }
-  wrap.append(label, select);
-  return wrap;
 }
 
 // Holiday decorations on the stage: which holidays, the hat, the menorah's candles, and the panel's note.
@@ -372,55 +324,4 @@ function applyHolidays(stage, decor) {
     if (next) parts.push(`Next: ${HOLIDAYS[next.key]} in ${next.days} day${next.days === 1 ? '' : 's'}`);
     note.textContent = parts.join(' · ');
   }
-}
-
-function neonField(decor) {
-  const wrap = document.createElement('div');
-  wrap.className = 'decor-field';
-  const label = document.createElement('label');
-  label.htmlFor = 'decor-neon';
-  label.textContent = 'Words';
-  const input = document.createElement('input');
-  Object.assign(input, {
-    id: 'decor-neon', name: 'neonText', type: 'text', maxLength: NEON_MAX, value: decor.neonText,
-    placeholder: 'side a', autocomplete: 'off', spellcheck: false,
-  });
-  wrap.append(label, input);
-  return wrap;
-}
-
-function group(name, decor) {
-  const option = OPTIONS[name];
-  const fieldset = document.createElement('fieldset');
-  fieldset.className = option.swatches ? 'decor-swatches' : 'decor-chips';
-  const legend = document.createElement('legend');
-  legend.textContent = option.label;
-  fieldset.appendChild(legend);
-
-  const entries = option.swatches
-    ? Object.entries(option.swatches).map(([value, [label, color]]) => [value, label, color])
-    : Object.entries(option.choices).map(([value, label]) => [value, label, null]);
-
-  for (const [value, label, color] of entries) {
-    const wrap = document.createElement('label');
-    wrap.className = color ? 'swatch' : 'chip';
-    const input = document.createElement('input');
-    const checked = option.multi ? decor[name].includes(value) : decor[name] === value;
-    Object.assign(input, { type: option.multi ? 'checkbox' : 'radio', name, value, checked });
-    const face = document.createElement('span');
-    if (color) {
-      face.className = 'swatch-dot';
-      face.style.setProperty('--c', color);
-      wrap.title = label;
-      const text = document.createElement('span');
-      text.className = 'sr-only';
-      text.textContent = label;
-      wrap.append(input, face, text);
-    } else {
-      face.textContent = label;
-      wrap.append(input, face);
-    }
-    fieldset.appendChild(wrap);
-  }
-  return fieldset;
 }

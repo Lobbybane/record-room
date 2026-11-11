@@ -1,4 +1,4 @@
-// Small living details: pets that wake when clicked, snowflakes, raindrops on the glass.
+// Small living details: pets that wake when clicked, the fish tank, the lamp, city windows, seasons.
 import { sfx } from './sounds.js';
 
 function seeded(seed) {
@@ -67,41 +67,9 @@ export function initCityLife() {
   }, 1400);
 }
 
+// Seasonal extras around the window (rain and snow are drawn by js/weather.js).
 export function buildWeather() {
   const rnd = seeded(7);
-
-  const flakes = [];
-  for (let i = 0; i < 48; i++) {
-    const flake = document.createElement('div');
-    flake.className = 'flake';
-    const size = 2 + rnd() * 3;
-    Object.assign(flake.style, {
-      left: `${Math.round(rnd() * 512)}px`,
-      width: `${size.toFixed(1)}px`,
-      height: `${size.toFixed(1)}px`,
-      opacity: (0.5 + rnd() * 0.5).toFixed(2),
-      animationDuration: `${(7 + rnd() * 7).toFixed(1)}s`,
-      animationDelay: `${(-rnd() * 14).toFixed(1)}s`,
-    });
-    flake.style.setProperty('--drift', `${Math.round(-30 + rnd() * 60)}px`);
-    flake.style.setProperty('--y', `${Math.round(rnd() * 300)}px`); // resting spot when motion is reduced
-    flakes.push(flake);
-  }
-  document.getElementById('snow').replaceChildren(...flakes);
-
-  const drops = [];
-  for (let i = 0; i < 11; i++) {
-    const drop = document.createElement('div');
-    drop.className = 'drop';
-    Object.assign(drop.style, {
-      left: `${Math.round(14 + rnd() * 484)}px`,
-      top: `${Math.round(10 + rnd() * 170)}px`,
-      animationDuration: `${(6 + rnd() * 6).toFixed(1)}s`,
-      animationDelay: `${(-rnd() * 12).toFixed(1)}s`,
-    });
-    drops.push(drop);
-  }
-  document.getElementById('drops').replaceChildren(...drops);
 
   // Seasonal petals or leaves falling past the window.
   const falling = [];

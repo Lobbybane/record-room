@@ -1,10 +1,13 @@
 import { SLOTS, loadRecords, saveRecords, loadCrate, saveCrate, parseYouTubeId } from './records.js';
-import { findCover, youtubeThumb } from './covers.js';
+import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
 import { sfx, setSoundEnabled, initThunder } from './sounds.js';
+import { confirmDialog } from './ui.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
+import { buildCity as drawCity } from './city.js';
+import { initWeather } from './weather.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -37,8 +40,9 @@ function fitStage() {
   let roomHeight = height;
   if (decorPanel.open) {
     const panel = decorPanel.getBoundingClientRect();
-    if (panel.width >= width - 1) roomHeight = Math.max(120, height - panel.height);
-    else roomWidth = Math.max(200, width - panel.width);
+    // A bottom sheet on phones, a floating sheet on the right elsewhere.
+    if (panel.left < 2) roomHeight = Math.max(120, panel.top);
+    else roomWidth = Math.max(200, panel.left - 8);
   }
   const scale = Number(Math.min(roomWidth / 1280, roomHeight / 820).toFixed(4));
   const centerX = roomWidth / 2;
@@ -111,38 +115,9 @@ function seeded(seed) {
   };
 }
 
-// How many city windows are lit at each time of day.
-const LIT = { sunrise: 0.18, golden: 0.12, dusk: 0.32, midnight: 0.42 };
-
+// The city outside is drawn by js/city.js; it is redrawn when the time of day changes.
 function buildCity(sky) {
-  const rnd = seeded(11);
-  const lit = LIT[sky] ?? LIT.dusk;
-  const specs = [[0, 70, 150], [64, 56, 186], [126, 82, 128], [200, 48, 222], [250, 90, 160], [338, 62, 204], [400, 70, 140], [464, 48, 182]];
-  const tones = ['#2E2558', '#352B63', '#2A2350', '#3B2F6B'];
-  const container = $('#buildings');
-  container.replaceChildren();
-
-  specs.forEach(([left, width, height], i) => {
-    const building = document.createElement('div');
-    building.className = 'building';
-    Object.assign(building.style, {
-      left: `${left}px`, top: `${322 - height}px`, width: `${width}px`, height: `${height}px`, background: tones[i % tones.length],
-    });
-    for (let y = 10; y < height - 24; y += 14) {
-      for (let x = 7; x < width - 8; x += 12) {
-        const r = rnd();
-        if (r < lit) {
-          const lit = document.createElement('div');
-          lit.className = 'lit';
-          Object.assign(lit.style, {
-            left: `${x}px`, top: `${y}px`, background: r < 0.06 ? '#6FE3F2' : '#FFD38A', opacity: (0.55 + r).toFixed(2),
-          });
-          building.appendChild(lit);
-        }
-      }
-    }
-    container.appendChild(building);
-  });
+  drawCity($('#buildings'), sky);
 }
 
 function buildStars() {
@@ -181,6 +156,7 @@ const decor = initDecor(stage, {
   },
 });
 initThunder(stage);
+initWeather(stage);
 initPets(stage);
 initLamp(decor);
 initCityLife();
@@ -333,6 +309,7 @@ const player = createPlayer('yt-player', {
   onState(state) {
     if (current === null || phase === 'returning') return;
     if (state === 1) {
+      if (phase !== 'playing') upgradeCover(current);
       phase = 'playing';
       setDeck({ spinning: true, needle: true });
       $('#tv-idle').hidden = true;
@@ -355,6 +332,29 @@ const player = createPlayer('yt-player', {
   },
 });
 let errorText = '';
+
+// A record that still shows a video thumbnail gets another try at a real cover once it
+// plays, using the title and channel the YouTube player reports.
+const triedCovers = new Set();
+async function upgradeCover(ref) {
+  const record = recordOf(ref);
+  if (!record || !isThumbnail(record.cover) || triedCovers.has(record.id)) return;
+  triedCovers.add(record.id);
+  const info = player.videoData();
+  if (!info) return;
+  const guess = guessFromVideo(info.title, info.channel);
+  const known = record.artist !== 'Unknown artist' && record.title !== 'Untitled record';
+  const cover = (known && await findCover(record.artist, record.title)) || await findCover(guess.artist, guess.title);
+  if (!cover || recordOf(ref) !== record) return;
+  record.cover = cover;
+  if (!known) Object.assign(record, { artist: guess.artist || record.artist, title: guess.title || record.title });
+  saveRecords(records);
+  saveCrate(crate);
+  renderShelf();
+  renderCrate();
+  updateCard();
+  $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(cover)})`;
+}
 
 function showTv(title, sub) {
   $('#tv-title').textContent = title;
@@ -475,8 +475,8 @@ $('#np-remove').addEventListener('click', async () => {
   if (busy || current === null) return;
   const ref = current;
   const record = recordOf(ref);
-  const where = ref.from === 'crate' ? 'out of the crate' : 'off the shelf';
-  if (!window.confirm(`Take “${record.title}” ${where}?`)) return;
+  const where = ref.from === 'crate' ? 'Remove from Crate?' : 'Remove from Shelf?';
+  if (!await confirmDialog({ title: where, message: `“${record.title}” by ${record.artist}` })) return;
   await putBack();
   if (ref.from === 'crate') takeFromCrate(ref.index);
   else {
@@ -545,7 +545,7 @@ function renderCrateBrowser(direction = '') {
   const playing = isCurrent('crate', crateIndex);
   const play = $('#crate-play');
   play.disabled = playing || busy;
-  play.textContent = playing ? 'On the turntable' : 'Play';
+  play.textContent = playing ? 'On the Turntable' : 'Play';
   const hasSpace = records.some((r) => !r);
   const toShelf = $('#crate-to-shelf');
   toShelf.disabled = playing || !hasSpace;
@@ -595,10 +595,10 @@ $('#crate-to-shelf').addEventListener('click', () => {
   renderShelf();
 });
 
-$('#crate-remove').addEventListener('click', () => {
+$('#crate-remove').addEventListener('click', async () => {
   const record = crate[crateIndex];
   if (!record || isCurrent('crate', crateIndex)) return;
-  if (!window.confirm(`Take “${record.title}” out of the crate?`)) return;
+  if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
   takeFromCrate(crateIndex);
   renderShelf();
 });
@@ -618,7 +618,8 @@ let addTarget = null; // a shelf spot number, or 'crate'
 
 function openDialog(target) {
   addTarget = target;
-  submit.textContent = target === 'crate' ? 'Put it in the crate' : 'Put it on the shelf';
+  submit.textContent = 'Add';
+  $('#add-title').textContent = target === 'crate' ? 'Add to Crate' : 'Add to Shelf';
   form.reset();
   errorBox.textContent = '';
   dialog.showModal();
@@ -636,11 +637,20 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  const artist = $('#f-artist').value.trim();
-  const title = $('#f-album').value.trim();
+  let artist = $('#f-artist').value.trim();
+  let title = $('#f-album').value.trim();
   submit.disabled = true;
-  submit.textContent = 'Finding the cover…';
+  submit.textContent = 'Adding…';
 
+  // Left blank? Use the video's own title and channel when YouTube shares them.
+  if (!artist || !title) {
+    const info = await fetchVideoInfo(id);
+    if (info) {
+      const guess = guessFromVideo(info.title, info.channel);
+      artist ||= guess.artist;
+      title ||= guess.title;
+    }
+  }
   const cover = await findCover(artist, title);
   const record = {
     id,
@@ -660,6 +670,7 @@ form.addEventListener('submit', async (event) => {
   renderShelf();
 
   submit.disabled = false;
+  submit.textContent = 'Add';
   dialog.close();
   if (addTarget === 'crate') openCrate();
 });
