@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record Room</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="viewport">
+<div class="stage" id="stage" data-sky="dusk" data-rain="on">
+
+  <!-- Wall and floor -->
+  <div class="wall"></div>
+  <div class="baseboard"></div>
+  <div class="floor"></div>
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <g stroke="#1E1636" stroke-width="2" opacity=".55">
+      <line x1="0" y1="646" x2="1280" y2="646"/>
+      <line x1="0" y1="696" x2="1280" y2="696"/>
+      <line x1="0" y1="756" x2="1280" y2="756"/>
+    </g>
+    <polygon class="spill" points="420,606 880,606 1010,820 300,820"/>
+    <ellipse cx="660" cy="748" rx="330" ry="52" fill="#4A3A6E"/>
+    <ellipse cx="660" cy="748" rx="310" ry="45" fill="none" stroke="#F28DB2" stroke-width="3" stroke-dasharray="2 10" opacity=".7"/>
+    <ellipse cx="640" cy="712" rx="92" ry="34" fill="#6E4C8E"/>
+    <ellipse cx="632" cy="704" rx="70" ry="22" fill="#8A63A8"/>
+  </svg>
+
+  <!-- Curtains and window frame -->
+  <div class="curtain-rod"></div>
+  <div class="curtain curtain-left"></div>
+  <div class="curtain curtain-right"></div>
+  <div class="window-frame"></div>
+
+  <!-- City view through the glass -->
+  <div class="glass" id="glass">
+    <div id="stars"></div>
+    <div class="moon"></div>
+    <div class="moon-cut"></div>
+    <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
+      <path class="far-city" d="M0 322 V150 H30 V128 H52 V156 H84 V112 H96 V96 H104 V112 H118 V146 H160 V120 H190 V160 H226 V84 H232 V70 H238 V84 H246 V140 H290 V108 H326 V150 H356 V124 H392 V158 H430 V100 H448 V88 H456 V100 H470 V140 H512 V322 Z"/>
+    </svg>
+    <div id="buildings"></div>
+    <div class="neon neon-records">RECORDS</div>
+    <div class="neon neon-24h">24H</div>
+    <div class="neon neon-cafe">CAFE</div>
+    <div class="track"></div>
+    <div class="pillar" style="left:40px"></div>
+    <div class="pillar" style="left:180px"></div>
+    <div class="pillar" style="left:320px"></div>
+    <div class="pillar" style="left:460px"></div>
+    <div class="train"><div class="train-windows"></div></div>
+    <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
+      <path fill="#15132B" d="M0 322 V296 H70 V288 H120 V300 H210 V284 H232 V270 H262 V284 H300 V292 H400 V280 H460 V296 H512 V322 Z"/>
+    </svg>
+    <svg class="layer-glass rain" aria-hidden="true" viewBox="0 0 512 322">
+      <g stroke="#D2E1FF" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="14 34">
+        <line x1="20" y1="-10" x2="-24" y2="332"/>
+        <line x1="60" y1="-10" x2="16" y2="332"/>
+        <line x1="100" y1="-10" x2="56" y2="332"/>
+        <line x1="140" y1="-10" x2="96" y2="332"/>
+        <line x1="180" y1="-10" x2="136" y2="332"/>
+        <line x1="220" y1="-10" x2="176" y2="332"/>
+        <line x1="260" y1="-10" x2="216" y2="332"/>
+        <line x1="300" y1="-10" x2="256" y2="332"/>
+        <line x1="340" y1="-10" x2="296" y2="332"/>
+        <line x1="380" y1="-10" x2="336" y2="332"/>
+        <line x1="420" y1="-10" x2="376" y2="332"/>
+        <line x1="460" y1="-10" x2="416" y2="332"/>
+        <line x1="500" y1="-10" x2="456" y2="332"/>
+        <line x1="540" y1="-10" x2="496" y2="332"/>
+      </g>
+      <g fill="#D2E1FF" opacity=".5">
+        <circle cx="88" cy="62" r="2.4"/><circle cx="214" cy="40" r="2"/><circle cx="300" cy="190" r="2.6"/>
+        <circle cx="140" cy="210" r="2"/><circle cx="452" cy="232" r="2.4"/><circle cx="36" cy="180" r="1.8"/>
+      </g>
+    </svg>
+    <div class="reflection"></div>
+  </div>
+  <div class="mullion"></div>
+
+  <!-- String lights -->
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <path d="M352 64 Q630 112 908 64" fill="none" stroke="#15132B" stroke-width="2"/>
+  </svg>
+  <div id="lights"></div>
+
+  <!-- Sill with plant and cat -->
+  <div class="sill"></div>
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <g fill="#3E8E7E">
+      <ellipse cx="392" cy="372" rx="10" ry="24" transform="rotate(-28 392 372)"/>
+      <ellipse cx="410" cy="364" rx="10" ry="28"/>
+      <ellipse cx="428" cy="372" rx="10" ry="24" transform="rotate(28 428 372)"/>
+    </g>
+    <g fill="#2E6E66">
+      <ellipse cx="400" cy="384" rx="8" ry="18" transform="rotate(-50 400 384)"/>
+      <ellipse cx="420" cy="384" rx="8" ry="18" transform="rotate(50 420 384)"/>
+    </g>
+    <polygon points="390,390 430,390 425,418 395,418" fill="#C8746A"/>
+    <rect x="386" y="386" width="48" height="8" rx="2" fill="#D98A7E"/>
+    <g fill="#15132B">
+      <ellipse cx="822" cy="404" rx="42" ry="15"/>
+      <circle cx="788" cy="398" r="13"/>
+      <polygon points="778,390 780,376 790,387"/>
+      <polygon points="790,387 799,377 800,392"/>
+      <path d="M860 408 Q884 410 878 422 L870 422 Q874 414 858 414 Z"/>
+    </g>
+  </svg>
+
+  <!-- Left shelf unit -->
+  <div class="shelf-unit"></div>
+  <div class="shelf-cubby" style="top:120px; height:120px"></div>
+  <div class="shelf-cubby" style="top:250px; height:140px"></div>
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <rect x="70" y="92" width="44" height="18" rx="3" fill="#6FE3F2"/>
+    <rect x="76" y="96" width="32" height="8" rx="2" fill="#1E1A3D"/>
+    <circle cx="84" cy="100" r="3" fill="#6FE3F2"/><circle cx="100" cy="100" r="3" fill="#6FE3F2"/>
+    <polygon points="252,84 282,84 278,110 256,110" fill="#C8746A"/>
+    <ellipse cx="258" cy="72" rx="7" ry="16" transform="rotate(-24 258 72)" fill="#3E8E7E"/>
+    <ellipse cx="268" cy="66" rx="7" ry="20" fill="#3E8E7E"/>
+    <ellipse cx="278" cy="72" rx="7" ry="16" transform="rotate(24 278 72)" fill="#2E6E66"/>
+  </svg>
+
+  <!-- Right ledge, plant and neon -->
+  <div class="ledge"></div>
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <path d="M1214 222 Q1224 262 1210 300 Q1200 330 1214 360" fill="none" stroke="#2E6E66" stroke-width="3"/>
+    <g fill="#3E8E7E">
+      <ellipse cx="1222" cy="246" rx="7" ry="10"/><ellipse cx="1206" cy="276" rx="7" ry="10"/>
+      <ellipse cx="1218" cy="300" rx="7" ry="10"/><ellipse cx="1204" cy="330" rx="7" ry="10"/>
+      <ellipse cx="1216" cy="356" rx="7" ry="10"/>
+    </g>
+  </svg>
+  <div class="neon-sign" aria-hidden="true">side a</div>
+
+  <!-- Cabinet, turntable, lamp -->
+  <div class="lamp-glow"></div>
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <rect x="944" y="650" width="10" height="34" fill="#15132B"/>
+    <rect x="1226" y="650" width="10" height="34" fill="#15132B"/>
+    <rect x="930" y="538" width="320" height="114" rx="6" fill="#4A3A6E"/>
+    <rect x="944" y="552" width="142" height="86" rx="4" fill="#3E3060"/>
+    <rect x="1094" y="552" width="142" height="86" rx="4" fill="#3E3060"/>
+    <rect x="1072" y="586" width="6" height="22" rx="3" fill="#FFD38A"/>
+    <rect x="1102" y="586" width="6" height="22" rx="3" fill="#FFD38A"/>
+    <rect x="924" y="528" width="332" height="12" rx="4" fill="#5A4880"/>
+    <rect x="950" y="482" width="190" height="46" rx="8" fill="#1E1A3D"/>
+    <rect x="950" y="482" width="190" height="8" rx="4" fill="#2E2558"/>
+    <ellipse cx="1030" cy="500" rx="72" ry="18" fill="#15132B"/>
+    <ellipse cx="1030" cy="500" rx="56" ry="13" fill="none" stroke="#2E2558" stroke-width="1.5"/>
+    <circle cx="966" cy="518" r="4" class="power-led"/>
+    <rect x="1150" y="498" width="24" height="30" rx="4" fill="#F4ECFF"/>
+    <path d="M1174 506 q9 0 9 8 q0 8 -9 8" fill="none" stroke="#F4ECFF" stroke-width="3"/>
+    <g class="steam" stroke="#F4ECFF" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M1158 490 q-5 -8 0 -16 q5 -8 0 -16"/><path d="M1167 490 q-5 -8 0 -16"/>
+    </g>
+    <rect x="1206" y="452" width="6" height="76" fill="#15132B"/>
+    <ellipse cx="1209" cy="528" rx="18" ry="4" fill="#15132B"/>
+    <polygon points="1186,412 1232,412 1246,454 1172,454" fill="#FFB38A"/>
+    <ellipse cx="1209" cy="454" rx="37" ry="5" fill="#FFE2C4"/>
+  </svg>
+
+  <!-- TV with the YouTube player (must stay visible) -->
+  <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <line x1="230" y1="528" x2="184" y2="468" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+    <line x1="230" y1="528" x2="290" y2="462" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="184" cy="468" r="4" fill="#15132B"/><circle cx="290" cy="462" r="4" fill="#15132B"/>
+    <rect x="80" y="792" width="30" height="14" rx="3" fill="#15132B"/>
+    <rect x="350" y="792" width="30" height="14" rx="3" fill="#15132B"/>
+  </svg>
+  <div class="tv"></div>
+  <div class="tv-bezel"></div>
+  <div class="tv-screen">
+    <div id="yt-player"></div>
+    <div class="tv-idle" id="tv-idle">
+      <div class="scanlines"></div>
+      <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#F4ECFF" stroke-width="1.6"/><path d="M10 8.5 L16 12 L10 15.5 Z" fill="#F4ECFF"/></svg>
+      <div class="tv-idle-title" id="tv-title">Nothing on yet</div>
+      <div class="tv-idle-sub" id="tv-sub">Pick a record to tune in</div>
+    </div>
+  </div>
+  <div class="tv-panel" aria-hidden="true">
+    <div class="knob"></div><div class="knob"></div>
+    <div class="grille"></div>
+    <div class="tv-led"></div>
+  </div>
+
+  <!-- Shelf of records (buttons are generated) -->
+  <div id="shelf"></div>
+
+  <!-- The record that travels to the turntable -->
+  <div class="vinyl-wrap" id="vinyl" hidden>
+    <div class="vinyl">
+      <div class="groove g1"></div>
+      <div class="groove g2"></div>
+      <div class="vinyl-label" id="vinyl-label"></div>
+      <div class="spindle"></div>
+    </div>
+  </div>
+
+  <!-- Tonearm sits above the record -->
+  <svg class="layer tonearm-layer" aria-hidden="true" viewBox="0 0 1280 820">
+    <g class="tonearm" id="tonearm">
+      <path d="M1118 492 L1096 506 L1062 508" fill="none" stroke="#B9B1D6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="1054" y="503" width="12" height="9" rx="2" fill="#F28DB2"/>
+      <circle cx="1118" cy="492" r="8" fill="#B9B1D6"/>
+      <circle cx="1118" cy="492" r="3" fill="#1E1A3D"/>
+    </g>
+  </svg>
+
+  <!-- Now spinning card -->
+  <section class="np-card" aria-live="polite" aria-label="Now spinning">
+    <div class="np-row">
+      <div class="np-art" id="np-art"></div>
+      <div class="np-text">
+        <div class="np-kicker" id="np-kicker">Turntable’s free</div>
+        <div class="np-title" id="np-title">Pick a record</div>
+        <div class="np-sub" id="np-sub">Click a sleeve, or + to add one</div>
+      </div>
+      <button type="button" class="np-btn np-play" id="np-toggle" aria-label="Play" disabled>
+        <svg class="icon-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5 L19 12 L8 19 Z" fill="currentColor"/></svg>
+        <svg class="icon-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="np-progress-row">
+      <div class="np-progress"><div class="np-bar" id="np-bar"></div></div>
+      <div class="np-time" id="np-time">0:00</div>
+    </div>
+    <div class="np-actions">
+      <button type="button" class="np-link" id="np-back" disabled>Put it back</button>
+      <button type="button" class="np-link" id="np-remove" hidden>Remove from shelf</button>
+    </div>
+  </section>
+
+  <!-- Room controls -->
+  <div class="room-controls">
+    <button type="button" class="pill" id="sky-toggle">Dusk</button>
+    <button type="button" class="pill" id="rain-toggle" aria-pressed="true">Rain</button>
+  </div>
+
+  <!-- Glow, vignette, grain -->
+  <div class="window-glow"></div>
+  <div class="vignette"></div>
+  <svg class="layer grain" aria-hidden="true" viewBox="0 0 1280 820">
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="9"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="1280" height="820" filter="url(#grain)"/>
+  </svg>
+</div>
+</main>
+
+<!-- Add a record -->
+<dialog class="add-dialog" id="add-dialog" aria-labelledby="add-title">
+  <form id="add-form" novalidate>
+    <h2 id="add-title">Add a record</h2>
+    <p class="hint">Paste a YouTube link for the song or the full album. The cover comes from Apple's iTunes catalog when it can find a match.</p>
+    <label for="f-link">YouTube link</label>
+    <input id="f-link" name="link" type="url" placeholder="https://www.youtube.com/watch?v=…" required autocomplete="off">
+    <label for="f-artist">Artist</label>
+    <input id="f-artist" name="artist" type="text" autocomplete="off">
+    <label for="f-album">Album or song</label>
+    <input id="f-album" name="album" type="text" autocomplete="off">
+    <p class="form-error" id="f-error" role="alert"></p>
+    <div class="dialog-actions">
+      <button type="button" class="ghost" id="f-cancel">Cancel</button>
+      <button type="submit" class="primary" id="f-submit">Put it on the shelf</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
