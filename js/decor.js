@@ -63,6 +63,10 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  posters: {
+    label: 'Posters',
+    choices: { records: 'My records', art: 'Art', off: 'Off' },
+  },
   // Not in the panel: switched by clicking the lamp.
   lamp: {
     label: 'Lamp',
@@ -92,6 +96,7 @@ export const DEFAULTS = {
   hair: 'plum',
   skin: 's2',
   lamp: 'on',
+  posters: 'records',
 };
 
 const NEON_MAX = 16;
@@ -146,7 +151,7 @@ function fitNeon(sign) {
  * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
  * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
-export function initDecor(stage, { onSky }) {
+export function initDecor(stage, { onSky, onApply = () => {} }) {
   const decor = loadDecor();
   const panel = document.getElementById('decor-panel');
   const form = document.getElementById('decor-form');
@@ -182,6 +187,7 @@ export function initDecor(stage, { onSky }) {
       shownSky = sky;
       onSky(sky);
     }
+    onApply(decor);
     saveDecor(decor);
   }
 
@@ -235,7 +241,7 @@ export function initDecor(stage, { onSky }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather']],
+    ['Room', ['time', 'weather', 'posters']],
     ['Neon sign', ['neonText', 'neonColor']],
     ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],

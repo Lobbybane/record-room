@@ -156,6 +156,22 @@ html, body {
 .stage.is-on .power-led { fill: var(--cyan); }
 .steam { opacity: .55; }
 
+/* ---------- posters ---------- */
+.poster {
+  position: absolute; width: 88px; height: 108px; padding: 6px 6px 18px;
+  background: #EFE3D0; border-radius: 2px;
+  box-shadow: 0 8px 16px rgba(10, 8, 25, .4);
+}
+.poster-a { left: 446px; top: 468px; transform: rotate(-3deg); }
+.poster-b { left: 806px; top: 452px; transform: rotate(2.5deg); }
+.stage[data-posters="off"] .poster { display: none; }
+.poster-art { width: 100%; height: 100%; background-size: cover; background-position: center; border-radius: 1px; }
+.art-moon { background: radial-gradient(circle at 62% 34%, #FFF1D6 0 11px, transparent 12px), linear-gradient(180deg, #2A2350 0%, #6E4C8E 58%, #F28DB2 59%, #FFB38A 74%, #6E4C8E 75%, #3B2F6B 100%); }
+.art-sun { background: radial-gradient(circle at 50% 58%, #FFD38A 0 18px, transparent 19px), repeating-linear-gradient(180deg, transparent 0 7px, rgba(42, 35, 80, .35) 7px 9px) 0 62% / 100% 30% no-repeat, linear-gradient(180deg, #F28DB2, #FFB38A); }
+.poster.has-cover .poster-art { background-color: #2A2350; background-size: cover; background-repeat: no-repeat; background-position: center; }
+.tape { position: absolute; left: 30px; top: -7px; width: 30px; height: 12px; background: rgba(244, 236, 255, .55); transform: rotate(-4deg); }
+.stage[data-lamp="off"] .poster { filter: brightness(.8); }
+
 /* ---------- listener in the armchair ---------- */
 .stage {
   --sweater: #FFB38A; --sweater-shade: #D98A66;

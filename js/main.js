@@ -2,6 +2,7 @@ import { SLOTS, loadRecords, saveRecords, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
+import { setPosterMode, setPosterRecords } from './posters.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -124,7 +125,7 @@ function buildLights() {
 
 /* ---------------- decorating and little details ---------------- */
 
-const decor = initDecor(stage, { onSky: buildCity });
+const decor = initDecor(stage, { onSky: buildCity, onApply: (d) => setPosterMode(d.posters) });
 initPets(stage);
 initLamp(decor);
 initCityLife();
@@ -139,6 +140,7 @@ let phase = 'idle';   // idle | moving | loading | playing | paused | ended | er
 let busy = false;
 
 function renderShelf() {
+  setPosterRecords(records);
   const shelf = $('#shelf');
   shelf.replaceChildren();
   SLOTS.forEach((slot, i) => {
