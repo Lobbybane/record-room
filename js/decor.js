@@ -28,6 +28,10 @@ export const OPTIONS = {
     label: 'Pet',
     choices: { cat: 'Cat', dog: 'Dog', none: 'No pet' },
   },
+  tank: {
+    label: 'Fish tank',
+    choices: { on: 'On', off: 'Off' },
+  },
   coat: {
     label: 'Coat',
     swatches: {
@@ -59,6 +63,14 @@ export const OPTIONS = {
       lilac: ['Lilac', '#B79CFF'],
     },
   },
+  holiday: {
+    label: 'Holidays',
+    choices: { auto: 'By date', off: 'Off', winter: 'Winter', halloween: 'Halloween', valentine: 'Valentine’s', newyear: 'New Year' },
+  },
+  posters: {
+    label: 'Posters',
+    choices: { records: 'My records', art: 'Art', off: 'Off' },
+  },
   // Not in the panel: switched by clicking the lamp.
   lamp: {
     label: 'Lamp',
@@ -82,11 +94,14 @@ export const DEFAULTS = {
   neonText: 'side a',
   neonColor: 'pink',
   pet: 'cat',
+  tank: 'on',
   coat: 'ginger',
   sweater: 'peach',
   hair: 'plum',
   skin: 's2',
   lamp: 'on',
+  posters: 'records',
+  holiday: 'auto',
 };
 
 const NEON_MAX = 16;
@@ -120,6 +135,17 @@ function saveDecor(decor) {
   } catch { /* private mode: still works until reload */ }
 }
 
+// Which holiday decorations "By date" shows today ('none' outside the holidays).
+export function holidayForDate(date) {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if ((month === 12 && day === 31) || (month === 1 && day === 1)) return 'newyear';
+  if (month === 12) return 'winter';
+  if (month === 10) return 'halloween';
+  if (month === 2 && day <= 14) return 'valentine';
+  return 'none';
+}
+
 // "Auto" follows the visitor's own clock.
 export function skyForHour(hour) {
   if (hour >= 5 && hour < 9) return 'sunrise';
@@ -141,7 +167,7 @@ function fitNeon(sign) {
  * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
  * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
-export function initDecor(stage, { onSky }) {
+export function initDecor(stage, { onSky, onApply = () => {} }) {
   const decor = loadDecor();
   const panel = document.getElementById('decor-panel');
   const form = document.getElementById('decor-form');
@@ -155,6 +181,9 @@ export function initDecor(stage, { onSky }) {
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
+    stage.dataset.tank = decor.tank;
+    stage.dataset.holiday = decor.holiday === 'auto' ? holidayForDate(new Date())
+      : decor.holiday === 'off' ? 'none' : decor.holiday;
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
@@ -176,6 +205,7 @@ export function initDecor(stage, { onSky }) {
       shownSky = sky;
       onSky(sky);
     }
+    onApply(decor);
     saveDecor(decor);
   }
 
@@ -212,7 +242,7 @@ export function initDecor(stage, { onSky }) {
   });
 
   // Re-check the clock each minute for "Auto".
-  setInterval(() => { if (decor.time === 'auto') apply(); }, 60_000);
+  setInterval(() => { if (decor.time === 'auto' || decor.holiday === 'auto') apply(); }, 60_000);
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
@@ -229,9 +259,9 @@ export function initDecor(stage, { onSky }) {
 
 function buildPanel(form, decor) {
   const sections = [
-    ['Room', ['time', 'weather']],
+    ['Room', ['time', 'weather', 'holiday', 'posters']],
     ['Neon sign', ['neonText', 'neonColor']],
-    ['Pet', ['pet', 'coat']],
+    ['Pets', ['pet', 'coat', 'tank']],
     ['Listener', ['sweater', 'hair', 'skin']],
   ];
 

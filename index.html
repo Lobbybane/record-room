@@ -29,6 +29,10 @@
     <ellipse cx="660" cy="748" rx="310" ry="45" fill="none" stroke="#F28DB2" stroke-width="3" stroke-dasharray="2 10" opacity=".7"/>
   </svg>
 
+  <!-- Posters made from your record covers -->
+  <div class="poster poster-a" aria-hidden="true"><div class="poster-art art-moon"></div><span class="tape"></span></div>
+  <div class="poster poster-b" aria-hidden="true"><div class="poster-art art-sun"></div><span class="tape"></span></div>
+
   <!-- Armchair with someone listening (head bobs while a record plays) -->
   <svg class="layer listener" aria-hidden="true" viewBox="0 0 1280 820">
     <ellipse cx="690" cy="780" rx="104" ry="10" fill="#120F26" opacity=".45"/>
@@ -55,7 +59,8 @@
         <path class="p-skin" d="M706 568 Q716 578 707 584 Z"/>
         <path class="p-hair" d="M664 600 Q650 586 656 562 Q662 540 688 542 Q712 546 712 566 Q704 564 700 556 Q698 566 690 568 Q688 562 684 560 Q680 574 682 590 Q674 594 672 604 Q668 604 664 600 Z"/>
         <path d="M662 566 Q668 550 686 548" fill="none" stroke="#FFFFFF" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>
-        <path d="M696 576 Q700 579 704 576" fill="none" stroke="#15132B" stroke-width="2" stroke-linecap="round"/>
+        <path class="eye-closed" d="M696 576 Q700 579 704 576" fill="none" stroke="#15132B" stroke-width="2" stroke-linecap="round"/>
+        <g class="eye-open"><ellipse cx="700" cy="575" rx="2.6" ry="3.2" fill="#15132B"/><circle cx="701" cy="573.8" r="1" fill="#fff"/></g>
         <ellipse cx="698" cy="585" rx="4.5" ry="2.6" fill="#F28DB2" opacity=".65"/>
         <path d="M702 592 Q705 594 708 591" fill="none" stroke="#8A4A4A" stroke-width="1.5" stroke-linecap="round"/>
       </g>
@@ -88,6 +93,9 @@
     <div class="moon-cut"></div>
     <div class="sun"></div>
     <div class="shooting-star"></div>
+    <div class="plane"></div>
+    <div class="firework fw1"></div><div class="firework fw2"></div><div class="firework fw3"></div>
+    <svg class="bat" viewBox="0 0 40 16" width="26" height="11" aria-hidden="true"><path d="M20 6 Q17 2 13 3 Q10 0 6 2 Q3 1 0 5 Q5 5 7 9 Q10 7 13 10 Q16 8 20 12 Q24 8 27 10 Q30 7 33 9 Q35 5 40 5 Q37 1 34 2 Q30 0 27 3 Q23 2 20 6 Z" fill="#15132B"/></svg>
     <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
       <path class="far-city" d="M0 322 V150 H30 V128 H52 V156 H84 V112 H96 V96 H104 V112 H118 V146 H160 V120 H190 V160 H226 V84 H232 V70 H238 V84 H246 V140 H290 V108 H326 V150 H356 V124 H392 V158 H430 V100 H448 V88 H456 V100 H470 V140 H512 V322 Z"/>
     </svg>
@@ -104,6 +112,9 @@
     <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
       <path fill="#15132B" d="M0 322 V296 H70 V288 H120 V300 H210 V284 H232 V270 H262 V284 H300 V292 H400 V280 H460 V296 H512 V322 Z"/>
     </svg>
+    <div class="car car-east"></div>
+    <div class="car car-west"></div>
+    <div class="car car-east late"></div>
     <svg class="layer-glass rain" aria-hidden="true" viewBox="0 0 512 322">
       <g stroke="#D2E1FF" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="14 34">
         <line x1="20" y1="-10" x2="-24" y2="332"/>
@@ -139,8 +150,26 @@
   </svg>
   <div id="lights"></div>
 
+  <!-- Holiday decorations (shown by data-holiday on the stage) -->
+  <svg class="layer holiday-garland" aria-hidden="true" viewBox="0 0 1280 820">
+    <path class="garland" d="M318 56 Q358 78 398 56 Q438 78 478 56 Q518 78 558 56 Q598 78 638 56 Q678 78 718 56 Q758 78 798 56 Q838 78 878 56 Q918 78 942 56" fill="none" stroke-width="7" stroke-linecap="round"/>
+    <g class="berries"><circle cx="358" cy="68" r="4"/><circle cx="438" cy="68" r="4"/><circle cx="518" cy="68" r="4"/><circle cx="598" cy="68" r="4"/><circle cx="678" cy="68" r="4"/><circle cx="758" cy="68" r="4"/><circle cx="838" cy="68" r="4"/><circle cx="912" cy="66" r="4"/></g>
+    <g class="garland-hearts">
+      <path d="M358 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M438 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M518 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M598 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/>
+      <path d="M678 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M758 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M838 64 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/><path d="M912 62 c-3-5-11-3-9 3 l9 8 9-8 c2-6-6-8-9-3z"/>
+    </g>
+  </svg>
+
   <!-- Sill with plant and cat -->
   <div class="sill"></div>
+  <div class="snow-cap"></div>
+  <div class="pumpkin-glow"></div>
+  <svg class="layer pumpkin" aria-hidden="true" viewBox="0 0 1280 820">
+    <path d="M470 384 q2 -8 8 -10" fill="none" stroke="#3E8E7E" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="458" cy="403" rx="12" ry="15" fill="#E8742C"/><ellipse cx="482" cy="403" rx="12" ry="15" fill="#E8742C"/>
+    <ellipse cx="470" cy="403" rx="13" ry="16" fill="#FF8A3C"/>
+    <g fill="#FFD38A"><polygon points="460,398 466,398 463,392"/><polygon points="474,398 480,398 477,392"/><path d="M458 406 h24 l-3 6 h-4 l-2 -3 -2 3 h-4 l-2 -3 -2 3 h-2 z"/></g>
+  </svg>
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
     <g fill="#3E8E7E">
       <ellipse cx="392" cy="372" rx="10" ry="24" transform="rotate(-28 392 372)"/>
@@ -190,6 +219,21 @@
     <ellipse cx="278" cy="72" rx="7" ry="16" transform="rotate(24 278 72)" fill="#2E6E66"/>
   </svg>
 
+  <!-- Fish tank on the shelf (click to feed) -->
+  <button type="button" class="fish-tank" id="fish-tank" aria-label="Feed the fish">
+    <span class="tank-water">
+      <span class="weed w1"></span><span class="weed w2"></span><span class="weed w3"></span>
+      <span class="tank-gravel"></span>
+      <span class="tank-bubble b1"></span><span class="tank-bubble b2"></span><span class="tank-bubble b3"></span>
+      <span class="food"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="fish-lane l1"><span class="fish"><svg viewBox="0 0 24 14" width="20" height="12" aria-hidden="true"><polygon points="15,7 24,1 22,7 24,13" fill="#FF9A5A" opacity=".85"/><ellipse cx="9" cy="7" rx="8" ry="5" fill="#FF9A5A"/><path d="M9 2.5 Q12 0 14 3" fill="#FF9A5A"/><circle cx="5" cy="6" r="1.2" fill="#15132B"/></svg></span></span>
+      <span class="fish-lane l2"><span class="fish"><svg viewBox="0 0 24 14" width="20" height="12" aria-hidden="true"><polygon points="15,7 24,1 22,7 24,13" fill="#F28DB2" opacity=".85"/><ellipse cx="9" cy="7" rx="8" ry="5" fill="#F28DB2"/><path d="M9 2.5 Q12 0 14 3" fill="#F28DB2"/><circle cx="5" cy="6" r="1.2" fill="#15132B"/></svg></span></span>
+      <span class="fish-lane l3"><span class="fish"><svg viewBox="0 0 24 14" width="20" height="12" aria-hidden="true"><polygon points="15,7 24,1 22,7 24,13" fill="#FFD38A" opacity=".85"/><ellipse cx="9" cy="7" rx="8" ry="5" fill="#FFD38A"/><path d="M9 2.5 Q12 0 14 3" fill="#FFD38A"/><circle cx="5" cy="6" r="1.2" fill="#15132B"/></svg></span></span>
+    </span>
+    <span class="tank-lid"></span>
+    <span class="pet-heart" aria-hidden="true">♥</span>
+  </button>
+
   <!-- Right ledge, plant and neon -->
   <div class="ledge"></div>
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
@@ -201,6 +245,14 @@
     </g>
   </svg>
   <div class="neon-sign" id="neon-sign" aria-hidden="true">side a</div>
+  <div class="love-hearts" aria-hidden="true"><span>♥</span><span>♥</span><span>♥</span></div>
+
+  <!-- What the listener is feeling: Zs when dozing, notes while a record plays -->
+  <div class="listener-fx" aria-hidden="true">
+    <span class="zz z1">z</span><span class="zz z2">z</span><span class="zz z3">Z</span>
+    <span class="note n1">♪</span><span class="note n2">♫</span><span class="note n3">♪</span>
+    <span class="bubble">?</span><span class="spark">✦</span>
+  </div>
 
   <!-- Dog on a floor cushion -->
   <button type="button" class="pet pet-dog" aria-label="Pet the dog">
@@ -225,6 +277,12 @@
       </g>
     </svg>
     <span class="pet-heart" aria-hidden="true">♥</span>
+  </button>
+
+  <!-- Record crate on the floor (click to flip through) -->
+  <button type="button" class="crate" id="crate" aria-label="Open the record crate">
+    <span class="crate-sleeves" id="crate-sleeves"></span>
+    <span class="crate-box"><span class="crate-handle"></span></span>
   </button>
 
   <!-- Cabinet, turntable, lamp -->
@@ -255,11 +313,14 @@
   </svg>
   <button type="button" class="lamp-switch" id="lamp-switch" aria-label="Lamp" aria-pressed="true"></button>
 
-  <!-- TV with the YouTube player (must stay visible) -->
+  <!-- TV with the YouTube player (must stay visible). On phones the whole set is enlarged. -->
+  <div class="tv-set">
   <svg class="layer" aria-hidden="true" viewBox="0 0 1280 820">
-    <line x1="230" y1="528" x2="184" y2="468" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
-    <line x1="230" y1="528" x2="290" y2="462" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="184" cy="468" r="4" fill="#15132B"/><circle cx="290" cy="462" r="4" fill="#15132B"/>
+    <g class="tv-antenna">
+      <line x1="230" y1="528" x2="184" y2="468" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+      <line x1="230" y1="528" x2="290" y2="462" stroke="#15132B" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="184" cy="468" r="4" fill="#15132B"/><circle cx="290" cy="462" r="4" fill="#15132B"/>
+    </g>
     <rect x="80" y="792" width="30" height="14" rx="3" fill="#15132B"/>
     <rect x="350" y="792" width="30" height="14" rx="3" fill="#15132B"/>
   </svg>
@@ -278,6 +339,7 @@
     <div class="knob"></div><div class="knob"></div>
     <div class="grille"></div>
     <div class="tv-led"></div>
+  </div>
   </div>
 
   <!-- Shelf of records (buttons are generated) -->
@@ -348,6 +410,7 @@
     <rect width="100%" height="100%" filter="url(#grain)"/>
   </svg>
 </div>
+<div class="scroll-spacer" id="scroll-spacer"></div>
 </main>
 
 <!-- Add a record -->
@@ -367,6 +430,37 @@
       <button type="submit" class="primary" id="f-submit">Put it on the shelf</button>
     </div>
   </form>
+</dialog>
+
+<!-- Flip through the record crate -->
+<dialog class="add-dialog crate-dialog" id="crate-dialog" aria-labelledby="crate-title">
+  <div class="crate-head">
+    <h2 id="crate-title">Record crate</h2>
+    <button type="button" class="decor-close" id="crate-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <p class="hint" id="crate-empty">The crate is empty. Fill it with records you want to keep without using a shelf spot. It holds as many as you like.</p>
+  <div class="crate-browser" id="crate-browser">
+    <button type="button" class="flip" id="crate-prev" aria-label="Previous record">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="crate-stack"><div class="crate-cover" id="crate-cover"></div></div>
+    <button type="button" class="flip" id="crate-next" aria-label="Next record">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="crate-info" id="crate-info" aria-live="polite">
+    <p class="crate-rec-title" id="crate-rec-title"></p>
+    <p class="crate-rec-artist" id="crate-rec-artist"></p>
+    <p class="crate-count" id="crate-count"></p>
+  </div>
+  <div class="dialog-actions crate-actions" id="crate-actions">
+    <button type="button" class="ghost" id="crate-remove">Remove</button>
+    <button type="button" class="ghost" id="crate-to-shelf">Move to shelf</button>
+    <button type="button" class="primary" id="crate-play">Play</button>
+  </div>
+  <button type="button" class="crate-add" id="crate-add">+ Add a record to the crate</button>
 </dialog>
 
 <!-- Decorate the room (built by js/decor.js) -->
