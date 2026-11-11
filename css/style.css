@@ -178,6 +178,36 @@ html, body {
 .stage.is-on .listener-head { animation: head-bob .8s ease-in-out infinite; }
 .stage.is-on .listener-foot { animation: foot-tap .8s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: scaleY(1.012); } }
+
+/* The listener reacts to the turntable (data-phase is set in js/main.js). */
+.listener .eye-open { display: none; }
+.stage:is([data-phase="moving"], [data-phase="loading"], [data-phase="paused"], [data-phase="ended"], [data-phase="error"], [data-phase="returning"]) .listener .eye-open { display: inline; }
+.stage:is([data-phase="moving"], [data-phase="loading"], [data-phase="paused"], [data-phase="ended"], [data-phase="error"], [data-phase="returning"]) .listener .eye-closed { display: none; }
+.stage[data-phase="idle"] .listener-head { transform: rotate(9deg); transition: transform 2.5s ease; }
+.stage:is([data-phase="moving"], [data-phase="loading"]) .listener-head { transform: rotate(-5deg); }
+.stage[data-phase="ended"] .listener-head { transform: rotate(-7deg); }
+.stage[data-phase="error"] .listener-head { transform: rotate(5deg); }
+
+.listener-fx { position: absolute; left: 700px; top: 470px; width: 80px; height: 90px; pointer-events: none; z-index: 7; }
+.listener-fx span { position: absolute; display: none; opacity: 0; font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; }
+.zz { color: #D9CCF2; }
+.z1 { left: 6px; top: 58px; font-size: 13px; } .z2 { left: 18px; top: 46px; font-size: 16px; } .z3 { left: 32px; top: 32px; font-size: 20px; }
+.stage[data-phase="idle"] .zz { display: block; animation: float-up 4.5s ease-out infinite; }
+.stage[data-phase="idle"] .z1 { animation-delay: 4s; } .stage[data-phase="idle"] .z2 { animation-delay: 5.5s; } .stage[data-phase="idle"] .z3 { animation-delay: 7s; }
+.note { color: var(--pink-soft); text-shadow: 0 0 8px rgba(242, 141, 178, .6); font-size: 18px; }
+.n1 { left: 10px; top: 56px; } .n2 { left: 34px; top: 48px; font-size: 20px; } .n3 { left: 56px; top: 60px; }
+.stage[data-phase="playing"] .note { display: block; animation: float-up 3.6s ease-out infinite; }
+.stage[data-phase="playing"] .n2 { animation-delay: 1.2s; } .stage[data-phase="playing"] .n3 { animation-delay: 2.4s; }
+.bubble { left: 18px; top: 34px; font-size: 22px; color: var(--warm); }
+.stage[data-phase="error"] .bubble { display: block; opacity: 1; animation: pop 2s ease-in-out infinite; }
+.spark { left: 22px; top: 40px; font-size: 20px; color: var(--warm); text-shadow: 0 0 10px rgba(255, 211, 138, .8); }
+.stage[data-phase="ended"] .spark { display: block; animation: float-up 2.4s ease-out 2; }
+@keyframes float-up {
+  0% { opacity: 0; transform: translate(0, 8px) scale(.7); }
+  20% { opacity: .95; }
+  100% { opacity: 0; transform: translate(14px, -46px) scale(1.1); }
+}
+@keyframes pop { 50% { transform: translateY(-4px); } }
 @keyframes head-bob { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(6deg); } }
 @keyframes foot-tap { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-7deg); } }
 
@@ -701,6 +731,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .car, .plane { display: none; }
+  .listener-fx span { animation: none !important; display: none !important; }
   .rain line, .vinyl.spinning, .fairy, .neon-sign, .train, .drop, .drop::after, .flake, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .listener-body, .stage.is-on .listener-head, .stage.is-on .listener-foot, .pet-body, .pet.awake .pet-tail { animation: none; }
   .tonearm, .sleeve { transition: none; }
   .flake { top: var(--y); }

@@ -358,6 +358,7 @@ function formatTime(seconds) {
 }
 
 function updateCard() {
+  stage.dataset.phase = phase; // the listener reacts to this in CSS
   const record = current !== null ? records[current] : null;
   $('#np-kicker').textContent = KICKERS[phase] || '';
   $('#np-title').textContent = record ? record.title : 'Pick a record';
