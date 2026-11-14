@@ -922,6 +922,10 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   box-shadow: 0 6px 18px rgba(10, 8, 25, .3);
 }
 .pill:hover { background: rgba(30, 27, 52, .65); }
+.pill-icon { width: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.pill-icon[hidden] { display: none; }
+.pill-icon .icon-exit, .pill-icon.is-full .icon-enter { display: none; }
+.pill-icon.is-full .icon-exit { display: block; }
 #decor-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 0 16px 0 13px; }
 #decor-toggle[aria-expanded="true"] { background: rgba(255, 255, 255, .9); color: #1C1A2E; }
 .pill[aria-pressed="false"] { color: var(--text-dim); }

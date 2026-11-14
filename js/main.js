@@ -1115,6 +1115,32 @@ form.addEventListener('submit', async (event) => {
   if (addTarget === 'crate') openCrate();
 });
 
+/* ---------------- full screen ---------------- */
+
+// Shown only where the browser can go full screen (not iPhone Safari: there, Add to
+// Home Screen opens the room like an app instead).
+{
+  const button = $('#fullscreen-toggle');
+  const root = document.documentElement;
+  const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (enter && (document.fullscreenEnabled || document.webkitFullscreenEnabled) && !standalone) {
+    button.hidden = false;
+    const sync = () => {
+      const full = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      button.classList.toggle('is-full', full);
+      button.setAttribute('aria-label', full ? 'Exit full screen' : 'Full screen');
+      button.title = full ? 'Exit full screen' : 'Full screen';
+    };
+    button.addEventListener('click', () => {
+      if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else enter.call(root).catch?.(() => {});
+    });
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('webkitfullscreenchange', sync);
+  }
+}
+
 /* ---------------- start ---------------- */
 
 buildStars();

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Record Room app icon: a record under the moon above a little night city -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1640"/><stop offset=".55" stop-color="#3B2F6B"/><stop offset=".85" stop-color="#8A5A9E"/><stop offset="1" stop-color="#F28DB2"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F28DB2" stop-opacity=".45"/><stop offset="1" stop-color="#F28DB2" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <g fill="#FFFFFF" opacity=".8"><circle cx="70" cy="70" r="3"/><circle cx="130" cy="40" r="2"/><circle cx="440" cy="110" r="2.5"/><circle cx="400" cy="50" r="2"/><circle cx="60" cy="170" r="2"/></g>
+  <circle cx="392" cy="96" r="44" fill="#FFF3D6"/><circle cx="414" cy="80" r="40" fill="#1E1A48"/>
+  <path d="M0 512 V400 H40 V360 H80 V392 H112 V330 H134 V310 H150 V330 H170 V380 H210 V350 H250 V400 H300 V340 H340 V376 H372 V320 H392 V300 H404 V320 H420 V370 H470 V350 H512 V512 Z" fill="#241E48"/>
+  <g fill="#FFD38A"><rect x="50" y="378" width="8" height="10"/><rect x="120" y="344" width="8" height="10"/><rect x="138" y="372" width="8" height="10"/><rect x="310" y="360" width="8" height="10"/><rect x="380" y="336" width="8" height="10"/><rect x="430" y="390" width="8" height="10"/><rect x="220" y="372" width="8" height="10"/></g>
+  <circle cx="256" cy="282" r="190" fill="url(#glow)"/>
+  <circle cx="256" cy="282" r="150" fill="#15132B"/>
+  <g fill="none" stroke="#2E2A4A" stroke-width="3"><circle cx="256" cy="282" r="130"/><circle cx="256" cy="282" r="112"/><circle cx="256" cy="282" r="94"/><circle cx="256" cy="282" r="76"/></g>
+  <path d="M170 210 A120 120 0 0 1 300 170" fill="none" stroke="#FFFFFF" stroke-opacity=".18" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="256" cy="282" r="52" fill="#F28DB2"/><circle cx="256" cy="282" r="52" fill="none" stroke="#FFB38A" stroke-width="6"/>
+  <circle cx="256" cy="282" r="7" fill="#15132B"/>
+</svg>
