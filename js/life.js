@@ -49,8 +49,9 @@ export function initLamp(decor) {
   button.addEventListener('click', () => {
     sfx.click();
     decor.set('lamp', decor.get('lamp') === 'on' ? 'off' : 'on');
-    sync();
   });
+  // Also follows changes made elsewhere (the sleep timer, presets).
+  new MutationObserver(sync).observe(document.getElementById('stage'), { attributes: true, attributeFilter: ['data-lamp'] });
   sync();
 }
 

@@ -101,6 +101,11 @@ export const OPTIONS = {
     label: 'Lofi radio',
     choices: { on: 'On', off: 'Off' },
   },
+  volume: {
+    label: 'Volume',
+    range: [0, 100, 5],
+    format: (v) => `${v}%`,
+  },
   station: {
     label: 'Station',
     choices: Object.fromEntries(STATIONS.map((s) => [s.key, s.label])),
@@ -143,6 +148,7 @@ export const DEFAULTS = {
   holiday: 'auto',
   sound: 'on',
   radio: 'on',
+  volume: 100,
   station: 'lofi',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),

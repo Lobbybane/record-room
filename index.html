@@ -620,6 +620,7 @@
       <div class="tv-idle-sub" id="tv-sub">lofi hip hop radio</div>
     </div>
     <div class="tv-static" aria-hidden="true"></div>
+    <div class="tv-vol" id="tv-vol" aria-hidden="true"><i></i><span>100%</span></div>
     <button type="button" class="tv-sound" id="tv-sound" hidden>
       <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span id="tv-sound-text">Tap for sound</span>
@@ -628,7 +629,8 @@
   <div class="tv-panel">
     <!-- The station knob: turns to the next radio station. -->
     <button type="button" class="knob knob-dial" id="tv-knob" aria-label="Change station"><span class="knob-mark" aria-hidden="true"></span></button>
-    <div class="knob" aria-hidden="true"></div>
+    <!-- The volume knob: steps the volume down, then back up to full. -->
+    <button type="button" class="knob knob-dial knob-volume" id="tv-volume" aria-label="Volume"><span class="knob-mark" aria-hidden="true"></span></button>
     <div class="grille" aria-hidden="true"></div>
     <div class="tv-led" aria-hidden="true"></div>
   </div>
@@ -671,6 +673,7 @@
         <svg class="icon-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></svg>
       </button>
     </div>
+    <p class="np-upnext" id="np-upnext" hidden></p>
     <div class="np-progress-row">
       <div class="np-progress"><div class="np-bar" id="np-bar"></div></div>
       <div class="np-time" id="np-time">0:00</div>
@@ -679,7 +682,12 @@
     <div class="np-actions">
       <button type="button" class="np-link" id="np-next" hidden>Next station</button>
       <button type="button" class="np-link" id="np-back" disabled>Put it back</button>
+      <button type="button" class="np-link" id="np-skip" hidden>Skip</button>
       <button type="button" class="np-link" id="np-remove" hidden>Remove from shelf</button>
+      <button type="button" class="np-chip" id="np-sleep" hidden>
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
+        <span id="np-sleep-text">30m</span>
+      </button>
     </div>
   </section>
 
@@ -759,6 +767,7 @@
     </div>
     <div class="ios-group" id="crate-actions">
       <button type="button" class="ios-row ios-action tint" id="crate-play">Play</button>
+      <button type="button" class="ios-row ios-action tint" id="crate-queue" hidden>Play Later</button>
       <button type="button" class="ios-row ios-action" id="crate-to-shelf">Move to Shelf</button>
       <button type="button" class="ios-row ios-action destructive" id="crate-remove">Remove from Crate</button>
     </div>
