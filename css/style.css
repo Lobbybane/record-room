@@ -1531,3 +1531,83 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .flame, .fl1, .fl2, .fl3, .flame-glow { animation: none !important; }
 }
+
+/* ---------- more rooms: rooftop greenhouse, forest treehouse, night train ---------- */
+.stage[data-room="greenhouse"] {
+  --wall-a: #18283A; --wall-b: #1E3346; --wall-c: #243C50;
+  --wall-pattern:
+    linear-gradient(90deg, rgba(190, 230, 255, .16) 3px, transparent 3px) 0 0 / 128px 100%,
+    linear-gradient(0deg, rgba(190, 230, 255, .12) 3px, transparent 3px) 0 0 / 100% 148px,
+    radial-gradient(circle, rgba(255, 255, 255, .5) 1px, transparent 1.5px) 0 0 / 97px 83px,
+    radial-gradient(circle, rgba(255, 255, 255, .35) 1px, transparent 1.5px) 40px 30px / 131px 109px;
+  --floor-a: #5A3E3A; --floor-b: #42302E;
+  --floor-pattern: linear-gradient(90deg, rgba(20, 10, 10, .35) 2px, transparent 2px) 0 0 / 60px 100%, linear-gradient(0deg, rgba(20, 10, 10, .35) 2px, transparent 2px) 0 0 / 100% 30px;
+}
+.stage[data-room="treehouse"] {
+  --wall-a: #3A2A28; --wall-b: #46322C; --wall-c: #4E3830;
+  --wall-pattern:
+    radial-gradient(ellipse 6px 10px, rgba(20, 10, 8, .35) 60%, transparent 62%) 30px 120px / 74px 260px,
+    repeating-linear-gradient(90deg, transparent 0 70px, rgba(14, 8, 6, .4) 70px 74px);
+  --floor-a: #4A3428; --floor-b: #36261E;
+  --floor-pattern: repeating-linear-gradient(90deg, transparent 0 96px, rgba(14, 8, 6, .35) 96px 99px);
+}
+.stage[data-room="train"] {
+  --wall-a: #3A1E26; --wall-b: #48242C; --wall-c: #522A32;
+  --wall-pattern:
+    linear-gradient(180deg, transparent 0 470px, rgba(201, 168, 106, .5) 470px 474px, transparent 474px) 0 0 / 100% 820px,
+    repeating-linear-gradient(90deg, rgba(255, 220, 200, .04) 0 2px, transparent 2px 160px);
+  --floor-a: #2E2440; --floor-b: #241C34;
+  --floor-pattern: radial-gradient(circle, rgba(201, 168, 106, .18) 2px, transparent 2.5px) 0 0 / 22px 22px;
+}
+.stage[data-room="greenhouse"] .greenhouse-plants, .stage[data-room="treehouse"] .treehouse-vines, .stage[data-room="train"] .luggage-rack { display: block; }
+.stage[data-room="greenhouse"] :is(.curtain-left, .curtain-right) { filter: hue-rotate(120deg) saturate(.6) brightness(.95); }
+.stage[data-room="treehouse"] :is(.curtain-left, .curtain-right) { filter: hue-rotate(70deg) saturate(.6) brightness(.85); }
+.stage[data-room="train"] :is(.curtain-rod, .curtain-left, .curtain-right) { display: none; }
+.stage[data-room="train"] :is(.window-frame, .glass) { border-radius: 30px; }
+.stage[data-room="train"] .window-frame { box-shadow: 0 0 0 6px #C9A86A; }
+
+/* Window views for the new rooms. */
+.view-forest, .view-train { display: none; }
+.stage:is([data-room="treehouse"], [data-room="train"]) .view-city { display: none; }
+.stage[data-room="treehouse"] .view-forest, .stage[data-room="train"] .view-train { display: block; }
+.forest-far { fill: var(--far-city); }
+.forest-mid { fill: #1E1838; }
+.near-leaves { fill: #2E4A3A; }
+.stage[data-season="autumn"] .near-leaves { fill: #B0603A; }
+.stage[data-season="spring"] .near-leaves { fill: #6E9A6A; }
+.stage[data-season="winter"] .near-leaves { fill: #E6E8F4; }
+.stage[data-season="winter"] .forest-mid { fill: #2A2850; }
+.mist {
+  position: absolute; left: -50%; top: 210px; width: 200%; height: 70px;
+  background: radial-gradient(ellipse 30% 50% at 25% 50%, rgba(220, 210, 255, .22), transparent), radial-gradient(ellipse 25% 45% at 70% 60%, rgba(220, 210, 255, .18), transparent);
+  animation: mist-drift 40s linear infinite;
+}
+@keyframes mist-drift { from { transform: translateX(0); } to { transform: translateX(25%); } }
+.owl { transform-box: fill-box; transform-origin: 50% 100%; animation: owl-turn 9s ease-in-out infinite; }
+@keyframes owl-turn { 0%, 70%, 100% { transform: scaleX(1); } 75%, 90% { transform: scaleX(-1); } }
+.lantern-light { animation: glow-flicker 3s ease-in-out infinite; }
+
+/* The night train: hills, lights and poles rolling past, with a gentle sway. */
+.view-train .scroll { position: absolute; left: 0; top: 0; width: 1024px; height: 322px; animation: roll linear infinite; }
+.scroll-far { animation-duration: 60s !important; }
+.scroll-near { animation-duration: 22s !important; }
+.scroll-poles { animation-duration: 3.2s !important; }
+@keyframes roll { from { transform: translateX(0); } to { transform: translateX(-512px); } }
+.hills-far { fill: var(--far-city); }
+.hills-near { fill: #1E1838; }
+.stage[data-season="winter"] .hills-far { fill: #B8B4D8; }
+.stage[data-season="winter"] .hills-near { fill: #8A86B4; }
+.town-lights { fill: #FFD38A; }
+.stage:is([data-sky="golden"], [data-sky="sunrise"]) .town-lights { opacity: .3; }
+.rail-blur { position: absolute; left: 0; bottom: 0; height: 26px; background: repeating-linear-gradient(90deg, #15132B 0 30px, #241E48 30px 34px); animation: roll .5s linear infinite; width: 1024px; }
+.stage[data-room="train"] .view-train { animation: sway 4s ease-in-out infinite; }
+.stage[data-room="train"] .rack { animation: sway 4s ease-in-out infinite; }
+@keyframes sway { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.5px); } }
+
+.glass.parallax :is(.forest-far, .hills-far) { translate: calc(var(--px, 0) * -3px) calc(var(--py, 0) * -1.5px); }
+.glass.parallax :is(.forest-mid, .hills-near) { translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -2px); }
+.glass.parallax .forest-near { translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -3px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mist, .owl, .lantern-light, .view-train .scroll, .rail-blur, .stage[data-room="train"] .view-train, .stage[data-room="train"] .rack { animation: none !important; }
+}

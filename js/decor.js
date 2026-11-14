@@ -12,7 +12,7 @@ const KEY = 'record-room:settings:v1';
 export const OPTIONS = {
   room: {
     label: 'Room',
-    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house' },
+    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house', greenhouse: 'Rooftop greenhouse', treehouse: 'Forest treehouse', train: 'Night train' },
   },
   time: {
     label: 'Time of day',
