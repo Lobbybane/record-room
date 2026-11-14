@@ -33,7 +33,8 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 - **Rooms:** city bedroom, corner café, mountain cabin, beach house, rooftop greenhouse, forest treehouse and night train.
 - **On your phone:** Share > Add to Home Screen opens it like an app. On a computer, the button beside Decorate goes full screen.
 - Click the lamp to switch it off and on. Click the cat or dog to wake it up, or the fish tank to feed the fish.
-- The people dozes when nothing's on, looks up when a record is coming, and nods along while it plays.
+- Everyone nods along while music plays, and a couple of them doze off when it stops.
+- **Lively people:** friends chat in speech bubbles, sip drinks and stretch, someone heads off for snacks and comes back, and visitors drop by (pizza delivery, a snowy skier, a surfer, the train conductor…). Turn it off in Decorate > Room > Lively people.
 - On a phone held upright, the room sits at the top with a big TV and the controls below.
 - Your crate and decorations are saved in this browser.
 
@@ -53,6 +54,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 | `js/holidays.js` | The holiday calendar (which holidays show on which dates) |
 | `js/sounds.js` | Sound effects made in the browser (no sound files) |
 | `js/people.js`, `js/groups.js` | The people in each room and how they're drawn |
+| `js/life-people.js` | Chats, snack runs, visitors and each room's little moments |
 | `js/records.js` | Starter records, the crate, saving, reading YouTube links |
 | `js/covers.js` | Cover lookup from the iTunes Search API (songs and albums) |
 | `js/player.js` | Wrapper for the YouTube IFrame Player API |
