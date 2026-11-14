@@ -5,7 +5,7 @@
 // `visitor` and `wanders` in js/groups.js). Nothing happens when the room is dozing,
 // with "Nobody" there, with Lively people off, or with reduced motion.
 
-import { personSvg, held, walkerDrop } from './people.js';
+import { personSvg, setHold, walkerDrop } from './people.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const NS = 'http://www.w3.org/2000/svg';
@@ -23,6 +23,22 @@ let lastSnack = 0;
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+/**
+ * Plays one CSS moment on a person: adds the class, waits until that person's animations
+ * from it have really finished (so nothing snaps back early), then removes the class.
+ */
+async function act(el, cls, fallback = 4000) {
+  el.classList.add(cls);
+  await frame();
+  const running = el.getAnimations({ subtree: true }).filter((a) => {
+    const t = a.effect?.getComputedTiming?.();
+    return t && Number.isFinite(t.activeDuration) && t.activeDuration > 0 && t.progress !== null;
+  });
+  await Promise.race([Promise.all(running.map((a) => a.finished.catch(() => {}))), wait(fallback)]);
+  el.classList.remove(cls);
+}
 
 export function initPeopleLife(theStage) {
   stage = theStage;
@@ -140,28 +156,26 @@ async function chat() {
       await talk(el, p, lines[i], 2300);
       await wait(250);
     }
-    if (Math.random() < 0.4) {
-      a.classList.add('laugh'); b.classList.add('laugh');
-      await wait(1600);
-      a.classList.remove('laugh'); b.classList.remove('laugh');
-    }
+    if (Math.random() < 0.4) await Promise.all([act(a, 'laugh'), act(b, 'laugh')]);
   } finally {
     leftOne.classList.remove('turned');
     busy.delete(a.dataset.pid); busy.delete(b.dataset.pid);
   }
 }
 
-const SOLO_FOR = { mug: 'sip', latte: 'sip', cocoa: 'sip', lemonade: 'sip', togo: 'sip', phone: 'scroll', laptop: 'type', book: 'scroll' };
+// What someone can do depends on what they're holding: a drink gets sipped, a laptop
+// typed on, popcorn eaten. Only empty hands stretch or wave.
+const SOLO_FOR = { mug: 'sip', latte: 'sip', cocoa: 'sip', lemonade: 'sip', togo: 'sip', phone: 'scroll', laptop: 'type', book: 'scroll', popcorn: 'munch' };
 async function solo() {
   const el = pick(present());
   if (!el) return;
   const p = dataOf(el);
-  const action = SOLO_FOR[p.hold] && Math.random() < 0.75 ? SOLO_FOR[p.hold] : pick(['laugh', 'stretch', 'wave']);
+  const hold = el.dataset.hold;
+  const own = SOLO_FOR[hold];
+  const action = own ? (Math.random() < 0.8 ? own : 'laugh') : hold ? 'laugh' : pick(['laugh', 'stretch', 'wave']);
   busy.add(el.dataset.pid);
-  el.classList.add(action);
   if (action === 'laugh') say(p, pick(['haha', 'lol', 'hehe']), 1600);
-  await wait(action === 'type' ? 2600 : 2700);
-  el.classList.remove(action);
+  await act(el, action);
   busy.delete(el.dataset.pid);
 }
 
@@ -187,52 +201,46 @@ const MOMENTS = {
   async popcorn() {
     const el = personWith((p) => p.hold === 'popcorn');
     if (!el) return;
-    const p = dataOf(el); const s = p.s || 1.5;
-    dots([[p.x - 31 * s, p.y - 30 * s, 20 * s, -28 * s]], 'kernel', 900);
-    await wait(700);
+    const p = dataOf(el);
+    await act(el, 'munch');
     await talk(el, p, 'mmm', 1200);
   },
   async groove() {
     const el = personWith((p) => (p.extras || []).some((e) => e.startsWith('headphones')));
     if (!el || stage.dataset.phase !== 'playing') return;
-    el.classList.add('groove');
-    await wait(4000);
-    el.classList.remove('groove');
+    await act(el, 'groove');
   },
   async warm() {
     if (stage.dataset.fire !== 'on') return MOMENTS.shiver();
     const el = personWith((p) => p.warms);
     if (!el) return;
     el.classList.add('warm');
+    await wait(700);
     await talk(el, dataOf(el), pick(['ahh, warm', 'cozy fire']), 2400);
-    await wait(800);
     el.classList.remove('warm');
+    await wait(700);
   },
   async shiver() {
     if (!['snow', 'storm'].includes(stage.dataset.weather) && stage.dataset.season !== 'winter') return;
     const el = pick(present());
     if (!el) return;
-    el.classList.add('shiver');
-    await talk(el, dataOf(el), 'brrr', 1800);
-    el.classList.remove('shiver');
+    await Promise.all([act(el, 'shiver'), talk(el, dataOf(el), 'brrr', 1800)]);
   },
   async fan() {
     const el = personWith((p) => (p.extras || []).some((e) => e.startsWith('sunhat')));
     if (!el) return;
-    el.classList.add('fan');
-    await talk(el, dataOf(el), pick(['so warm today', 'phew']), 2400);
-    el.classList.remove('fan');
+    await Promise.all([act(el, 'fan'), talk(el, dataOf(el), pick(['so warm today', 'phew']), 2400)]);
   },
   async water() {
     const el = personWith((p) => p.hold === 'can');
     if (!el) return;
     const p = dataOf(el); const s = p.s || 1.5;
-    el.classList.add('pour');
     const sx = p.x - 50 * s; const sy = p.y - 30 * s;
-    dots([[sx, sy, -4, 46, 0], [sx + 3, sy, -2, 50, 250], [sx - 2, sy, -6, 44, 500], [sx + 1, sy, -3, 48, 750]], 'droplet', 900);
-    scene.root.querySelector('.f-plantpot')?.classList.add('grow');
-    await wait(1800);
-    el.classList.remove('pour');
+    setTimeout(() => dots([[sx, sy, -4, 46, 0], [sx + 3, sy, -2, 50, 250], [sx - 2, sy, -6, 44, 500], [sx + 1, sy, -3, 48, 750]], 'droplet', 900), 450);
+    const pot = scene.root.querySelector('.f-plantpot');
+    pot?.classList.remove('grow');
+    pot?.classList.add('grow');
+    await act(el, 'pour');
     await talk(el, p, "it's growing!", 2000);
   },
   async snore() {
@@ -260,9 +268,7 @@ const MOMENTS = {
   async type() {
     const el = personWith((p) => p.hold === 'laptop');
     if (!el) return;
-    el.classList.add('type');
-    await wait(2600);
-    el.classList.remove('type');
+    await act(el, 'type');
     await talk(el, dataOf(el), pick(['deadline…', 'almost done', 'one more email']), 2000);
   },
 };
@@ -275,16 +281,19 @@ async function moment() {
 /* ---------- walking ---------- */
 
 // Moves an SVG group from x to toX, keeping its y and size; faces the way it walks.
+// The walk speeds up gently at the start and slows to a stop at the end.
+const easeInOut = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
 function walkTo(el, { x, y, s }, toX, speed = 110) {
   const facing = toX > x ? -1 : 1; // everyone is drawn facing left
-  const duration = (Math.abs(toX - x) / speed) * 1000;
+  const duration = (Math.abs(toX - x) / speed) * 1000 * 1.15;
   el.classList.add('walking');
   const start = performance.now();
   return new Promise((resolve) => {
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
-      const cx = x + (toX - x) * t;
-      const bob = Math.abs(Math.sin(t * duration / 140)) * -1.5;
+      const cx = x + (toX - x) * easeInOut(t);
+      // A soft step bob that fades in and out with the walk.
+      const bob = Math.abs(Math.sin((now - start) / 260 * Math.PI)) * -1.4 * Math.min(1, t * 6, (1 - t) * 6);
       el.setAttribute('transform', `translate(${cx.toFixed(1)} ${(y + bob).toFixed(1)}) scale(${facing * s} ${s})`);
       if (t < 1) requestAnimationFrame(step);
       else {
@@ -298,6 +307,21 @@ function walkTo(el, { x, y, s }, toX, speed = 110) {
 }
 
 /* ---------- a snack run ---------- */
+
+// Standing up and sitting down: the seated person and their standing copy crossfade.
+async function standUp(seated, walker) {
+  walker.classList.add('out');
+  await frame();
+  walker.classList.add('shown');
+  seated.classList.add('away');
+  await wait(320);
+}
+async function sitDown(seated, walker) {
+  seated.classList.remove('away');
+  walker.classList.remove('shown');
+  await wait(320);
+  walker.classList.remove('out');
+}
 
 async function snack() {
   const el = present().find((e) => dataOf(e).wanders);
@@ -313,27 +337,25 @@ async function snack() {
   try {
     await talk(el, p, pick(p.snackLines || ['snack run!', 'anyone want anything?']), 2000);
     if (gen !== generation) return;
-    el.classList.add('away');
-    walker.classList.add('out');
+    await standUp(el, walker);
     await walkTo(walker, at, OFFSTAGE);
-    walker.classList.remove('out');
+    walker.classList.remove('out', 'shown');
     await wait(rand(12_000, 22_000));
     if (gen !== generation) return;
     const treat = pick(p.snacks || ['snacks']);
-    walker.querySelector('.own-hold').innerHTML = held(treat);
-    walker.classList.add('out');
+    setHold(walker, treat);
+    walker.classList.add('out', 'shown');
     await walkTo(walker, { ...at, x: OFFSTAGE }, p.x);
     if (gen !== generation) return;
-    walker.classList.remove('out');
-    el.querySelector('.own-hold').innerHTML = held(treat);
-    el.classList.remove('away');
+    setHold(el, treat);
+    await sitDown(el, walker);
     await talk(el, p, pick(['got snacks!', "who's hungry?", 'back!']), 2000);
     const friend = present().find((e) => e !== el && Math.abs(dataOf(e).x - p.x) < 190);
     if (friend) await talk(friend, dataOf(friend), pick(['yay!', 'thanks!', 'my hero']), 1800);
   } finally {
     if (gen === generation) {
       el.classList.remove('away');
-      walker.classList.remove('out', 'walking');
+      walker.classList.remove('out', 'shown', 'walking');
     }
     busy.delete(el.dataset.pid);
   }
@@ -350,6 +372,8 @@ async function visitor() {
   const holder = document.createElementNS(NS, 'g');
   holder.innerHTML = personSvg(p, 7, 'visitor');
   const el = holder.firstElementChild;
+  el.style.opacity = '0';
+  requestAnimationFrame(() => { el.style.opacity = ''; });
   // Slot the visitor in at the right depth among the group.
   const before = [...scene.root.children].find((c) => Number(c.dataset.y) > v.y);
   scene.root.insertBefore(el, before || null);
@@ -369,9 +393,7 @@ async function visitor() {
       }
       await wait(200);
     }
-    el.classList.add('wave');
-    await wait(1600);
-    el.classList.remove('wave');
+    await act(el, 'wave');
     if (gen !== generation) return;
     await walkTo(el, { x: v.x, y: v.y, s: p.s }, OFFSTAGE);
   } finally {
