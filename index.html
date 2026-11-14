@@ -4,7 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Record Room</title>
-<link rel="icon" href="data:,">
+<!-- Add to Home Screen: opens like an app -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#1A1640">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Record Room">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
@@ -25,11 +33,63 @@
       <line x1="-4000" y1="756" x2="5280" y2="756"/>
     </g>
     <polygon class="spill" points="420,606 880,606 1484,1600 -137,1600"/>
-    <ellipse cx="660" cy="748" rx="330" ry="52" fill="#4A3A6E"/>
-    <ellipse cx="660" cy="748" rx="310" ry="45" fill="none" stroke="#F28DB2" stroke-width="3" stroke-dasharray="2 10" opacity=".7"/>
+    <!-- Rugs (Decorate > Room > Furniture picks one with data-rug) -->
+    <defs>
+      <pattern id="rug-stripe" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="scale(1 .5)">
+        <rect width="40" height="40" fill="#4A3A6E"/><rect width="14" height="40" fill="#F28DB2" opacity=".55"/><rect x="20" width="6" height="40" fill="#FFB38A" opacity=".6"/>
+      </pattern>
+      <pattern id="rug-check" width="48" height="24" patternUnits="userSpaceOnUse">
+        <rect width="48" height="24" fill="#3E3260"/><rect width="24" height="12" fill="#F4ECFF" opacity=".16"/><rect x="24" y="12" width="24" height="12" fill="#F4ECFF" opacity=".16"/>
+      </pattern>
+    </defs>
+    <g class="rug rug-round">
+      <ellipse cx="660" cy="748" rx="330" ry="52" fill="#4A3A6E"/>
+      <ellipse cx="660" cy="748" rx="310" ry="45" fill="none" stroke="#F28DB2" stroke-width="3" stroke-dasharray="2 10" opacity=".7"/>
+    </g>
+    <g class="rug rug-stripes">
+      <ellipse cx="660" cy="748" rx="330" ry="52" fill="url(#rug-stripe)"/>
+      <ellipse cx="660" cy="748" rx="326" ry="50" fill="none" stroke="#2E2448" stroke-width="6"/>
+    </g>
+    <g class="rug rug-checker">
+      <ellipse cx="660" cy="748" rx="330" ry="52" fill="url(#rug-check)"/>
+      <ellipse cx="660" cy="748" rx="327" ry="50" fill="none" stroke="#B79CFF" stroke-width="3" opacity=".5"/>
+    </g>
+    <g class="rug rug-braided" fill="none" stroke-width="9">
+      <ellipse cx="660" cy="748" rx="326" ry="48" stroke="#A4523A"/>
+      <ellipse cx="660" cy="748" rx="300" ry="40" stroke="#E0A458"/>
+      <ellipse cx="660" cy="748" rx="274" ry="32" stroke="#6E4C8E"/>
+      <ellipse cx="660" cy="748" rx="248" ry="24" stroke="#C97A6A"/>
+      <ellipse cx="660" cy="748" rx="222" ry="16" stroke="#E0A458"/>
+      <ellipse cx="660" cy="748" rx="196" ry="8" stroke="#A4523A"/>
+      <ellipse cx="660" cy="748" rx="330" ry="52" stroke="#000" stroke-opacity=".15" stroke-width="2" stroke-dasharray="3 5"/>
+    </g>
   </svg>
 
   <!-- Room decorations (one shows per room, set by data-room) -->
+  <!-- Rooftop greenhouse: hanging planters -->
+  <svg class="layer room-prop greenhouse-plants" aria-hidden="true" viewBox="0 0 1280 820">
+    <g class="hanger" transform="translate(153 0) scale(.85)"><path d="M1020 0 V40 M1004 40 L1020 18 L1036 40" stroke="#B9B1D6" stroke-width="1.5" fill="none"/><path d="M1000 40 h40 l-6 26 h-28 z" fill="#C8746A"/>
+      <path d="M1006 64 q-6 30 4 54 M1016 66 q2 26 -6 46 M1030 64 q8 24 2 50" stroke="#3E8E7E" stroke-width="3" fill="none"/>
+      <g fill="#4FA88E"><ellipse cx="1008" cy="84" rx="5" ry="8"/><ellipse cx="1012" cy="112" rx="5" ry="8"/><ellipse cx="1014" cy="96" rx="4" ry="7"/><ellipse cx="1034" cy="92" rx="5" ry="8"/><ellipse cx="1030" cy="110" rx="4" ry="7"/></g></g>
+    <g class="hanger h2" transform="translate(-80 0)"><path d="M1170 0 V30 M1154 30 L1170 10 L1186 30" stroke="#B9B1D6" stroke-width="1.5" fill="none"/><path d="M1150 30 h40 l-6 24 h-28 z" fill="#E0A458"/>
+      <g fill="#3E8E7E"><ellipse cx="1160" cy="58" rx="6" ry="10" transform="rotate(-20 1160 58)"/><ellipse cx="1172" cy="62" rx="6" ry="12"/><ellipse cx="1184" cy="58" rx="6" ry="10" transform="rotate(20 1184 58)"/><ellipse cx="1170" cy="28" rx="7" ry="13" fill="#4FA88E"/></g></g>
+  </svg>
+  <!-- Forest treehouse: a leafy garland and a lantern -->
+  <svg class="layer room-prop treehouse-vines" aria-hidden="true" viewBox="0 0 1280 820">
+    <path d="M-40 26 Q160 70 340 34 Q640 -6 940 40 Q1120 70 1320 24" fill="none" stroke="#3E6E4E" stroke-width="4"/>
+    <g fill="#4F8E5E"><ellipse cx="40" cy="40" rx="9" ry="5" transform="rotate(-20 40 40)"/><ellipse cx="110" cy="52" rx="9" ry="5" transform="rotate(30 110 52)"/><ellipse cx="180" cy="54" rx="9" ry="5" transform="rotate(-10 180 54)"/><ellipse cx="250" cy="46" rx="9" ry="5" transform="rotate(25 250 46)"/><ellipse cx="320" cy="38" rx="9" ry="5" transform="rotate(-30 320 38)"/><ellipse cx="420" cy="24" rx="9" ry="5" transform="rotate(20 420 24)"/><ellipse cx="520" cy="16" rx="9" ry="5" transform="rotate(-15 520 16)"/><ellipse cx="600" cy="16" rx="9" ry="5" transform="rotate(30 600 16)"/><ellipse cx="700" cy="20" rx="9" ry="5" transform="rotate(-25 700 20)"/><ellipse cx="800" cy="28" rx="9" ry="5" transform="rotate(15 800 28)"/><ellipse cx="880" cy="36" rx="9" ry="5" transform="rotate(-20 880 36)"/><ellipse cx="960" cy="44" rx="9" ry="5" transform="rotate(25 960 44)"/><ellipse cx="1040" cy="52" rx="9" ry="5" transform="rotate(-10 1040 52)"/><ellipse cx="1120" cy="48" rx="9" ry="5" transform="rotate(30 1120 48)"/><ellipse cx="1200" cy="36" rx="9" ry="5" transform="rotate(-20 1200 36)"/><ellipse cx="1260" cy="28" rx="9" ry="5" transform="rotate(10 1260 28)"/></g>
+    <g fill="#6FB07A"><ellipse cx="76" cy="50" rx="7" ry="4" transform="rotate(40 76 50)"/><ellipse cx="146" cy="56" rx="7" ry="4" transform="rotate(-20 146 56)"/><ellipse cx="286" cy="44" rx="7" ry="4" transform="rotate(10 286 44)"/><ellipse cx="470" cy="20" rx="7" ry="4" transform="rotate(-30 470 20)"/><ellipse cx="650" cy="16" rx="7" ry="4" transform="rotate(20 650 16)"/><ellipse cx="750" cy="24" rx="7" ry="4" transform="rotate(-10 750 24)"/><ellipse cx="920" cy="42" rx="7" ry="4" transform="rotate(30 920 42)"/><ellipse cx="1080" cy="52" rx="7" ry="4" transform="rotate(-30 1080 52)"/><ellipse cx="1230" cy="32" rx="7" ry="4" transform="rotate(20 1230 32)"/></g>
+    <g class="lantern" transform="translate(-290 0)"><path d="M1250 0 V60" stroke="#15132B" stroke-width="1.5"/><rect x="1238" y="60" width="24" height="30" rx="4" fill="#2B2440"/><rect x="1242" y="64" width="16" height="22" rx="3" fill="#FFD38A" class="lantern-light"/><path d="M1236 60 h28 l-4 -6 h-20 z" fill="#2B2440"/></g>
+  </svg>
+  <!-- Night train: a luggage rack and the carriage number -->
+  <svg class="layer room-prop luggage-rack" aria-hidden="true" viewBox="0 0 1280 820">
+    <g class="rack"><rect x="330" y="44" width="600" height="6" rx="3" fill="#C9A86A"/><path d="M340 50 L350 64 M920 50 L910 64 M330 44 V20 M930 44 V20" stroke="#C9A86A" stroke-width="4" stroke-linecap="round"/>
+      <rect x="380" y="10" width="110" height="34" rx="6" fill="#8A4A3C"/><rect x="380" y="20" width="110" height="5" fill="#6E3428"/><rect x="424" y="4" width="22" height="7" rx="3" fill="none" stroke="#6E3428" stroke-width="3"/>
+      <rect x="520" y="18" width="80" height="26" rx="5" fill="#3E6E8E"/><path d="M540 18 v26 M580 18 v26" stroke="#2E5470" stroke-width="3"/>
+      <rect x="760" y="14" width="96" height="30" rx="8" fill="#D0A048"/><circle cx="790" cy="29" r="6" fill="#F4ECFF" opacity=".7"/><circle cx="822" cy="27" r="4" fill="#C8443C" opacity=".8"/></g>
+    <g><rect x="980" y="36" width="110" height="34" rx="6" fill="#C9A86A"/><rect x="984" y="40" width="102" height="26" rx="4" fill="#2B2440"/><text x="1035" y="58" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="14" fill="#C9A86A" letter-spacing="2">CAR 7</text></g>
+  </svg>
+
   <div class="room-prop chalkboard" aria-hidden="true"><span class="chalk-title">lofi &amp; latte</span><span class="chalk-sub">today's blend: rainy jazz</span></div>
   <div class="room-prop cabin-sign" aria-hidden="true">cozy</div>
   <div class="room-prop life-ring" aria-hidden="true"></div>
@@ -41,13 +101,31 @@
   <!-- Armchair with someone listening (head bobs while a record plays) -->
   <svg class="layer listener" aria-hidden="true" viewBox="0 0 1280 820">
     <ellipse cx="690" cy="780" rx="104" ry="10" fill="#120F26" opacity=".45"/>
-    <!-- chair back and seat -->
-    <rect x="596" y="584" width="52" height="150" rx="24" fill="#5A3F7E" transform="rotate(-7 622 660)"/>
-    <rect x="602" y="590" width="36" height="136" rx="18" fill="#6E4C8E" transform="rotate(-7 620 660)"/>
-    <rect x="612" y="760" width="10" height="20" rx="2" fill="#15132B"/>
-    <rect x="718" y="760" width="10" height="20" rx="2" fill="#15132B"/>
-    <rect x="604" y="706" width="132" height="58" rx="12" fill="#5A3F7E"/>
-    <rect x="612" y="694" width="124" height="22" rx="10" fill="#7A5A9E"/>
+    <!-- chair back and seat (data-chair picks armchair, beanbag or rocking chair) -->
+    <g class="chair chair-armchair">
+      <rect x="596" y="584" width="52" height="150" rx="24" fill="#5A3F7E" transform="rotate(-7 622 660)"/>
+      <rect x="602" y="590" width="36" height="136" rx="18" fill="#6E4C8E" transform="rotate(-7 620 660)"/>
+      <rect x="612" y="760" width="10" height="20" rx="2" fill="#15132B"/>
+      <rect x="718" y="760" width="10" height="20" rx="2" fill="#15132B"/>
+      <rect x="604" y="706" width="132" height="58" rx="12" fill="#5A3F7E"/>
+      <rect x="612" y="694" width="124" height="22" rx="10" fill="#7A5A9E"/>
+    </g>
+    <g class="chair chair-beanbag">
+      <path d="M566 782 Q552 712 596 636 Q624 594 652 628 Q668 668 700 690 Q770 694 784 740 Q792 782 690 788 Q620 790 566 782 Z" fill="#4F6FA8"/>
+      <path d="M584 744 Q578 690 606 640 Q624 616 640 636 Q620 690 616 760 Z" fill="#6A8BC4" opacity=".7"/>
+      <path d="M660 780 Q700 770 760 772" fill="none" stroke="#3E5A90" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g class="chair chair-rocker">
+      <path d="M574 768 Q672 798 770 762" fill="none" stroke="#6E4430" stroke-width="8" stroke-linecap="round"/>
+      <path d="M616 716 L606 772 M724 716 L734 768" stroke="#8A5A3C" stroke-width="7" stroke-linecap="round"/>
+      <g transform="rotate(-7 622 650)">
+        <rect x="598" y="578" width="48" height="140" rx="10" fill="none" stroke="#8A5A3C" stroke-width="8"/>
+        <path d="M602 606 H642 M602 634 H642 M602 662 H642 M602 690 H642" stroke="#A8724E" stroke-width="5"/>
+      </g>
+      <rect x="604" y="706" width="132" height="14" rx="6" fill="#8A5A3C"/>
+      <rect x="610" y="694" width="124" height="16" rx="8" fill="#C97A6A"/>
+      <path d="M612 701 H730" stroke="#E0A090" stroke-width="2" stroke-dasharray="4 6"/>
+    </g>
     <!-- plaid throw over the chair (mountain cabin) -->
     <defs>
       <pattern id="plaid" width="16" height="16" patternUnits="userSpaceOnUse">
@@ -55,7 +133,7 @@
         <rect width="16" height="1.5" y="12" fill="#F2B33D" opacity=".6"/>
       </pattern>
     </defs>
-    <path class="throw" d="M596 600 Q620 586 650 596 L654 680 Q630 690 606 684 Q598 640 596 600 Z" fill="url(#plaid)" transform="rotate(-7 622 640)"/>
+    <path class="throw chair-armchair-only" d="M596 600 Q620 586 650 596 L654 680 Q630 690 606 684 Q598 640 596 600 Z" fill="url(#plaid)" transform="rotate(-7 622 640)"/>
     <!-- far leg -->
     <path class="p-pants-far" d="M640 690 L742 684 Q756 684 756 698 Q756 712 742 714 L644 718 Z"/>
     <path class="p-pants-far" d="M736 694 L758 692 L764 764 L742 766 Z"/>
@@ -64,8 +142,31 @@
     <g class="listener-body">
       <path class="p-sweater" d="M640 708 Q632 664 646 632 Q656 614 676 614 Q696 618 698 644 Q700 678 698 710 Z"/>
       <path class="p-hood" d="M640 708 Q632 664 646 632 Q650 650 650 672 Q650 694 654 708 Z"/>
-      <path class="p-hood" d="M642 628 Q642 606 662 604 Q678 606 676 620 Q664 632 642 628 Z"/>
-      <path class="p-string" d="M686 620 L689 642 M692 619 L696 638" fill="none" stroke-width="2" stroke-linecap="round"/>
+      <!-- outfits (data-outfit): the hood and strings belong to the hoodie -->
+      <g class="wear wear-hoodie">
+        <path class="p-hood" d="M642 628 Q642 606 662 604 Q678 606 676 620 Q664 632 642 628 Z"/>
+        <path class="p-string" d="M686 620 L689 642 M692 619 L696 638" fill="none" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <g class="wear wear-sweater">
+        <rect class="p-hood" x="667" y="602" width="22" height="16" rx="6"/>
+        <path d="M671 604 V616 M676 603 V617 M681 603 V617 M686 604 V616" stroke="#000" stroke-opacity=".12" stroke-width="1.5"/>
+        <path d="M646 700 H698" stroke="#000" stroke-opacity=".12" stroke-width="5"/>
+        <path d="M656 650 l6 6 6 -6 6 6 6 -6 6 6 6 -6" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="2"/>
+      </g>
+      <g class="wear wear-pyjamas">
+        <defs><pattern id="pj-dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.6" fill="#FFFFFF" fill-opacity=".45"/><circle cx="8" cy="8" r="1.2" fill="#FFFFFF" fill-opacity=".3"/></pattern></defs>
+        <path d="M640 708 Q632 664 646 632 Q656 614 676 614 Q696 618 698 644 Q700 678 698 710 Z" fill="url(#pj-dots)"/>
+        <path d="M670 614 L680 630 L692 616" fill="none" stroke="#FFFFFF" stroke-opacity=".8" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="684" cy="644" r="2" fill="#FFFFFF" fill-opacity=".8"/><circle cx="686" cy="662" r="2" fill="#FFFFFF" fill-opacity=".8"/>
+      </g>
+      <g class="wear wear-cardigan">
+        <path d="M668 612 Q680 640 694 614 Z" fill="#F4ECFF"/>
+        <path d="M668 612 Q680 640 694 614" fill="none" class="p-string" stroke-width="3"/>
+        <path d="M680 616 Q690 618 692 640 Q696 674 696 708 L684 708 Q684 664 680 640 Q676 626 672 618 Z" fill="#F4ECFF"/>
+        <path d="M680 616 Q676 626 680 640 Q684 664 684 708" fill="none" class="p-string" stroke-width="3"/>
+        <circle cx="681" cy="650" r="2.2" class="p-hood"/><circle cx="683" cy="670" r="2.2" class="p-hood"/><circle cx="684" cy="690" r="2.2" class="p-hood"/>
+        <path d="M652 680 h18 v12 h-18 z" fill="none" class="p-string" stroke-width="2"/>
+      </g>
       <g class="listener-head">
         <rect class="p-skin" x="672" y="592" width="13" height="22" rx="5"/>
         <circle class="p-skin" cx="684" cy="572" r="25"/>
@@ -111,10 +212,26 @@
           <g fill="#FF9A3C"><circle cx="664" cy="560" r="5"/><circle cx="672" cy="556" r="5"/><circle cx="672" cy="566" r="5"/><circle cx="664" cy="570" r="5"/><circle cx="658" cy="565" r="5"/></g>
           <circle cx="666" cy="563" r="3.5" fill="#FFD34A"/>
         </g>
+        <!-- headphones and glasses (switches in Decorate > Listener) -->
+        <g class="wear wear-headphones">
+          <path d="M660 574 Q658 534 688 536 Q714 540 712 568" fill="none" stroke="#2B2440" stroke-width="5" stroke-linecap="round"/>
+          <rect x="666" y="562" width="15" height="24" rx="7" fill="#F28DB2"/><rect x="670" y="566" width="7" height="16" rx="3.5" fill="#2B2440" opacity=".5"/>
+        </g>
         <path class="eye-closed" d="M696 576 Q700 579 704 576" fill="none" stroke="#15132B" stroke-width="2" stroke-linecap="round"/>
         <g class="eye-open"><ellipse cx="700" cy="575" rx="2.6" ry="3.2" fill="#15132B"/><circle cx="701" cy="573.8" r="1" fill="#fff"/></g>
         <ellipse cx="698" cy="585" rx="4.5" ry="2.6" fill="#F28DB2" opacity=".65"/>
         <path d="M702 592 Q705 594 708 591" fill="none" stroke="#8A4A4A" stroke-width="1.5" stroke-linecap="round"/>
+        <g class="wear wear-glasses">
+          <circle cx="701" cy="575" r="6.5" fill="#FFFFFF" fill-opacity=".14" stroke="#2B2440" stroke-width="1.8"/>
+          <path d="M694.5 574 L684 571" stroke="#2B2440" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M698 571 l3 -2" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+      </g>
+      <g class="wear wear-scarf">
+        <path d="M664 606 Q678 616 694 608 L696 618 Q678 628 662 616 Z" fill="#E85A6A"/>
+        <path d="M688 612 L694 646 L684 648 L680 614 Z" fill="#D04858"/>
+        <path d="M686 640 l-1 10 M690 639 l1 10 M694 638 l2 9" stroke="#D04858" stroke-width="1.5"/>
+        <path d="M668 610 l4 4 M676 612 l2 5 M684 612 l1 5" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="2"/>
       </g>
     </g>
     <!-- near leg -->
@@ -125,12 +242,102 @@
       <rect x="746" y="778" width="50" height="4" rx="2" fill="#B9B1D6"/>
     </g>
     <!-- arm resting on the armrest -->
-    <rect x="620" y="672" width="118" height="30" rx="15" fill="#8A63A8"/>
-    <rect x="626" y="672" width="106" height="8" rx="4" fill="#9C78BA"/>
-    <path class="p-sleeve-edge" d="M680 630 L688 666 L726 668" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <path class="p-sleeve" d="M680 630 L688 666 L726 668" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle class="p-skin" cx="736" cy="668" r="7"/>
+    <g class="chair chair-armchair">
+      <rect x="620" y="672" width="118" height="30" rx="15" fill="#8A63A8"/>
+      <rect x="626" y="672" width="106" height="8" rx="4" fill="#9C78BA"/>
+    </g>
+    <g class="chair chair-beanbag"><ellipse cx="704" cy="688" rx="52" ry="16" fill="#5A7CB8"/><ellipse cx="700" cy="682" rx="40" ry="7" fill="#7A9AD0" opacity=".6"/></g>
+    <g class="chair chair-rocker">
+      <path d="M730 678 L734 708" stroke="#8A5A3C" stroke-width="6" stroke-linecap="round"/>
+      <rect x="618" y="670" width="124" height="10" rx="5" fill="#A8724E"/>
+    </g>
+    <g class="arm-rest">
+      <path class="p-sleeve-edge" d="M680 630 L688 666 L726 668" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="p-sleeve" d="M680 630 L688 666 L726 668" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle class="p-skin" cx="736" cy="668" r="7"/>
+    </g>
+    <!-- arm holding something up (data-hands on the stage picks what) -->
+    <g class="arm-hold">
+      <g class="hold-mug">
+        <path class="p-sleeve-edge" d="M680 630 L688 664 L714 648" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L688 664 L714 648" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="716" y="630" width="17" height="20" rx="3" fill="#F7A9C8"/>
+        <path d="M733 635 q7 0 7 6 t-7 6" fill="none" stroke="#F7A9C8" stroke-width="3"/>
+        <rect x="716" y="630" width="17" height="4" rx="2" fill="#B9637F"/>
+        <circle class="p-skin" cx="720" cy="645" r="7"/>
+        <path class="mug-steam" d="M722 624 q-4 -6 0 -12 t0 -12 M729 624 q-4 -6 0 -12" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <g class="hold-knit">
+        <path class="p-sleeve-edge" d="M680 630 L688 666 L716 656" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L688 666 L716 656" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M720 656 L734 654 L738 676 L722 680 Z" class="p-hood"/>
+        <path d="M722 662 h14 M723 668 h14 M724 674 h13" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="1.5"/>
+        <g class="needles"><path d="M708 664 L748 638 M714 640 L746 664" stroke="#D0B48A" stroke-width="2.4" stroke-linecap="round"/></g>
+        <path d="M736 676 Q770 720 784 758" fill="none" stroke="#F7A9C8" stroke-width="1.5"/>
+        <circle cx="790" cy="764" r="11" fill="#F7A9C8"/><path d="M782 758 q8 4 16 0 M781 766 q9 4 18 -1" fill="none" stroke="#C9708F" stroke-width="1.5"/>
+        <circle class="p-skin" cx="720" cy="660" r="7"/>
+      </g>
+      <g class="hold-draw">
+        <path d="M700 690 L758 684 L762 698 L704 704 Z" fill="#F7F1E6"/>
+        <path d="M700 690 L704 704 L702 706 L698 692 Z" fill="#6E4C8E"/>
+        <path d="M716 694 q6 -5 12 0 t12 0 M720 699 q8 -3 14 0" fill="none" stroke="#6E9CCB" stroke-width="1.5"/>
+        <path class="p-sleeve-edge" d="M680 630 L690 668 L722 684" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L690 668 L722 684" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <g class="pencil"><path d="M728 690 L744 672" stroke="#FFD34A" stroke-width="4" stroke-linecap="round"/><path d="M728 690 l-2 3" stroke="#15132B" stroke-width="2" stroke-linecap="round"/></g>
+        <circle class="p-skin" cx="728" cy="684" r="7"/>
+      </g>
+      <g class="hold-book">
+        <path class="p-sleeve-edge" d="M680 630 L688 666 L716 656" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L688 666 L716 656" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M712 664 L736 626 L760 632 L742 670 Z" fill="#6FA6C8"/>
+        <path d="M716 662 L738 628 L740 630 L719 663 Z" fill="#F7F1E6"/>
+        <path d="M739 630 L757 634 L741 667 L722 662 Z" fill="#F7F1E6"/>
+        <path d="M744 640 L752 642 M741 646 L750 648 M738 652 L746 654" stroke="#B9B1D6" stroke-width="1.2"/>
+        <circle class="p-skin" cx="720" cy="660" r="7"/>
+      </g>
+    </g>
   </svg>
+
+  <!-- Fireplace (cabin and treehouse): click to light it -->
+  <button type="button" class="fireplace" id="fireplace" aria-label="Light the fire" aria-pressed="false">
+    <svg viewBox="0 0 160 134" width="160" height="134" aria-hidden="true" overflow="visible">
+      <rect x="6" y="12" width="148" height="122" rx="6" fill="#6E5A6A"/>
+      <g fill="#5A4858">
+        <rect x="12" y="20" width="30" height="16" rx="5"/><rect x="46" y="18" width="36" height="14" rx="5"/><rect x="88" y="20" width="26" height="15" rx="5"/><rect x="118" y="18" width="30" height="17" rx="5"/>
+        <rect x="10" y="42" width="22" height="20" rx="5"/><rect x="128" y="40" width="20" height="22" rx="5"/>
+        <rect x="12" y="68" width="22" height="22" rx="5"/><rect x="126" y="70" width="22" height="20" rx="5"/>
+        <rect x="10" y="96" width="24" height="18" rx="5"/><rect x="128" y="96" width="22" height="20" rx="5"/>
+      </g>
+      <rect x="0" y="2" width="160" height="14" rx="4" fill="#8A5A4A"/><rect x="0" y="2" width="160" height="4" rx="2" fill="#A8724E"/>
+      <path d="M36 134 V76 Q36 46 80 46 Q124 46 124 76 V134 Z" fill="#1A1426"/>
+      <ellipse class="embers" cx="80" cy="126" rx="34" ry="6" fill="#FF7A3C" opacity="0"/>
+      <g class="fire-flames">
+        <path class="fl fl1" d="M58 124 Q50 104 62 88 Q62 100 70 104 Q68 88 80 72 Q84 92 92 96 Q96 86 94 80 Q108 98 102 124 Z" fill="#FF8A3C" style="transform-origin: 80px 124px"/>
+        <path class="fl fl2" d="M66 124 Q62 110 72 98 Q74 108 80 110 Q80 98 88 90 Q96 106 94 124 Z" fill="#FFC857" style="transform-origin: 80px 124px"/>
+        <path class="fl fl3" d="M74 124 Q72 114 80 106 Q88 114 86 124 Z" fill="#FFF3C4" style="transform-origin: 80px 124px"/>
+      </g>
+      <rect x="50" y="120" width="60" height="8" rx="4" fill="#6E4430" transform="rotate(-8 80 124)"/>
+      <rect x="54" y="122" width="56" height="8" rx="4" fill="#8A5A3C" transform="rotate(7 80 126)"/>
+      <path d="M20 16 h120" stroke="#15132B" stroke-opacity=".2"/>
+      <g class="mantel-things"><rect x="16" y="-14" width="10" height="16" rx="2" fill="#F4ECFF"/><rect x="132" y="-22" width="18" height="24" rx="3" fill="#3E8E7E"/><ellipse cx="141" cy="-22" rx="11" ry="6" fill="#4FA88E"/></g>
+    </svg>
+  </button>
+  <!-- Candles on the sill: click to light them -->
+  <button type="button" class="candles" id="candles" aria-label="Light the candles" aria-pressed="false">
+    <svg viewBox="0 0 64 46" width="64" height="46" aria-hidden="true" overflow="visible">
+      <ellipse cx="32" cy="44" rx="30" ry="3" fill="#15132B" opacity=".45"/>
+      <rect x="8" y="24" width="12" height="20" rx="2.5" fill="#F4ECFF"/><rect x="8" y="24" width="4" height="20" rx="2" fill="#FFFFFF" opacity=".5"/>
+      <rect x="25" y="14" width="13" height="30" rx="2.5" fill="#F7E1C8"/><rect x="25" y="14" width="4" height="30" rx="2" fill="#FFFFFF" opacity=".45"/>
+      <rect x="43" y="28" width="11" height="16" rx="2.5" fill="#F7A9C8"/><rect x="43" y="28" width="3.5" height="16" rx="1.7" fill="#FFFFFF" opacity=".4"/>
+      <path d="M14 24 v-3 M31.5 14 v-3 M48.5 28 v-3" stroke="#2B2440" stroke-width="1.4" stroke-linecap="round"/>
+      <g class="flame " style="transform-origin: 14px 22px"><path d="M14 22 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M14 22 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g><g class="flame f2" style="transform-origin: 31.5px 12px"><path d="M31.5 12 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M31.5 12 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g><g class="flame f3" style="transform-origin: 48.5px 26px"><path d="M48.5 26 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M48.5 26 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g>
+    </svg>
+  </button>
+  <!-- Study timer: a flip clock on the wall -->
+  <button type="button" class="study-clock" id="study-clock" aria-label="Study timer">
+    <span class="clock-face"><span class="clock-time">12:00</span></span>
+    <span class="clock-label">study</span>
+  </button>
 
   <!-- Curtains and window frame -->
   <div class="curtain-rod"></div>
@@ -192,6 +399,32 @@
         <path class="palm" d="M0 322 V292 Q30 286 46 300 L44 322 Z M28 300 Q22 250 34 218 L38 218 Q30 252 36 300 Z M36 220 Q10 210 -6 226 Q14 214 36 222 Z M36 220 Q50 196 78 202 Q54 206 38 224 Z M36 220 Q64 214 84 234 Q58 220 37 224 Z M36 220 Q30 196 6 192 Q30 194 38 222 Z"/>
       </svg>
       <div class="beam"></div>
+    </div>
+    <div class="view view-forest">
+      <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
+        <path class="forest-far" d="M0 322 V250 H512 V322 Z M-20 250 L-9 193 L2 250 Z M-17 230 L-9 187 L-1 230 Z M-5 250 L4 176 L14 250 Z M-3 224 L4 170 L11 224 Z M6 250 L15 177 L24 250 Z M8 225 L15 171 L22 225 Z M14 250 L26 197 L38 250 Z M17 231 L26 191 L35 231 Z M26 250 L37 163 L49 250 Z M28 219 L37 157 L46 219 Z M37 250 L47 172 L58 250 Z M39 223 L47 166 L55 223 Z M53 250 L66 182 L78 250 Z M56 226 L66 176 L75 226 Z M73 250 L82 161 L91 250 Z M75 219 L82 155 L89 219 Z M83 250 L93 195 L103 250 Z M85 231 L93 189 L100 231 Z M94 250 L108 192 L122 250 Z M97 230 L108 186 L119 230 Z M112 250 L125 183 L138 250 Z M115 227 L125 177 L135 227 Z M129 250 L138 197 L147 250 Z M131 232 L138 191 L145 232 Z M139 250 L152 181 L165 250 Z M142 226 L152 175 L162 226 Z M153 250 L166 180 L178 250 Z M156 225 L166 174 L175 225 Z M167 250 L181 169 L195 250 Z M170 221 L181 163 L191 221 Z M182 250 L194 176 L207 250 Z M185 224 L194 170 L204 224 Z M201 250 L214 187 L227 250 Z M204 228 L214 181 L224 228 Z M222 250 L232 181 L241 250 Z M224 226 L232 175 L239 226 Z M236 250 L246 178 L256 250 Z M238 225 L246 172 L253 225 Z M245 250 L258 166 L271 250 Z M248 220 L258 160 L268 220 Z M262 250 L276 186 L290 250 Z M265 228 L276 180 L287 228 Z M282 250 L294 174 L307 250 Z M285 223 L294 168 L304 223 Z M297 250 L311 157 L325 250 Z M300 218 L311 151 L322 218 Z M314 250 L327 197 L340 250 Z M317 232 L327 191 L337 232 Z M332 250 L345 155 L358 250 Z M335 217 L345 149 L355 217 Z M351 250 L362 183 L373 250 Z M354 226 L362 177 L370 226 Z M366 250 L375 179 L384 250 Z M368 225 L375 173 L382 225 Z M375 250 L385 197 L395 250 Z M378 232 L385 191 L392 232 Z M389 250 L399 189 L409 250 Z M392 229 L399 183 L406 229 Z M401 250 L415 196 L429 250 Z M404 231 L415 190 L426 231 Z M418 250 L430 160 L443 250 Z M421 219 L430 154 L440 219 Z M436 250 L450 187 L464 250 Z M439 228 L450 181 L461 228 Z M453 250 L464 160 L475 250 Z M456 219 L464 154 L473 219 Z M470 250 L480 192 L490 250 Z M473 230 L480 186 L488 230 Z M481 250 L491 178 L502 250 Z M484 225 L491 172 L499 225 Z M495 250 L505 200 L516 250 Z M497 232 L505 194 L513 232 Z M507 250 L518 175 L530 250 Z M510 224 L518 169 L527 224 Z M525 250 L538 177 L551 250 Z M528 224 L538 171 L548 224 Z "/>
+        <g class="forest-lights"><rect x="352" y="206" width="5" height="5" fill="#FFD38A"/><rect x="359" y="206" width="5" height="5" fill="#FFD38A"/><path d="M346 206 L360 194 L374 206 Z" fill="#241E48"/><rect x="348" y="206" width="24" height="12" fill="#241E48" opacity=".5"/></g>
+      </svg>
+      <div class="mist"></div>
+      <svg class="layer-glass" aria-hidden="true" viewBox="0 0 512 322">
+        <path class="forest-mid" d="M0 322 V298 H512 V322 Z M-20 300 L1 217 L22 300 Z M-15 271 L1 211 L17 271 Z M12 300 L34 168 L56 300 Z M18 254 L34 162 L51 254 Z M44 300 L63 196 L81 300 Z M49 264 L63 190 L77 264 Z M62 300 L83 216 L104 300 Z M67 271 L83 210 L99 271 Z M82 300 L99 210 L116 300 Z M86 269 L99 204 L112 269 Z M101 300 L117 220 L132 300 Z M105 272 L117 214 L128 272 Z M117 300 L133 198 L149 300 Z M121 264 L133 192 L145 264 Z M131 300 L154 183 L177 300 Z M137 259 L154 177 L172 259 Z M154 300 L172 199 L189 300 Z M158 265 L172 193 L185 265 Z M174 300 L190 169 L207 300 Z M178 254 L190 163 L203 254 Z M200 300 L219 191 L238 300 Z M205 262 L219 185 L234 262 Z M218 300 L234 199 L250 300 Z M222 265 L234 193 L246 265 Z M236 300 L258 210 L281 300 Z M241 269 L258 204 L275 269 Z M256 300 L280 188 L303 300 Z M262 261 L280 182 L298 261 Z M280 300 L300 218 L320 300 Z M285 271 L300 212 L315 271 Z M305 300 L329 168 L353 300 Z M311 254 L329 162 L347 254 Z M338 300 L356 198 L373 300 Z M342 264 L356 192 L369 264 Z M356 300 L378 188 L400 300 Z M361 261 L378 182 L394 261 Z M388 300 L405 207 L423 300 Z M392 267 L405 201 L419 267 Z M414 300 L438 169 L462 300 Z M420 254 L438 163 L456 254 Z M449 300 L471 176 L494 300 Z M454 256 L471 170 L488 256 Z M473 300 L492 199 L512 300 Z M477 265 L492 193 L507 265 Z M491 300 L506 203 L521 300 Z M494 266 L506 197 L517 266 Z M507 300 L528 163 L550 300 Z M512 252 L528 157 L544 252 Z "/>
+      </svg>
+      <svg class="layer-glass forest-near" aria-hidden="true" viewBox="0 0 512 322">
+        <rect x="430" y="0" width="34" height="322" fill="#2A1C26"/><rect x="438" y="0" width="6" height="322" fill="#3A2A34"/>
+        <path d="M430 120 Q400 112 372 120 M464 80 Q492 70 520 76" stroke="#2A1C26" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <g class="near-leaves"><circle cx="372" cy="114" r="14"/><circle cx="388" cy="104" r="12"/><circle cx="360" cy="124" r="10"/><circle cx="506" cy="70" r="16"/><circle cx="488" cy="64" r="11"/></g>
+        <g class="owl"><ellipse cx="408" cy="104" rx="9" ry="12" fill="#3A2A34"/><circle cx="404" cy="100" r="3" fill="#FFD38A"/><circle cx="412" cy="100" r="3" fill="#FFD38A"/><circle cx="404" cy="100" r="1.2" fill="#15132B"/><circle cx="412" cy="100" r="1.2" fill="#15132B"/><path d="M400 92 L403 96 M416 92 L413 96" stroke="#3A2A34" stroke-width="2"/></g>
+      </svg>
+    </div>
+    <div class="view view-train">
+      <div class="scroll scroll-far"><svg width="1024" height="322" viewBox="0 0 1024 322" aria-hidden="true"><path class="hills-far" d="M0 322 L0 208 Q64 180 128 193 Q192 180 256 202 Q320 177 384 190 Q448 177 512 208 Q576 180 640 193 Q704 180 768 202 Q832 177 896 190 Q960 177 1024 208 L1024 322 Z"/></svg></div>
+      <div class="scroll scroll-near"><svg width="1024" height="322" viewBox="0 0 1024 322" aria-hidden="true"><path class="hills-near" d="M0 322 L0 251 Q43 240 85 248 Q128 239 171 246 Q213 234 256 242 Q299 234 341 248 Q384 235 427 242 Q469 235 512 251 Q555 240 597 248 Q640 239 683 246 Q725 234 768 242 Q811 234 853 248 Q896 235 939 242 Q981 235 1024 251 L1024 322 Z"/><g class="town-lights"><rect x="237" y="256" width="3" height="3"/><rect x="749" y="243" width="3" height="3"/><rect x="191" y="245" width="3" height="3"/><rect x="703" y="242" width="3" height="3"/><rect x="71" y="251" width="3" height="3"/><rect x="583" y="260" width="3" height="3"/><rect x="444" y="253" width="3" height="3"/><rect x="956" y="257" width="3" height="3"/><rect x="3" y="248" width="3" height="3"/><rect x="515" y="256" width="3" height="3"/><rect x="257" y="242" width="3" height="3"/><rect x="769" y="246" width="3" height="3"/><rect x="460" y="255" width="3" height="3"/><rect x="972" y="256" width="3" height="3"/><rect x="41" y="249" width="3" height="3"/><rect x="553" y="242" width="3" height="3"/><rect x="284" y="246" width="3" height="3"/><rect x="796" y="245" width="3" height="3"/><rect x="316" y="246" width="3" height="3"/><rect x="828" y="258" width="3" height="3"/><rect x="21" y="244" width="3" height="3"/><rect x="533" y="260" width="3" height="3"/><rect x="194" y="259" width="3" height="3"/><rect x="706" y="241" width="3" height="3"/><rect x="360" y="248" width="3" height="3"/><rect x="872" y="251" width="3" height="3"/><rect x="231" y="241" width="3" height="3"/><rect x="743" y="249" width="3" height="3"/></g></svg></div>
+      <div class="scroll scroll-poles"><svg width="1024" height="322" viewBox="0 0 1024 322" aria-hidden="true">
+        <path d="M0 132 Q128 154 256 132 T512 132 T768 132 T1024 132" fill="none" stroke="#15132B" stroke-width="1.5"/>
+        <path d="M0 142 Q128 164 256 142 T512 142 T768 142 T1024 142" fill="none" stroke="#15132B" stroke-width="1.5"/>
+        <g fill="#15132B"><rect x="252" y="120" width="8" height="202"/><rect x="236" y="126" width="40" height="5"/><rect x="764" y="120" width="8" height="202"/><rect x="748" y="126" width="40" height="5"/></g>
+      </svg></div>
+      <div class="rail-blur"></div>
     </div>
     <svg class="layer-glass branch" aria-hidden="true" viewBox="0 0 512 322">
       <g class="branch-wood" fill="none" stroke-linecap="round">
@@ -344,6 +577,22 @@
   </svg>
   <button type="button" class="pet pet-cat" aria-label="Pet the cat">
     <svg viewBox="770 360 130 74" width="130" height="74" aria-hidden="true">
+      <!-- standing and walking (js/life.js adds .standing) -->
+      <g class="pet-stand">
+        <path class="stand-tail fur-stroke" d="M852 398 Q872 392 870 372 Q869 364 876 362" fill="none" stroke-width="6" stroke-linecap="round" style="transform-origin: 852px 398px"/>
+        <g class="leg leg-a"><rect x="809" y="402" width="6" height="18" rx="3" class="shade"/><rect x="841" y="402" width="6" height="18" rx="3" class="shade"/></g>
+        <g class="leg leg-b"><rect x="816" y="402" width="6" height="18" rx="3" class="fur"/><rect x="848" y="402" width="6" height="18" rx="3" class="fur"/></g>
+        <ellipse class="stand-body fur" cx="831" cy="398" rx="28" ry="12"/>
+        <path d="M824 388 q3 5 0 10 M836 387 q3 5 0 10" fill="none" class="shade-stroke" stroke-width="2.5" stroke-linecap="round"/>
+        <g class="stand-head">
+          <polygon points="789,382 790,366 801,378" class="fur"/><polygon points="801,377 812,368 812,384" class="fur"/>
+          <polygon points="792,378 793,371 797,377" fill="#F28DB2"/><polygon points="804,377 808,372 809,380" fill="#F28DB2"/>
+          <circle cx="800" cy="389" r="13" class="fur"/>
+          <circle cx="794" cy="388" r="2.2" fill="#15132B"/><circle cx="804" cy="388" r="2.2" fill="#15132B"/>
+          <path d="M797 393 h5 l-2.5 3 z" fill="#F28DB2"/>
+        </g>
+      </g>
+      <g class="pet-lying">
       <g class="pet-tail" style="transform-origin: 858px 414px">
         <path d="M858 414 Q892 414 882 426 Q866 432 834 428" fill="none" class="fur-stroke" stroke-width="7" stroke-linecap="round"/>
       </g>
@@ -361,6 +610,7 @@
         <path d="M791 408 h5 l-2.5 3 z" fill="#F28DB2"/>
         <g class="pet-hat pet-hat-cone"><path d="M786 393 L796 371 L804 391 Z" class="hat-a"/><circle cx="796" cy="371" r="3" class="hat-b"/><rect x="784" y="390" width="22" height="4" rx="2" class="hat-b"/></g>
         <g class="pet-hat pet-hat-witch"><path d="M786 391 Q792 380 790 368 Q796 372 803 390 Z" fill="#2A2040"/><ellipse cx="795" cy="391" rx="14" ry="3" fill="#2A2040"/></g>
+      </g>
       </g>
     </svg>
     <span class="pet-heart" aria-hidden="true">♥</span>
@@ -445,10 +695,29 @@
   </div>
 
   <!-- Dog on a floor cushion -->
+  <!-- The dog's cushion stays put when the dog wanders off -->
+  <svg class="dog-cushion" viewBox="400 712 170 82" width="170" height="82" aria-hidden="true">
+    <ellipse cx="482" cy="778" rx="66" ry="13" fill="#3E3060"/>
+    <ellipse cx="482" cy="772" rx="60" ry="11" fill="#5A4880"/>
+  </svg>
   <button type="button" class="pet pet-dog" aria-label="Pet the dog">
     <svg viewBox="400 712 170 82" width="170" height="82" aria-hidden="true">
-      <ellipse cx="482" cy="778" rx="66" ry="13" fill="#3E3060"/>
-      <ellipse cx="482" cy="772" rx="60" ry="11" fill="#5A4880"/>
+      <g class="pet-stand">
+        <path class="stand-tail fur-stroke" d="M528 740 Q546 734 548 716" fill="none" stroke-width="6" stroke-linecap="round" style="transform-origin: 528px 740px"/>
+        <g class="leg leg-a"><rect x="464" y="744" width="8" height="32" rx="4" class="shade"/><rect x="512" y="744" width="8" height="32" rx="4" class="shade"/></g>
+        <g class="leg leg-b"><rect x="474" y="744" width="8" height="32" rx="4" class="fur"/><rect x="522" y="744" width="8" height="32" rx="4" class="fur"/></g>
+        <ellipse class="stand-body fur" cx="496" cy="740" rx="38" ry="15"/>
+        <ellipse cx="520" cy="742" rx="14" ry="11" class="shade"/>
+        <g class="stand-head">
+          <ellipse cx="458" cy="724" rx="17" ry="14" class="fur"/>
+          <ellipse cx="443" cy="731" rx="11" ry="7" class="light"/>
+          <ellipse cx="434" cy="728" rx="3.4" ry="2.8" fill="#15132B"/>
+          <path d="M462 712 Q478 714 474 738 Q464 736 460 722 Z" class="shade"/>
+          <circle cx="452" cy="720" r="2.4" fill="#15132B"/><circle cx="452.8" cy="719.2" r=".8" fill="#fff"/>
+          <path d="M440 737 q4 6 8 0" fill="#F28DB2"/>
+        </g>
+      </g>
+      <g class="pet-lying">
       <g class="pet-tail" style="transform-origin: 536px 754px">
         <path d="M534 754 Q556 748 554 732" fill="none" class="fur-stroke" stroke-width="7" stroke-linecap="round"/>
       </g>
@@ -466,6 +735,7 @@
         <g class="pet-hat pet-hat-witch"><path d="M440 739 Q446 728 444 716 Q450 720 458 738 Z" fill="#2A2040"/><ellipse cx="449" cy="739" rx="14" ry="3" fill="#2A2040"/></g>
         <path class="eyes-closed" d="M439 750 q3 3 6 0" fill="none" stroke="#15132B" stroke-width="1.6" stroke-linecap="round"/>
         <g class="eyes-open"><circle cx="442" cy="749" r="2.4" fill="#15132B"/><circle cx="442.8" cy="748.2" r=".8" fill="#fff"/></g>
+      </g>
       </g>
     </svg>
     <span class="pet-heart" aria-hidden="true">♥</span>
@@ -620,6 +890,7 @@
       <div class="tv-idle-sub" id="tv-sub">lofi hip hop radio</div>
     </div>
     <div class="tv-static" aria-hidden="true"></div>
+    <div class="tv-vol" id="tv-vol" aria-hidden="true"><i></i><span>100%</span></div>
     <button type="button" class="tv-sound" id="tv-sound" hidden>
       <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span id="tv-sound-text">Tap for sound</span>
@@ -628,7 +899,8 @@
   <div class="tv-panel">
     <!-- The station knob: turns to the next radio station. -->
     <button type="button" class="knob knob-dial" id="tv-knob" aria-label="Change station"><span class="knob-mark" aria-hidden="true"></span></button>
-    <div class="knob" aria-hidden="true"></div>
+    <!-- The volume knob: steps the volume down, then back up to full. -->
+    <button type="button" class="knob knob-dial knob-volume" id="tv-volume" aria-label="Volume"><span class="knob-mark" aria-hidden="true"></span></button>
     <div class="grille" aria-hidden="true"></div>
     <div class="tv-led" aria-hidden="true"></div>
   </div>
@@ -671,6 +943,7 @@
         <svg class="icon-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></svg>
       </button>
     </div>
+    <p class="np-upnext" id="np-upnext" hidden></p>
     <div class="np-progress-row">
       <div class="np-progress"><div class="np-bar" id="np-bar"></div></div>
       <div class="np-time" id="np-time">0:00</div>
@@ -679,7 +952,12 @@
     <div class="np-actions">
       <button type="button" class="np-link" id="np-next" hidden>Next station</button>
       <button type="button" class="np-link" id="np-back" disabled>Put it back</button>
+      <button type="button" class="np-link" id="np-skip" hidden>Skip</button>
       <button type="button" class="np-link" id="np-remove" hidden>Remove from shelf</button>
+      <button type="button" class="np-chip" id="np-sleep" hidden>
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
+        <span id="np-sleep-text">30m</span>
+      </button>
     </div>
   </section>
 
@@ -691,6 +969,10 @@
 
   <!-- Room controls -->
   <div class="room-controls">
+    <button type="button" class="pill pill-icon" id="fullscreen-toggle" aria-label="Full screen" title="Full screen" hidden>
+      <svg class="icon-enter" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="icon-exit" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
     <button type="button" class="pill" id="decor-toggle" aria-expanded="false" aria-controls="decor-panel">
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20c0-3 2-4 4-4 1.5 0 3 1 3 3s-1.5 3-4 3H4z" fill="currentColor"/><path d="M10 15 19 4.5a1.8 1.8 0 0 1 2.5 2.5L11 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       Decorate
@@ -701,6 +983,8 @@
   <div class="window-glow"></div>
   <div class="storm-flash full-screen"></div>
   <div class="room-dim full-screen"></div>
+  <div class="flame-glow candle-glow" aria-hidden="true"></div>
+  <div class="flame-glow fire-glow" aria-hidden="true"></div>
   <div class="vignette full-screen"></div>
   <svg class="grain full-screen" aria-hidden="true">
     <filter id="grain" x="0" y="0" width="100%" height="100%">
@@ -759,6 +1043,7 @@
     </div>
     <div class="ios-group" id="crate-actions">
       <button type="button" class="ios-row ios-action tint" id="crate-play">Play</button>
+      <button type="button" class="ios-row ios-action tint" id="crate-queue" hidden>Play Later</button>
       <button type="button" class="ios-row ios-action" id="crate-to-shelf">Move to Shelf</button>
       <button type="button" class="ios-row ios-action destructive" id="crate-remove">Remove from Crate</button>
     </div>

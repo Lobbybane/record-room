@@ -22,6 +22,134 @@ export function initPets(stage) {
       timer = setTimeout(() => pet.classList.remove('awake'), 3800);
     });
   }
+  initWandering(stage);
+}
+
+/* ---------- pets that move about ---------- */
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const between = (a, b) => a + Math.random() * (b - a);
+
+// Stage pixels from a click.
+function stagePoint(stage, event) {
+  const rect = stage.getBoundingClientRect();
+  const scale = rect.width / 1280;
+  return { x: (event.clientX - rect.left) / scale, y: (event.clientY - rect.top) / scale };
+}
+
+function initWandering(stage) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cat = stage.querySelector('.pet-cat');
+  const dog = stage.querySelector('.pet-dog');
+  const pos = new Map([[cat, 0], [dog, 0]]); // how far each has moved left/right
+  let catBusy = false;
+  let dogBusy = false;
+  let dogAway = 0; // timer to bring the dog back to its cushion
+  let lookTimer = 0;
+
+  const visible = (pet) => getComputedStyle(pet).display !== 'none';
+
+  // Moves a pet by dx stage pixels, facing the way it walks (both are drawn facing left).
+  async function walk(pet, to, speed) {
+    const from = pos.get(pet);
+    if (Math.abs(to - from) < 2) return;
+    const facing = to > from ? -1 : 1;
+    pet.classList.add('standing', 'walking');
+    const duration = (Math.abs(to - from) / speed) * 1000;
+    await pet.animate([
+      { transform: `translateX(${from}px) scaleX(${facing})` },
+      { transform: `translateX(${to}px) scaleX(${facing})` },
+    ], { duration, easing: 'linear', fill: 'forwards' }).finished;
+    pos.set(pet, to);
+    pet.classList.remove('walking');
+  }
+
+  function settle(pet) {
+    const x = pos.get(pet);
+    pet.getAnimations().forEach((a) => a.cancel());
+    pet.style.transform = `translateX(${x}px)`;
+    pet.classList.remove('standing', 'walking', 'stretching');
+  }
+
+  async function stretch(pet) {
+    pet.classList.add('standing', 'stretching');
+    await sleep(1400);
+    pet.classList.remove('stretching');
+  }
+
+  // The cat gets up now and then, stretches, wanders along the sill and lies back down.
+  async function catStroll() {
+    if (catBusy || !visible(cat) || document.hidden) return;
+    catBusy = true;
+    try {
+      await stretch(cat);
+      await walk(cat, -Math.round(between(80, 160)), 45);
+      await sleep(between(1200, 2600));
+      await walk(cat, 0, 45);
+    } finally {
+      settle(cat);
+      catBusy = false;
+    }
+  }
+
+  // The dog chases its tail, or stretches, then lies down again.
+  async function dogTrick() {
+    if (dogBusy || !visible(dog) || document.hidden) return;
+    dogBusy = true;
+    try {
+      if (Math.random() < 0.5) {
+        await stretch(dog);
+      } else {
+        dog.classList.add('standing');
+        const x = pos.get(dog);
+        const frames = [];
+        for (let i = 0; i <= 6; i++) {
+          frames.push({ transform: `translate(${x}px, ${i % 2 ? -6 : 0}px) scaleX(${i % 2 ? -1 : 1})` });
+        }
+        await dog.animate(frames, { duration: 1800, easing: 'ease-in-out' }).finished;
+      }
+      await sleep(600);
+    } finally {
+      settle(dog);
+      dogBusy = false;
+    }
+  }
+
+  // Click the floor and the dog trots over (it stays clear of the TV on the left).
+  stage.addEventListener('click', async (event) => {
+    if (event.target.closest('button, a, input, dialog, .np-card, .tv-set')) return;
+    const point = stagePoint(stage, event);
+    // The cat glances toward clicks.
+    if (visible(cat) && !catBusy) {
+      cat.classList.remove('look-left', 'look-right');
+      cat.classList.add(point.x < 806 ? 'look-left' : 'look-right');
+      clearTimeout(lookTimer);
+      lookTimer = setTimeout(() => cat.classList.remove('look-left', 'look-right'), 2200);
+    }
+    if (!visible(dog) || dogBusy || point.y < 640) return;
+    dogBusy = true;
+    clearTimeout(dogAway);
+    try {
+      const target = Math.round(Math.min(440, Math.max(0, point.x - 485)));
+      await walk(dog, target, 160);
+    } finally {
+      settle(dog);
+      dogBusy = false;
+    }
+    // After a while it goes back to its cushion.
+    dogAway = setTimeout(async () => {
+      if (dogBusy) return;
+      dogBusy = true;
+      try { await walk(dog, 0, 110); } finally { settle(dog); dogBusy = false; }
+    }, 20000);
+  });
+
+  const every = (fn, min, max) => {
+    const next = () => setTimeout(async () => { await fn(); next(); }, between(min, max));
+    next();
+  };
+  every(catStroll, 40000, 90000);
+  every(dogTrick, 40000, 90000);
 }
 
 // Click the fish tank to sprinkle food; the fish swim up for it.
@@ -49,8 +177,9 @@ export function initLamp(decor) {
   button.addEventListener('click', () => {
     sfx.click();
     decor.set('lamp', decor.get('lamp') === 'on' ? 'off' : 'on');
-    sync();
   });
+  // Also follows changes made elsewhere (the sleep timer, presets).
+  new MutationObserver(sync).observe(document.getElementById('stage'), { attributes: true, attributeFilter: ['data-lamp'] });
   sync();
 }
 

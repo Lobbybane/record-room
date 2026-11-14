@@ -3,12 +3,16 @@ import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } 
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
-import { sfx, setSoundEnabled, initThunder } from './sounds.js';
-import { confirmDialog } from './ui.js';
+import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
+import { confirmDialog, actionSheet } from './ui.js';
+import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
-import { STATIONS, stationFor, nextStation } from './radio.js';
+import { initStudyTimer } from './study.js';
+import { lookPages } from './looks.js';
+import { initParallax, setParallax } from './parallax.js';
+import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -151,14 +155,52 @@ function buildLights() {
 
 const decor = initDecor(stage, {
   onSky: buildCity,
+  custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor) },
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
+    setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
+    // Room sounds: the sliders, plus the room's own sounds when "Match the room" is on.
+    const match = d.mixMatch === 'on';
+    const wet = ['rain', 'storm'].includes(d.weather);
+    setAmbience({
+      rain: Math.max(d.mixRain, match && wet ? (d.weather === 'storm' ? 55 : 40) : 0) / 100,
+      // A lit fireplace always crackles softly.
+      fire: Math.max(d.mixFire, d.fire === 'on' && ['cabin', 'treehouse'].includes(d.room) ? (match ? 40 : 22) : 0) / 100,
+      cafe: Math.max(d.mixCafe, match && d.room === 'cafe' ? 35 : 0) / 100,
+      purr: d.mixPurr / 100,
+    });
     // After this file has finished setting up (the radio code is further down).
-    queueMicrotask(() => musicSettingsChanged(d));
+    queueMicrotask(() => { musicSettingsChanged(d); updateHands(); });
   },
 });
+// What the listener holds: a book while studying, tea on a break.
+const study = initStudyTimer(stage, { onChange: () => updateHands() });
+const HANDS = { listen: 'rest', read: 'book', tea: 'tea', knit: 'knit', draw: 'draw' };
+function updateHands() {
+  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : HANDS[decor.get('activity')] || 'rest';
+}
+updateHands();
 initThunder(stage);
+initParallax(stage);
+// Candles and the fireplace: click to light or blow out.
+for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {
+  const button = $(`#${id}`);
+  const sync = () => {
+    const lit = decor.get(name) === 'on';
+    button.setAttribute('aria-pressed', String(lit));
+    button.setAttribute('aria-label', lit ? `Put out the ${label}` : `Light the ${label}`);
+  };
+  button.addEventListener('click', () => {
+    const lit = decor.get(name) === 'on';
+    if (lit) sfx.puff(); else sfx.strike();
+    decor.set(name, lit ? 'off' : 'on');
+    sync();
+  });
+  sync();
+  new MutationObserver(sync).observe(stage, { attributes: true, attributeFilter: [`data-${name}`] });
+}
+setParallax(decor.get('parallax') === 'on');
 initWeather(stage);
 initPets(stage);
 initLamp(decor);
@@ -234,7 +276,10 @@ async function onSleeve(i) {
     return;
   }
   if (busy || isCurrent('shelf', i)) return;
-  if (current !== null) await putBack();
+  if (current !== null) {
+    await chooseHowToPlay({ from: 'shelf', index: i });
+    return;
+  }
   await playRecord({ from: 'shelf', index: i });
 }
 
@@ -316,6 +361,7 @@ const player = createPlayer('yt-player', {
     // Ignore the radio winding down while the record is still on its way.
     if (phase === 'returning' || phase === 'moving') return;
     if (state === 1) {
+      asleep = false;
       if (phase !== 'playing') upgradeCover(current);
       phase = 'playing';
       setDeck({ spinning: true, needle: true });
@@ -328,7 +374,7 @@ const player = createPlayer('yt-player', {
       setDeck({ needle: false });
       // The side is over: the record goes back by itself and the radio returns.
       const ref = current;
-      setTimeout(() => { if (current === ref && phase === 'ended' && !busy) putBack(); }, 3000);
+      setTimeout(() => { if (current === ref && phase === 'ended' && !busy) putBack({ advance: true }); }, 3000);
     }
     updateCard();
   },
@@ -404,7 +450,7 @@ async function playRecord(ref) {
     player.unMute();
     player.setVolume(0);
     await player.load(record.id);
-    player.fade(VOLUME, 500);
+    player.fade(vol(), 500);
   } catch {
     phase = 'error';
     errorText = 'Could not reach YouTube. Check your connection or ad blocker.';
@@ -415,15 +461,19 @@ async function playRecord(ref) {
   updateCard();
 }
 
-async function putBack() {
+// advance: play the next queued record (when a record ends or is skipped).
+// Putting a record back by hand clears the queue.
+async function putBack({ advance = false } = {}) {
   if (current === null) return;
+  if (!advance) queue = [];
   busy = true;
   phase = 'returning';
   updateCard();
   await player.fade(0, 500);
   player.stop();
   setDeck();
-  if (radioOn) showTv('Tuning in…', station.name);
+  if (advance && queue.length) showTv('Up next…', queue[0].title);
+  else if (radioOn) showTv('Tuning in…', station.name);
   else showRadioOff();
   await wait(600);
   await moveToSleeve(current);
@@ -433,8 +483,110 @@ async function putBack() {
   renderShelf();
   renderCrate();
   updateCard();
+  if (advance && await playNextInQueue()) return;
   if (radioOn) tuneRadio();
 }
+
+/* ---------------- the queue ---------------- */
+
+// Records waiting to play after the current one. Kept as the record objects themselves,
+// so moving or removing records can't make the queue point at the wrong one.
+let queue = [];
+
+function refOfRecord(record) {
+  const shelf = records.indexOf(record);
+  if (shelf >= 0) return { from: 'shelf', index: shelf };
+  const inCrate = crate.indexOf(record);
+  return inCrate >= 0 ? { from: 'crate', index: inCrate } : null;
+}
+
+async function playNextInQueue() {
+  while (queue.length) {
+    const ref = refOfRecord(queue.shift());
+    if (ref) {
+      await playRecord(ref);
+      return true;
+    }
+  }
+  updateCard();
+  return false;
+}
+
+// While a record plays, picking another asks whether to play it now or queue it.
+async function chooseHowToPlay(ref) {
+  const record = recordOf(ref);
+  const choice = await actionSheet({
+    title: record.title,
+    message: record.artist,
+    actions: [
+      { label: 'Play Now', value: 'now' },
+      { label: 'Play Next', value: 'next' },
+      { label: 'Play Later', value: 'later' },
+    ],
+  });
+  if (!choice || busy) return;
+  if (choice === 'now') {
+    if (current !== null) await putBack();
+    const now = refOfRecord(record);
+    if (now) await playRecord(now);
+    return;
+  }
+  queue = queue.filter((r) => r !== record);
+  if (choice === 'next') queue.unshift(record);
+  else queue.push(record);
+  sfx.click();
+  updateCard();
+}
+
+/* ---------------- sleep timer ---------------- */
+
+let asleep = false; // the timer ran out: the listener dozes until music plays again
+
+initSleepTimer({
+  async onEnd() {
+    queue = [];
+    const playing = current !== null ? phase === 'playing' : radioPhase === 'playing';
+    if (playing) {
+      await player.fade(0, reduceMotion ? 3000 : 30000);
+      player.pause();
+      player.setVolume(vol());
+    }
+    asleep = true;
+    decor.set('lamp', 'off');
+    updateCard();
+  },
+});
+onSleepChange(() => {
+  updateCard();
+  decor.refresh();
+});
+
+$('#np-sleep').addEventListener('click', async () => {
+  const choice = await actionSheet({
+    title: `Sleep timer: ${sleepMinutesLeft()} min left`,
+    actions: [
+      { label: 'Add 15 Minutes', value: 'add' },
+      { label: 'Turn Off Timer', value: 'off', destructive: true },
+    ],
+  });
+  if (choice === 'add') setSleepTimer(sleepMinutesLeft() + 15);
+  if (choice === 'off') setSleepTimer(0);
+});
+
+/* ---------------- volume knob ---------------- */
+
+let volumeTimer = 0;
+$('#tv-volume').addEventListener('click', () => {
+  sfx.click();
+  const next = VOLUME_STEPS.find((step) => step < vol() - 2) ?? VOLUME_STEPS[0];
+  decor.set('volume', next);
+  const bar = $('#tv-vol');
+  bar.style.setProperty('--v', `${next}%`);
+  bar.querySelector('span').textContent = `${next}%`;
+  bar.classList.add('show');
+  clearTimeout(volumeTimer);
+  volumeTimer = setTimeout(() => bar.classList.remove('show'), 1500);
+});
 
 /* ---------------- the radio ---------------- */
 
@@ -442,7 +594,9 @@ async function putBack() {
 // It starts muted, because browsers only allow sound after a tap; the first tap
 // anywhere turns the sound up.
 
-const VOLUME = 100;
+const VOLUME_STEPS = [100, 70, 40, 15];
+const vol = () => decor.get('volume');
+let lastVolume = null;
 let station = STATIONS[0];
 let radioOn = null;          // the "Lofi radio" setting; null until the settings first arrive
 let radioPhase = 'off';      // off | tuning | playing | paused | error
@@ -452,13 +606,22 @@ let settingKey = null;     // the station chosen in Decorate (a broken one may b
 let stallTimer = 0;
 
 function musicSettingsChanged(d) {
+  if (d.volume !== lastVolume) {
+    lastVolume = d.volume;
+    if (soundOn || current !== null) player.setVolume(d.volume);
+    const knob = $('#tv-volume');
+    knob.style.setProperty('--turn', `${Math.round((d.volume / 100) * 240 - 120)}deg`);
+    knob.setAttribute('aria-label', `Volume ${d.volume}%: turn down`);
+    knob.title = `Volume ${d.volume}%`;
+  }
   const nextOn = d.radio === 'on';
   const next = stationFor(d.station);
+  const wanted = `${d.station}:${next.key}`; // "auto" can change station as the day goes on
   const first = radioOn === null;
-  if (!first && nextOn === radioOn && next.key === settingKey) return;
-  const retune = nextOn && (next.key !== settingKey || !radioOn);
+  if (!first && nextOn === radioOn && wanted === settingKey) return;
+  const retune = nextOn && (wanted !== settingKey || !radioOn);
   radioOn = nextOn;
-  settingKey = next.key;
+  settingKey = wanted;
   station = next;
   updateKnob();
   if (current !== null) { updateCard(); return; } // a record is on; the radio waits
@@ -468,6 +631,11 @@ function musicSettingsChanged(d) {
     tuneRadio({ flash: !first });
   }
 }
+
+// Auto station: check the clock each minute.
+setInterval(() => {
+  if (decor.get('station') === 'auto') musicSettingsChanged({ radio: decor.get('radio'), station: 'auto', volume: decor.get('volume') });
+}, 60_000);
 
 function showRadioOff() {
   showTv('Radio’s off', 'Turn the knob, or pick a record');
@@ -487,7 +655,7 @@ async function tuneRadio({ flash = false } = {}) {
       player.setVolume(0);
     }
     await player.load(station.id, { muted: !soundOn });
-    if (soundOn) player.fade(VOLUME, 1200);
+    if (soundOn) player.fade(vol(), 1200);
   } catch {
     radioPhase = 'error';
     showTv('No signal', 'Could not reach YouTube. Check your connection or ad blocker.');
@@ -516,6 +684,7 @@ function stopRadio() {
 function radioState(state) {
   if (!radioOn || radioPhase === 'off') return;
   if (state === 1) {
+    asleep = false;
     radioPhase = 'playing';
     radioFailures = 0;
     $('#tv-idle').hidden = true;
@@ -595,9 +764,9 @@ function enableSound() {
   player.unMute();
   if (radioPhase === 'playing') {
     player.setVolume(0);
-    player.fade(VOLUME, 1500);
+    player.fade(vol(), 1500);
   } else {
-    player.setVolume(VOLUME);
+    player.setVolume(vol());
     player.play();
   }
   updateTvTag();
@@ -643,7 +812,8 @@ const RADIO_PHASES = { tuning: 'loading', playing: 'playing', paused: 'paused', 
 function updateCard() {
   const record = recordOf(current);
   const radio = current === null && radioOn && radioPhase !== 'off';
-  const shownPhase = current !== null ? phase : (RADIO_PHASES[radioPhase] || 'idle');
+  let shownPhase = current !== null ? phase : (RADIO_PHASES[radioPhase] || 'idle');
+  if (asleep && shownPhase !== 'playing') shownPhase = 'idle';
   stage.dataset.phase = shownPhase; // the listener reacts to this in CSS
   stage.dataset.source = current !== null ? 'record' : 'radio';
   stage.classList.toggle('is-on', shownPhase === 'playing');
@@ -653,7 +823,8 @@ function updateCard() {
   if (radio) {
     $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
     $('#np-title').textContent = station.name;
-    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead' : station.by;
+    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
+      : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
     $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;
   } else {
     $('#np-kicker').textContent = KICKERS[phase] || '';
@@ -676,6 +847,16 @@ function updateCard() {
   next.textContent = radioOn ? 'Next station' : 'Turn on the radio';
   next.disabled = busy;
   $('#np-back').hidden = current === null;
+  $('#np-skip').hidden = current === null || queue.length === 0;
+  $('#np-skip').disabled = busy;
+  const upNext = queue.filter((r) => refOfRecord(r));
+  $('#np-upnext').hidden = upNext.length === 0;
+  $('#np-upnext').textContent = upNext.length
+    ? `Up next: ${upNext[0].title}${upNext.length > 1 ? ` (+${upNext.length - 1})` : ''}` : '';
+  const minutes = sleepMinutesLeft();
+  $('#np-sleep').hidden = !minutes;
+  $('#np-sleep-text').textContent = `${minutes}m`;
+  $('#np-sleep').setAttribute('aria-label', `Sleep timer: ${minutes} minutes left`);
   $('#np-back').disabled = record === null || busy;
   $('#np-remove').hidden = record === null;
   $('#np-remove').textContent = current?.from === 'crate' ? 'Remove from crate' : 'Remove from shelf';
@@ -709,6 +890,10 @@ $('#np-next').addEventListener('click', () => {
 
 $('#np-back').addEventListener('click', () => {
   if (!busy) putBack();
+});
+
+$('#np-skip').addEventListener('click', () => {
+  if (!busy) putBack({ advance: true });
 });
 
 $('#np-remove').addEventListener('click', async () => {
@@ -785,7 +970,12 @@ function renderCrateBrowser(direction = '') {
   const playing = isCurrent('crate', crateIndex);
   const play = $('#crate-play');
   play.disabled = playing || busy;
-  play.textContent = playing ? 'On the Turntable' : 'Play';
+  play.textContent = playing ? 'On the Turntable' : current !== null ? 'Play Now' : 'Play';
+  const queued = queue.includes(record);
+  const addToQueue = $('#crate-queue');
+  addToQueue.hidden = current === null || playing;
+  addToQueue.disabled = queued;
+  addToQueue.textContent = queued ? 'In the Queue' : 'Play Later';
   const hasSpace = records.some((r) => !r);
   const toShelf = $('#crate-to-shelf');
   toShelf.disabled = playing || !hasSpace;
@@ -825,6 +1015,16 @@ $('#crate-play').addEventListener('click', async () => {
   crateDialog.close();
   if (current !== null) await putBack();
   await playRecord({ from: 'crate', index });
+});
+
+$('#crate-queue').addEventListener('click', () => {
+  const record = crate[crateIndex];
+  if (!record || current === null) return;
+  queue = queue.filter((r) => r !== record);
+  queue.push(record);
+  sfx.click();
+  updateCard();
+  renderCrateBrowser();
 });
 
 $('#crate-to-shelf').addEventListener('click', () => {
@@ -914,6 +1114,32 @@ form.addEventListener('submit', async (event) => {
   dialog.close();
   if (addTarget === 'crate') openCrate();
 });
+
+/* ---------------- full screen ---------------- */
+
+// Shown only where the browser can go full screen (not iPhone Safari: there, Add to
+// Home Screen opens the room like an app instead).
+{
+  const button = $('#fullscreen-toggle');
+  const root = document.documentElement;
+  const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (enter && (document.fullscreenEnabled || document.webkitFullscreenEnabled) && !standalone) {
+    button.hidden = false;
+    const sync = () => {
+      const full = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      button.classList.toggle('is-full', full);
+      button.setAttribute('aria-label', full ? 'Exit full screen' : 'Full screen');
+      button.title = full ? 'Exit full screen' : 'Full screen';
+    };
+    button.addEventListener('click', () => {
+      if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else enter.call(root).catch?.(() => {});
+    });
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('webkitfullscreenchange', sync);
+  }
+}
 
 /* ---------------- start ---------------- */
 

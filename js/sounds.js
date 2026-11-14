@@ -9,20 +9,20 @@ let noise = null;
 
 export function setSoundEnabled(on) {
   enabled = on;
-  if (master) master.gain.value = on ? 0.5 : 0;
+  setMasterGain();
 }
 
 function unlock() {
-  if (!enabled) return;
   const Ctx = window.AudioContext || window.webkitAudioContext;
   if (!Ctx) return;
   if (!ctx) {
     ctx = new Ctx();
     master = ctx.createGain();
-    master.gain.value = 0.5;
+    setMasterGain();
     master.connect(ctx.destination);
   }
   if (ctx.state === 'suspended') ctx.resume();
+  startAmbience();
 }
 window.addEventListener('pointerdown', unlock, { capture: true });
 window.addEventListener('keydown', unlock, { capture: true });
@@ -32,6 +32,9 @@ function ready() {
   if (!enabled || !ctx || ctx.state !== 'running') return null;
   return ctx;
 }
+
+// Not part of the sound-effects switch: master is muted when effects are off.
+function setMasterGain() { if (master) master.gain.value = enabled ? 0.5 : 0; }
 
 function noiseBuffer() {
   if (!noise) {
@@ -79,6 +82,28 @@ function tone({ at = 0, duration, freq, freqEnd, type = 'sine', gain = 0.2, atta
 }
 
 export const sfx = {
+  // The study timer: three soft bell notes going up.
+  chime() {
+    if (!ready()) return;
+    [[784, 0], [988, 0.18], [1319, 0.36]].forEach(([freq, at]) => {
+      tone({ at, duration: 1.6, freq, gain: 0.12, attack: 0.01 });
+      tone({ at, duration: 0.9, freq: freq * 2, gain: 0.03, attack: 0.01 });
+    });
+  },
+
+  // Striking a match: a scratch, then a soft whoosh as it catches.
+  strike() {
+    if (!ready()) return;
+    noiseBurst({ duration: 0.12, type: 'highpass', freq: 2800, gain: 0.25, attack: 0.01 });
+    noiseBurst({ at: 0.1, duration: 0.5, type: 'lowpass', freq: 900, freqEnd: 300, gain: 0.12, attack: 0.05 });
+  },
+
+  // Blowing out a candle: a short puff.
+  puff() {
+    if (!ready()) return;
+    noiseBurst({ duration: 0.25, type: 'bandpass', freq: 700, q: 0.6, gain: 0.15, attack: 0.02 });
+  },
+
   // The lamp's switch: a small two-part click.
   click() {
     if (!ready()) return;
@@ -174,3 +199,137 @@ export function initThunder(stage) {
   lightning.addEventListener('animationstart', schedule);
   lightning.addEventListener('animationiteration', schedule);
 }
+
+/* ---------------- room sounds (the mixer) ---------------- */
+
+// Soft looping sounds made from filtered noise: rain, a crackling fire, café murmur and
+// purring. Levels are 0-1 and come from Decorate > Room sounds. They play through their
+// own output, so the sound-effects switch doesn't silence them.
+
+const wanted = { rain: 0, fire: 0, cafe: 0, purr: 0 };
+const beds = {};
+let ambienceOut = null;
+let eventsTimer = 0;
+
+function loopNoise(filters) {
+  const src = ctx.createBufferSource();
+  src.buffer = noiseBuffer();
+  src.loop = true;
+  let node = src;
+  for (const [type, freq, q = 0.7] of filters) {
+    const f = ctx.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    f.Q.value = q;
+    node = node.connect(f);
+  }
+  src.start(0, Math.random() * 3);
+  return node;
+}
+
+// A slow wobble on a gain (gusts of rain, voices rising and falling, breathing).
+function wobble(param, rate, depth) {
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = rate;
+  const amount = ctx.createGain();
+  amount.gain.value = depth;
+  lfo.connect(amount).connect(param);
+  lfo.start();
+}
+
+function buildBeds() {
+  ambienceOut = ctx.createGain();
+  ambienceOut.gain.value = 0.9;
+  ambienceOut.connect(ctx.destination);
+  const bed = (name) => {
+    const g = ctx.createGain();
+    g.gain.value = 0;
+    g.connect(ambienceOut);
+    beds[name] = g;
+    return g;
+  };
+
+  // Rain: a wide hiss with gusts, plus a lower patter.
+  const rain = bed('rain');
+  const hiss = ctx.createGain();
+  hiss.gain.value = 0.25;
+  wobble(hiss.gain, 0.13, 0.08);
+  loopNoise([['highpass', 400], ['lowpass', 5200]]).connect(hiss).connect(rain);
+  const patter = ctx.createGain();
+  patter.gain.value = 0.22;
+  loopNoise([['bandpass', 900, 0.6]]).connect(patter).connect(rain);
+
+  // Fire: a low rumble (crackles are added as events).
+  const fire = bed('fire');
+  const rumble = ctx.createGain();
+  rumble.gain.value = 0.5;
+  wobble(rumble.gain, 0.3, 0.15);
+  loopNoise([['lowpass', 260], ['lowpass', 400]]).connect(rumble).connect(fire);
+
+  // Café: several bands of murmur that rise and fall like distant voices.
+  const cafe = bed('cafe');
+  [[320, 0.21], [520, 0.37], [760, 0.53], [1150, 0.29]].forEach(([freq, rate]) => {
+    const voice = ctx.createGain();
+    voice.gain.value = 0.11;
+    wobble(voice.gain, rate, 0.09);
+    loopNoise([['bandpass', freq, 2.2]]).connect(voice).connect(cafe);
+  });
+
+  // Purring: a low rumble pulsing about 25 times a second, with slow breaths.
+  const purr = bed('purr');
+  const body = ctx.createGain();
+  body.gain.value = 0.5;
+  loopNoise([['lowpass', 180], ['lowpass', 240]]).connect(body);
+  const pulse = ctx.createGain();
+  pulse.gain.value = 0.5;
+  wobble(pulse.gain, 25, 0.5);
+  const breath = ctx.createGain();
+  breath.gain.value = 0.7;
+  wobble(breath.gain, 0.35, 0.35);
+  body.connect(pulse).connect(breath).connect(purr);
+}
+
+// Little events on top of the beds: fire crackles and pops, cups clinking in the café.
+function ambienceEvents() {
+  if (!ctx || ctx.state !== 'running') return;
+  if (wanted.fire > 0 && Math.random() < 0.55) {
+    for (let i = 0, n = 1 + Math.floor(Math.random() * 3); i < n; i++) {
+      noiseBurst({ at: Math.random() * 0.25, duration: 0.006 + Math.random() * 0.02, type: 'highpass', freq: 1200 + Math.random() * 3500, gain: 0.25 * wanted.fire, attack: 0.001, out: ambienceOut });
+    }
+  }
+  if (wanted.cafe > 0 && Math.random() < 0.05) {
+    const freq = 2400 + Math.random() * 1600;
+    const t = ctx.currentTime;
+    [0, 0.12 + Math.random() * 0.1].forEach((at) => {
+      const osc = ctx.createOscillator();
+      osc.frequency.value = freq * (1 + Math.random() * 0.03);
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0.0001, t + at);
+      env.gain.exponentialRampToValueAtTime(0.05 * wanted.cafe, t + at + 0.003);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.5);
+      osc.connect(env).connect(ambienceOut);
+      osc.start(t + at);
+      osc.stop(t + at + 0.6);
+    });
+  }
+}
+
+function startAmbience() {
+  if (!ctx) return;
+  if (!ambienceOut && Object.values(wanted).some((v) => v > 0)) buildBeds();
+  if (!ambienceOut) return;
+  for (const [name, level] of Object.entries(wanted)) {
+    beds[name].gain.setTargetAtTime(level * (name === 'purr' ? 0.9 : 0.6), ctx.currentTime, 0.4);
+  }
+  clearInterval(eventsTimer);
+  if (wanted.fire > 0 || wanted.cafe > 0) eventsTimer = setInterval(ambienceEvents, 250);
+}
+
+/** Sets the room-sound levels (0-1 each). They start after the first tap. */
+export function setAmbience(levels) {
+  Object.assign(wanted, levels);
+  startAmbience();
+}
+
+// For tests and the panel: is anything audible right now?
+export const ambienceRunning = () => Boolean(ambienceOut && ctx && ctx.state === 'running' && Object.values(wanted).some((v) => v > 0));

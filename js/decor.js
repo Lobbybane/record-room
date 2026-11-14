@@ -3,7 +3,7 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
-import { STATIONS } from './radio.js';
+import { STATIONS, isStation } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
 
@@ -12,7 +12,7 @@ const KEY = 'record-room:settings:v1';
 export const OPTIONS = {
   room: {
     label: 'Room',
-    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house' },
+    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house', greenhouse: 'Rooftop greenhouse', treehouse: 'Forest treehouse', train: 'Night train' },
   },
   time: {
     label: 'Time of day',
@@ -93,6 +93,35 @@ export const OPTIONS = {
     label: 'Holiday hats',
     choices: { on: 'On', off: 'Off' },
   },
+  chair: {
+    label: 'Chair',
+    choices: { armchair: 'Armchair', beanbag: 'Beanbag', rocker: 'Rocking chair' },
+  },
+  rug: {
+    label: 'Rug',
+    choices: { round: 'Round dotted', stripes: 'Striped', checker: 'Checkered', braided: 'Braided', none: 'No rug' },
+  },
+  wallpaper: {
+    label: 'Wallpaper',
+    choices: { plain: 'Plain', stripes: 'Soft stripes', dots: 'Polka dots', stars: 'Tiny stars', flowers: 'Little flowers' },
+  },
+  curtain: {
+    label: 'Curtains',
+    swatches: {
+      room: ['Match the room', '#6E4C8E', '', ''],
+      rose: ['Rose', '#C9708F', '#9C4E6C', '#E092AE'],
+      sage: ['Sage', '#7FA08A', '#5C7C68', '#9CBDA6'],
+      ocean: ['Ocean', '#4F7FB0', '#3A6090', '#6E9CCB'],
+      mustard: ['Mustard', '#D0A048', '#A67C30', '#E8BC68'],
+      cream: ['Cream', '#E6D8C2', '#C2B39C', '#F4EAD9'],
+    },
+  },
+  parallax: {
+    label: 'Moving city',
+    choices: { on: 'On', off: 'Off' },
+  },
+  candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
+  fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
@@ -101,10 +130,21 @@ export const OPTIONS = {
     label: 'Lofi radio',
     choices: { on: 'On', off: 'Off' },
   },
+  volume: {
+    label: 'Volume',
+    range: [0, 100, 5],
+    format: (v) => `${v}%`,
+  },
   station: {
     label: 'Station',
-    choices: Object.fromEntries(STATIONS.map((s) => [s.key, s.label])),
+    choices: { auto: 'Auto', ...Object.fromEntries(STATIONS.map((s) => [s.key, s.label])) },
+    validate: isStation, // also your own stations
   },
+  mixMatch: { label: 'Match the room', choices: { on: 'On', off: 'Off' } },
+  mixRain: { label: 'Rain', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixFire: { label: 'Fire', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixCafe: { label: 'Café', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixPurr: { label: 'Purring', range: [0, 100, 5], format: (v) => `${v}%` },
   sound: {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
@@ -113,6 +153,18 @@ export const OPTIONS = {
   lamp: {
     label: 'Lamp',
     choices: { on: 'On', off: 'Off' },
+  },
+  outfit: {
+    label: 'Outfit',
+    choices: { hoodie: 'Hoodie', sweater: 'Cozy sweater', pyjamas: 'Pyjamas', cardigan: 'Cardigan' },
+  },
+  headphones: { label: 'Headphones', choices: { on: 'On', off: 'Off' } },
+  glasses: { label: 'Glasses', choices: { on: 'On', off: 'Off' } },
+  scarf: { label: 'Scarf', choices: { on: 'On', off: 'Off' } },
+  activity: {
+    label: 'Activity',
+    choices: { listen: 'Just listening', read: 'Reading', tea: 'Sipping tea', knit: 'Knitting', draw: 'Drawing' },
+    footer: 'The study timer swaps in a book while you focus and tea on breaks.',
   },
   skin: {
     label: 'Skin',
@@ -140,9 +192,27 @@ export const DEFAULTS = {
   skin: 's2',
   lamp: 'on',
   posters: 'records',
+  parallax: 'on',
+  candles: 'off',
+  fire: 'off',
+  chair: 'armchair',
+  outfit: 'hoodie',
+  headphones: 'off',
+  glasses: 'off',
+  scarf: 'off',
+  activity: 'listen',
+  rug: 'round',
+  wallpaper: 'plain',
+  curtain: 'room',
   holiday: 'auto',
   sound: 'on',
+  mixMatch: 'off',
+  mixRain: 0,
+  mixFire: 0,
+  mixCafe: 0,
+  mixPurr: 0,
   radio: 'on',
+  volume: 100,
   station: 'lofi',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
@@ -154,6 +224,8 @@ const NEON_MAX = 16;
 function isValid(name, value) {
   const option = OPTIONS[name];
   if (!option) return false;
+  if (option.range) return typeof value === 'number' && value >= option.range[0] && value <= option.range[1];
+  if (option.validate) return option.validate(value);
   const keys = option.choices || option.swatches;
   if (option.multi) return Array.isArray(value) && value.every((v) => Object.hasOwn(keys, v));
   return Object.hasOwn(keys, value);
@@ -219,7 +291,7 @@ function fitNeon(sign) {
  * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
  * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
-export function initDecor(stage, { onSky, onApply = () => {} }) {
+export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
   const decor = loadDecor();
   const panel = document.getElementById('decor-panel');
   const toggle = document.getElementById('decor-toggle');
@@ -234,6 +306,21 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
+    stage.dataset.chair = decor.chair;
+    stage.dataset.candles = decor.candles;
+    stage.dataset.fire = decor.fire;
+    stage.dataset.outfit = decor.outfit;
+    stage.dataset.headphones = decor.headphones;
+    stage.dataset.glasses = decor.glasses;
+    stage.dataset.scarf = decor.scarf;
+    stage.dataset.rug = decor.rug;
+    stage.dataset.wallpaper = decor.wallpaper;
+    stage.dataset.curtain = decor.curtain;
+    const [, , curtainA, curtainB] = OPTIONS.curtain.swatches[decor.curtain];
+    for (const [name, value] of [['--curtain-a', curtainA], ['--curtain-b', curtainB]]) {
+      if (value) stage.style.setProperty(name, value);
+      else stage.style.removeProperty(name);
+    }
     stage.dataset.season = decor.season === 'auto' ? seasonForDate(new Date()) : decor.season;
     applyHolidays(stage, decor);
 
@@ -266,6 +353,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     options: OPTIONS,
     decor,
     maxText: NEON_MAX,
+    custom,
     onChange(name, value) {
       if (name === 'neonText') decor.neonText = String(value).slice(0, NEON_MAX);
       else if (isValid(name, value)) decor[name] = value;
@@ -309,6 +397,18 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
       decor[name] = value;
       apply();
     },
+    // Several settings at once (presets and saved looks); unknown or invalid ones are skipped.
+    setMany(values) {
+      for (const [name, value] of Object.entries(values || {})) {
+        if (name === 'neonText' && typeof value === 'string') decor.neonText = value.slice(0, NEON_MAX);
+        else if (isValid(name, value)) decor[name] = Array.isArray(value) ? [...value] : value;
+      }
+      apply();
+    },
+    // A copy of every setting, for saving a look.
+    snapshot: () => JSON.parse(JSON.stringify(decor)),
+    refresh: () => ui.refresh(),
+    close: () => setOpen(false),
   };
 }
 
