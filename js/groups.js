@@ -80,12 +80,12 @@ export const GROUPS = {
   treehouse: {
     furniture: [
       { type: 'log', x: 650, y: 722, s: 1.4, core: true, people: true },
-      { type: 'sleepingbag', x: 480, y: 790, s: 1.3, color: '#D04858', core: true, people: true },
+      { type: 'sleepingbag', x: 480, y: 768, s: 1.3, color: '#D04858', core: true, people: true },
     ],
     people: [
       { x: 624, y: 716, s: 1.45, core: true, skin: 2, hair: ['bob', '#2A1E1E'], top: ['flannel', '#C8443C'], legs: '#3B3F78', hold: 'lantern', shoes: '#8A5A3C' },
       { x: 684, y: 706, s: 1.4, skin: 0, hair: ['short', '#B0603A'], top: ['flannel', '#3E6E4E'], legs: '#5A4858', hold: 'cocoa', shoes: '#8A5A3C', studier: true },
-      { x: 480, y: 790, s: 1.3, core: true, pose: 'lie', skin: 1, hair: ['curly', '#3A2A3A'], extras: ['beanie:#4F8E5E'], dozer: true },
+      { x: 480, y: 768, s: 1.3, core: true, pose: 'lie', skin: 1, hair: ['curly', '#3A2A3A'], extras: ['beanie:#4F8E5E'], dozer: true },
       { x: 590, y: 742, s: 1.35, pose: 'floor', skin: 3, hair: ['short', '#15101A'], top: ['tee', '#C9A86A'], legs: '#4F6E3A', extras: ['scout:#8A6A3C', 'scarf:#E85A6A'], hold: 'cocoa' },
     ],
   },

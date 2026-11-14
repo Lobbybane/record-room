@@ -1523,3 +1523,5 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* Wall art where the record ledge used to be (one per room; the café has its menu board). */
 .stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
 .stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
+/* The holiday shelf layer (tree on the shelf, stockings on the console) sits in front of the console. */
+.holiday-shelf { z-index: 2; }
