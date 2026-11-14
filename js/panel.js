@@ -6,7 +6,7 @@
 // custom page doesn't exist are skipped.
 const SECTIONS = [
   { title: 'Looks', rows: [{ custom: 'presets' }, { custom: 'looks' }] },
-  { title: 'Room', rows: ['room', { sub: 'furniture', label: 'Furniture', rows: ['chair', 'rug', 'wallpaper', 'curtain'] }, 'posters', 'candles', 'fire'] },
+  { title: 'Room', rows: ['room', { sub: 'furniture', label: 'Furniture', rows: ['chair', 'rug', 'wallpaper', 'curtain'] }, 'posters', 'candles', 'fire'], footer: 'The fireplace is in the mountain cabin and the treehouse. You can also click the candles and the fire to light them.' },
   { title: 'Outside', rows: ['time', 'weather', 'season', 'parallax'], footer: '“Auto” and “By date” follow your clock and calendar. The moving city follows your mouse, or the tilt of your phone (on iPhone, switch it off and on to allow that).' },
   { title: 'Holidays', rows: ['holiday', 'celebrate', 'hats'], footerId: 'holiday-note' },
   { title: 'Music', rows: ['radio', { custom: 'stations' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },

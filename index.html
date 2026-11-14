@@ -266,6 +266,41 @@
     </g>
   </svg>
 
+  <!-- Fireplace (cabin and treehouse): click to light it -->
+  <button type="button" class="fireplace" id="fireplace" aria-label="Light the fire" aria-pressed="false">
+    <svg viewBox="0 0 160 134" width="160" height="134" aria-hidden="true" overflow="visible">
+      <rect x="6" y="12" width="148" height="122" rx="6" fill="#6E5A6A"/>
+      <g fill="#5A4858">
+        <rect x="12" y="20" width="30" height="16" rx="5"/><rect x="46" y="18" width="36" height="14" rx="5"/><rect x="88" y="20" width="26" height="15" rx="5"/><rect x="118" y="18" width="30" height="17" rx="5"/>
+        <rect x="10" y="42" width="22" height="20" rx="5"/><rect x="128" y="40" width="20" height="22" rx="5"/>
+        <rect x="12" y="68" width="22" height="22" rx="5"/><rect x="126" y="70" width="22" height="20" rx="5"/>
+        <rect x="10" y="96" width="24" height="18" rx="5"/><rect x="128" y="96" width="22" height="20" rx="5"/>
+      </g>
+      <rect x="0" y="2" width="160" height="14" rx="4" fill="#8A5A4A"/><rect x="0" y="2" width="160" height="4" rx="2" fill="#A8724E"/>
+      <path d="M36 134 V76 Q36 46 80 46 Q124 46 124 76 V134 Z" fill="#1A1426"/>
+      <ellipse class="embers" cx="80" cy="126" rx="34" ry="6" fill="#FF7A3C" opacity="0"/>
+      <g class="fire-flames">
+        <path class="fl fl1" d="M58 124 Q50 104 62 88 Q62 100 70 104 Q68 88 80 72 Q84 92 92 96 Q96 86 94 80 Q108 98 102 124 Z" fill="#FF8A3C" style="transform-origin: 80px 124px"/>
+        <path class="fl fl2" d="M66 124 Q62 110 72 98 Q74 108 80 110 Q80 98 88 90 Q96 106 94 124 Z" fill="#FFC857" style="transform-origin: 80px 124px"/>
+        <path class="fl fl3" d="M74 124 Q72 114 80 106 Q88 114 86 124 Z" fill="#FFF3C4" style="transform-origin: 80px 124px"/>
+      </g>
+      <rect x="50" y="120" width="60" height="8" rx="4" fill="#6E4430" transform="rotate(-8 80 124)"/>
+      <rect x="54" y="122" width="56" height="8" rx="4" fill="#8A5A3C" transform="rotate(7 80 126)"/>
+      <path d="M20 16 h120" stroke="#15132B" stroke-opacity=".2"/>
+      <g class="mantel-things"><rect x="16" y="-14" width="10" height="16" rx="2" fill="#F4ECFF"/><rect x="132" y="-22" width="18" height="24" rx="3" fill="#3E8E7E"/><ellipse cx="141" cy="-22" rx="11" ry="6" fill="#4FA88E"/></g>
+    </svg>
+  </button>
+  <!-- Candles on the sill: click to light them -->
+  <button type="button" class="candles" id="candles" aria-label="Light the candles" aria-pressed="false">
+    <svg viewBox="0 0 64 46" width="64" height="46" aria-hidden="true" overflow="visible">
+      <ellipse cx="32" cy="44" rx="30" ry="3" fill="#15132B" opacity=".45"/>
+      <rect x="8" y="24" width="12" height="20" rx="2.5" fill="#F4ECFF"/><rect x="8" y="24" width="4" height="20" rx="2" fill="#FFFFFF" opacity=".5"/>
+      <rect x="25" y="14" width="13" height="30" rx="2.5" fill="#F7E1C8"/><rect x="25" y="14" width="4" height="30" rx="2" fill="#FFFFFF" opacity=".45"/>
+      <rect x="43" y="28" width="11" height="16" rx="2.5" fill="#F7A9C8"/><rect x="43" y="28" width="3.5" height="16" rx="1.7" fill="#FFFFFF" opacity=".4"/>
+      <path d="M14 24 v-3 M31.5 14 v-3 M48.5 28 v-3" stroke="#2B2440" stroke-width="1.4" stroke-linecap="round"/>
+      <g class="flame " style="transform-origin: 14px 22px"><path d="M14 22 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M14 22 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g><g class="flame f2" style="transform-origin: 31.5px 12px"><path d="M31.5 12 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M31.5 12 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g><g class="flame f3" style="transform-origin: 48.5px 26px"><path d="M48.5 26 q-4 -6 0 -13 q4 7 0 13z" fill="#FFB347"/><path d="M48.5 26 q-2 -3.5 0 -8 q2 4.5 0 8z" fill="#FFF3C4"/></g>
+    </svg>
+  </button>
   <!-- Study timer: a flip clock on the wall -->
   <button type="button" class="study-clock" id="study-clock" aria-label="Study timer">
     <span class="clock-face"><span class="clock-time">12:00</span></span>
@@ -886,6 +921,8 @@
   <div class="window-glow"></div>
   <div class="storm-flash full-screen"></div>
   <div class="room-dim full-screen"></div>
+  <div class="flame-glow candle-glow" aria-hidden="true"></div>
+  <div class="flame-glow fire-glow" aria-hidden="true"></div>
   <div class="vignette full-screen"></div>
   <svg class="grain full-screen" aria-hidden="true">
     <filter id="grain" x="0" y="0" width="100%" height="100%">

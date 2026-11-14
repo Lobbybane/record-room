@@ -120,6 +120,8 @@ export const OPTIONS = {
     label: 'Moving city',
     choices: { on: 'On', off: 'Off' },
   },
+  candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
+  fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
@@ -191,6 +193,8 @@ export const DEFAULTS = {
   lamp: 'on',
   posters: 'records',
   parallax: 'on',
+  candles: 'off',
+  fire: 'off',
   chair: 'armchair',
   outfit: 'hoodie',
   headphones: 'off',
@@ -303,6 +307,8 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
     stage.dataset.chair = decor.chair;
+    stage.dataset.candles = decor.candles;
+    stage.dataset.fire = decor.fire;
     stage.dataset.outfit = decor.outfit;
     stage.dataset.headphones = decor.headphones;
     stage.dataset.glasses = decor.glasses;

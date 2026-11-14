@@ -91,6 +91,19 @@ export const sfx = {
     });
   },
 
+  // Striking a match: a scratch, then a soft whoosh as it catches.
+  strike() {
+    if (!ready()) return;
+    noiseBurst({ duration: 0.12, type: 'highpass', freq: 2800, gain: 0.25, attack: 0.01 });
+    noiseBurst({ at: 0.1, duration: 0.5, type: 'lowpass', freq: 900, freqEnd: 300, gain: 0.12, attack: 0.05 });
+  },
+
+  // Blowing out a candle: a short puff.
+  puff() {
+    if (!ready()) return;
+    noiseBurst({ duration: 0.25, type: 'bandpass', freq: 700, q: 0.6, gain: 0.15, attack: 0.02 });
+  },
+
   // The lamp's switch: a small two-part click.
   click() {
     if (!ready()) return;

@@ -165,7 +165,8 @@ const decor = initDecor(stage, {
     const wet = ['rain', 'storm'].includes(d.weather);
     setAmbience({
       rain: Math.max(d.mixRain, match && wet ? (d.weather === 'storm' ? 55 : 40) : 0) / 100,
-      fire: Math.max(d.mixFire, match && d.fire === 'on' ? 40 : 0) / 100,
+      // A lit fireplace always crackles softly.
+      fire: Math.max(d.mixFire, d.fire === 'on' && ['cabin', 'treehouse'].includes(d.room) ? (match ? 40 : 22) : 0) / 100,
       cafe: Math.max(d.mixCafe, match && d.room === 'cafe' ? 35 : 0) / 100,
       purr: d.mixPurr / 100,
     });
@@ -182,6 +183,23 @@ function updateHands() {
 updateHands();
 initThunder(stage);
 initParallax(stage);
+// Candles and the fireplace: click to light or blow out.
+for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {
+  const button = $(`#${id}`);
+  const sync = () => {
+    const lit = decor.get(name) === 'on';
+    button.setAttribute('aria-pressed', String(lit));
+    button.setAttribute('aria-label', lit ? `Put out the ${label}` : `Light the ${label}`);
+  };
+  button.addEventListener('click', () => {
+    const lit = decor.get(name) === 'on';
+    if (lit) sfx.puff(); else sfx.strike();
+    decor.set(name, lit ? 'off' : 'on');
+    sync();
+  });
+  sync();
+  new MutationObserver(sync).observe(stage, { attributes: true, attributeFilter: [`data-${name}`] });
+}
 setParallax(decor.get('parallax') === 'on');
 initWeather(stage);
 initPets(stage);
