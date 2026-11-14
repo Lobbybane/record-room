@@ -1183,11 +1183,60 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .ios-field input::placeholder { color: rgba(235, 235, 245, .3); }
 #decor-neon { font: 400 19px 'Pacifico', cursive; color: #FFE3EF; }
 
+/* Sliders */
+.ios-spacer { height: 12px; }
+.ios-slider-row { cursor: default; }
+.ios-slider-row .ios-label { flex: 0 0 auto; max-width: 40%; }
+.ios-slider {
+  -webkit-appearance: none; appearance: none;
+  flex: 1 1 auto; min-width: 60px; height: 28px; margin: 0; background: none; cursor: pointer;
+}
+.ios-slider::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--ios-tint) var(--fill, 50%), rgba(120, 120, 128, .36) var(--fill, 50%));
+}
+.ios-slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(120, 120, 128, .36); }
+.ios-slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--ios-tint); }
+.ios-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 26px; height: 26px; margin-top: -11px; border-radius: 50%;
+  background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, .25), 0 0 0 .5px rgba(0, 0, 0, .06);
+}
+.ios-slider::-moz-range-thumb { width: 26px; height: 26px; border: 0; border-radius: 50%; background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+.ios-slider:focus-visible { outline: 2px solid var(--ios-tint); outline-offset: 2px; border-radius: 4px; }
+.ios-slider-value { flex: 0 0 auto; min-width: 42px; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+
 /* Action rows */
 .ios-action { font-weight: 400; }
 .ios-action.tint { color: var(--ios-tint); }
 .ios-action.destructive { color: var(--ios-red); }
 .ios-action:disabled { color: rgba(235, 235, 245, .3); cursor: default; }
+
+/* Action sheets ("Play now / Play next") */
+.ios-actions {
+  width: min(400px, calc(100vw - 16px)); max-width: none; margin: auto auto 8px;
+  padding: 0; border: 0; background: none; overflow: visible;
+  font-family: var(--ios-font); color: #FFFFFF;
+}
+.ios-actions[open] { display: flex; flex-direction: column; gap: 8px; animation: sheet-up .3s cubic-bezier(.2, .9, .3, 1); }
+.ios-actions::backdrop { background: rgba(0, 0, 0, .35); }
+.ios-actions-group, .ios-actions-cancel {
+  border-radius: 14px; background: rgba(40, 36, 62, .94);
+  -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+  overflow: hidden;
+}
+.ios-actions-head { padding: 14px 16px 12px; text-align: center; border-bottom: .5px solid var(--ios-sep); }
+.ios-actions-head[hidden] { display: none; }
+.ios-actions-head h2 { margin: 0; font: 600 13px var(--ios-font); color: var(--ios-secondary); }
+.ios-actions-head p { margin: 2px 0 0; font: 400 13px var(--ios-font); color: var(--ios-secondary); }
+.ios-actions-head p:empty { display: none; }
+.ios-actions-list button, .ios-actions-cancel {
+  display: block; width: 100%; min-height: 56px; border: 0; background: none;
+  color: var(--ios-tint); font: 400 20px var(--ios-font); cursor: pointer;
+}
+.ios-actions-list button + button { border-top: .5px solid var(--ios-sep); }
+.ios-actions-list button.destructive { color: var(--ios-red); }
+.ios-actions-cancel { font-weight: 600; }
+.ios-actions-list button:hover, .ios-actions-cancel:hover { background: rgba(255, 255, 255, .06); }
 
 /* Sheets: Add a record and the Record crate. */
 .ios-sheet {
@@ -1244,7 +1293,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ios-panel[open], .ios-sheet[open], .ios-alert[open], .ios-page.from-right, .ios-page.from-left { animation: none; }
+  .ios-panel[open], .ios-sheet[open], .ios-alert[open], .ios-actions[open], .ios-page.from-right, .ios-page.from-left { animation: none; }
   .ios-page.to-left, .ios-page.to-right { animation: none; display: none; }
   .ios-switch, .ios-switch::after { transition: none; }
 }

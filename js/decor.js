@@ -154,6 +154,7 @@ const NEON_MAX = 16;
 function isValid(name, value) {
   const option = OPTIONS[name];
   if (!option) return false;
+  if (option.range) return typeof value === 'number' && value >= option.range[0] && value <= option.range[1];
   const keys = option.choices || option.swatches;
   if (option.multi) return Array.isArray(value) && value.every((v) => Object.hasOwn(keys, v));
   return Object.hasOwn(keys, value);
@@ -219,7 +220,7 @@ function fitNeon(sign) {
  * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
  * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
-export function initDecor(stage, { onSky, onApply = () => {} }) {
+export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
   const decor = loadDecor();
   const panel = document.getElementById('decor-panel');
   const toggle = document.getElementById('decor-toggle');
@@ -266,6 +267,7 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
     options: OPTIONS,
     decor,
     maxText: NEON_MAX,
+    custom,
     onChange(name, value) {
       if (name === 'neonText') decor.neonText = String(value).slice(0, NEON_MAX);
       else if (isValid(name, value)) decor[name] = value;
@@ -309,6 +311,18 @@ export function initDecor(stage, { onSky, onApply = () => {} }) {
       decor[name] = value;
       apply();
     },
+    // Several settings at once (presets and saved looks); unknown or invalid ones are skipped.
+    setMany(values) {
+      for (const [name, value] of Object.entries(values || {})) {
+        if (name === 'neonText' && typeof value === 'string') decor.neonText = value.slice(0, NEON_MAX);
+        else if (isValid(name, value)) decor[name] = Array.isArray(value) ? [...value] : value;
+      }
+      apply();
+    },
+    // A copy of every setting, for saving a look.
+    snapshot: () => JSON.parse(JSON.stringify(decor)),
+    refresh: () => ui.refresh(),
+    close: () => setOpen(false),
   };
 }
 
