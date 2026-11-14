@@ -3,7 +3,7 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
-import { STATIONS } from './radio.js';
+import { STATIONS, isStation } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
 
@@ -108,7 +108,8 @@ export const OPTIONS = {
   },
   station: {
     label: 'Station',
-    choices: Object.fromEntries(STATIONS.map((s) => [s.key, s.label])),
+    choices: { auto: 'Auto', ...Object.fromEntries(STATIONS.map((s) => [s.key, s.label])) },
+    validate: isStation, // also your own stations
   },
   sound: {
     label: 'Sound effects',
@@ -161,6 +162,7 @@ function isValid(name, value) {
   const option = OPTIONS[name];
   if (!option) return false;
   if (option.range) return typeof value === 'number' && value >= option.range[0] && value <= option.range[1];
+  if (option.validate) return option.validate(value);
   const keys = option.choices || option.swatches;
   if (option.multi) return Array.isArray(value) && value.every((v) => Object.hasOwn(keys, v));
   return Object.hasOwn(keys, value);

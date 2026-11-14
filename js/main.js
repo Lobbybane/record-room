@@ -9,7 +9,7 @@ import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTim
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
-import { STATIONS, stationFor, nextStation } from './radio.js';
+import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -152,7 +152,7 @@ function buildLights() {
 
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { sleep: sleepPage },
+  custom: { sleep: sleepPage, stations: stationsPage(() => decor) },
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
@@ -576,11 +576,12 @@ function musicSettingsChanged(d) {
   }
   const nextOn = d.radio === 'on';
   const next = stationFor(d.station);
+  const wanted = `${d.station}:${next.key}`; // "auto" can change station as the day goes on
   const first = radioOn === null;
-  if (!first && nextOn === radioOn && next.key === settingKey) return;
-  const retune = nextOn && (next.key !== settingKey || !radioOn);
+  if (!first && nextOn === radioOn && wanted === settingKey) return;
+  const retune = nextOn && (wanted !== settingKey || !radioOn);
   radioOn = nextOn;
-  settingKey = next.key;
+  settingKey = wanted;
   station = next;
   updateKnob();
   if (current !== null) { updateCard(); return; } // a record is on; the radio waits
@@ -590,6 +591,11 @@ function musicSettingsChanged(d) {
     tuneRadio({ flash: !first });
   }
 }
+
+// Auto station: check the clock each minute.
+setInterval(() => {
+  if (decor.get('station') === 'auto') musicSettingsChanged({ radio: decor.get('radio'), station: 'auto', volume: decor.get('volume') });
+}, 60_000);
 
 function showRadioOff() {
   showTv('Radio’s off', 'Turn the knob, or pick a record');
@@ -777,7 +783,8 @@ function updateCard() {
   if (radio) {
     $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
     $('#np-title').textContent = station.name;
-    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead' : station.by;
+    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
+      : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
     $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;
   } else {
     $('#np-kicker').textContent = KICKERS[phase] || '';

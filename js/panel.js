@@ -9,7 +9,7 @@ const SECTIONS = [
   { title: 'Room', rows: ['room', { sub: 'furniture', label: 'Furniture', rows: ['chair', 'rug', 'wallpaper', 'curtain'] }, 'posters', 'candles', 'fire'] },
   { title: 'Outside', rows: ['time', 'weather', 'season', 'parallax'], footer: '“Auto” and “By date” follow your clock and calendar.' },
   { title: 'Holidays', rows: ['holiday', 'celebrate', 'hats'], footerId: 'holiday-note' },
-  { title: 'Music', rows: ['radio', 'station', 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
+  { title: 'Music', rows: ['radio', { custom: 'stations' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
   { title: 'Room sounds', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], footer: 'Soft sounds made in your browser, playing under the music.' },
   { title: 'Neon sign', rows: ['neonText', 'neonColor'] },
   { title: 'Pets', rows: ['pet', 'coat', 'tank'] },
@@ -175,7 +175,7 @@ export function createPanel(panel, { options, decor, onChange, maxText = 16, cus
     const page = pages.get(name);
     const scroll = page.querySelector('.ios-scroll');
     scroll.replaceChildren(el('div', { className: 'ios-spacer' }));
-    custom[name].build(scroll, { back: () => pop(), refresh, el });
+    custom[name].build(scroll, { back: () => pop(), refresh, el, rebuild: () => { buildCustom(name); refresh(); } });
   }
 
   // ---------- choice pages ----------
@@ -270,7 +270,7 @@ export function createPanel(panel, { options, decor, onChange, maxText = 16, cus
       const name = span.dataset.value;
       span.replaceChildren();
       if (name.startsWith('custom:')) {
-        span.textContent = custom[name.slice(7)].value?.() || '';
+        span.textContent = custom[name.slice(7)].value?.(decor) || '';
         continue;
       }
       const option = options[name];

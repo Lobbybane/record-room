@@ -1201,6 +1201,14 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .ios-field input::placeholder { color: rgba(235, 235, 245, .3); }
 #decor-neon { font: 400 19px 'Pacifico', cursive; color: #FFE3EF; }
 
+/* Two-line labels, Remove buttons and pickers in lists */
+.ios-sub { display: block; margin-top: 1px; font-size: 13px; color: var(--ios-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ios-row:has(.ios-sub) { min-height: 56px; padding-top: 6px; padding-bottom: 6px; }
+.ios-delete { flex: 0 0 auto; padding: 4px 10px; border-radius: 8px; background: rgba(255, 105, 97, .16); color: var(--ios-red); font-size: 13px; font-weight: 600; cursor: pointer; }
+.ios-delete:hover { background: rgba(255, 105, 97, .26); }
+.ios-select { flex: 1 1 auto; min-width: 0; height: 44px; border: 0; background: none; color: var(--ios-secondary); font: 400 17px var(--ios-font); text-align: right; text-align-last: right; cursor: pointer; }
+.ios-select option { color: #000; }
+
 /* Sliders */
 .ios-spacer { height: 12px; }
 .ios-slider-row { cursor: default; }
