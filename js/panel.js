@@ -6,10 +6,10 @@
 // custom page doesn't exist are skipped.
 const SECTIONS = [
   { title: 'Looks', rows: [{ custom: 'presets' }, { custom: 'looks' }] },
-  { title: 'Room', rows: ['room', 'crowd', 'lively', { sub: 'furniture', label: 'Furniture', rows: ['rug', 'wallpaper', 'curtain'] }, 'candles', 'fire'], footer: 'Lively people chat, get snacks and have visitors. The fireplace is in the mountain cabin and the treehouse; click the candles and the fire to light them.' },
+  { title: 'Room', rows: ['room', 'crowd', 'lively', 'seat', { sub: 'furniture', label: 'Furniture', rows: ['rug', 'wallpaper', 'curtain'] }, 'candles', 'fire'], footer: 'Lively people chat, get snacks and have visitors. The fireplace is in the mountain cabin and the treehouse; click the candles and the fire to light them.' },
   { title: 'Outside', rows: ['time', 'weather', 'season', 'parallax'], footer: '“Auto” and “By date” follow your clock and calendar. The moving city follows your mouse, or the tilt of your phone (on iPhone, switch it off and on to allow that).' },
   { title: 'Holidays', rows: ['holiday', 'celebrate', 'hats'], footerId: 'holiday-note' },
-  { title: 'Music', rows: ['radio', { custom: 'stations' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
+  { title: 'Music', rows: ['radio', { custom: 'stations' }, { custom: 'showings' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
   { title: 'Room sounds', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], footer: 'Soft sounds made in your browser, playing under the music. “Match the room” adds rain when it rains, murmur in the café and crackle when the fire is lit.' },
   { title: 'Neon sign', rows: ['neonText', 'neonColor'] },
   { title: 'Pets', rows: ['pet', 'coat', 'tank'] },

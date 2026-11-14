@@ -730,6 +730,7 @@
     <div class="tv-idle" id="tv-idle">
       <div class="scanlines"></div>
       <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#F4ECFF" stroke-width="1.6"/><path d="M10 8.5 L16 12 L10 15.5 Z" fill="#F4ECFF"/></svg>
+      <div class="leader" aria-hidden="true"><span>3</span><span>2</span><span>1</span></div>
       <div class="tv-idle-title" id="tv-title">Tuning in…</div>
       <div class="tv-idle-sub" id="tv-sub">lofi hip hop radio</div>
     </div>
@@ -820,6 +821,50 @@
       Decorate
     </button>
   </div>
+
+  <!-- Movie theater (data-room="theater"): a layer over the whole room; the big screen,
+       the curtains, the card and the controls sit above it. The audience is drawn by js/theater.js. -->
+  <div class="theater" aria-hidden="true">
+    <div class="th-wall full-screen"></div>
+    <div class="th-floor"></div>
+    <svg class="layer th-scenery" viewBox="0 0 1280 820">
+      <defs>
+        <linearGradient id="th-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6DC" stop-opacity=".02"/><stop offset="1" stop-color="#FFF6DC" stop-opacity=".16"/></linearGradient>
+        <radialGradient id="th-sconce" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFD38A" stop-opacity=".8"/><stop offset="1" stop-color="#FFD38A" stop-opacity="0"/></radialGradient>
+      </defs>
+      <!-- the screen: black masking with a pale strip under the picture -->
+      <rect class="th-frame" x="262" y="70" width="756" height="462" rx="6"/>
+      <rect class="th-screen-surface" x="276" y="84" width="728" height="434" rx="2"/>
+      <rect class="th-screen-glow" x="290" y="92" width="700" height="394"/>
+      <!-- the projector beam, coming over our heads from the booth behind us -->
+      <polygon class="th-beam" points="610,-40 670,-40 990,92 290,92"/>
+      <g class="th-dust"><circle cx="560" cy="40" r="1.4"/><circle cx="700" cy="20" r="1.1"/><circle cx="640" cy="60" r="1.6"/><circle cx="760" cy="70" r="1.2"/><circle cx="520" cy="76" r="1"/></g>
+      <!-- the marquee -->
+      <g class="th-marquee">
+        <rect x="430" y="2" width="420" height="52" rx="10"/>
+        <circle class="bulb" cx="440" cy="9" r="2.6"/><circle class="bulb" cx="458" cy="9" r="2.6"/><circle class="bulb" cx="476" cy="9" r="2.6"/><circle class="bulb" cx="494" cy="9" r="2.6"/><circle class="bulb" cx="512" cy="9" r="2.6"/><circle class="bulb" cx="530" cy="9" r="2.6"/><circle class="bulb" cx="548" cy="9" r="2.6"/><circle class="bulb" cx="566" cy="9" r="2.6"/><circle class="bulb" cx="584" cy="9" r="2.6"/><circle class="bulb" cx="602" cy="9" r="2.6"/><circle class="bulb" cx="620" cy="9" r="2.6"/><circle class="bulb" cx="638" cy="9" r="2.6"/><circle class="bulb" cx="656" cy="9" r="2.6"/><circle class="bulb" cx="674" cy="9" r="2.6"/><circle class="bulb" cx="692" cy="9" r="2.6"/><circle class="bulb" cx="710" cy="9" r="2.6"/><circle class="bulb" cx="728" cy="9" r="2.6"/><circle class="bulb" cx="746" cy="9" r="2.6"/><circle class="bulb" cx="764" cy="9" r="2.6"/><circle class="bulb" cx="782" cy="9" r="2.6"/><circle class="bulb" cx="800" cy="9" r="2.6"/><circle class="bulb" cx="818" cy="9" r="2.6"/><circle class="bulb" cx="836" cy="9" r="2.6"/><circle class="bulb b2" cx="449" cy="47" r="2.6"/><circle class="bulb b2" cx="467" cy="47" r="2.6"/><circle class="bulb b2" cx="485" cy="47" r="2.6"/><circle class="bulb b2" cx="503" cy="47" r="2.6"/><circle class="bulb b2" cx="521" cy="47" r="2.6"/><circle class="bulb b2" cx="539" cy="47" r="2.6"/><circle class="bulb b2" cx="557" cy="47" r="2.6"/><circle class="bulb b2" cx="575" cy="47" r="2.6"/><circle class="bulb b2" cx="593" cy="47" r="2.6"/><circle class="bulb b2" cx="611" cy="47" r="2.6"/><circle class="bulb b2" cx="629" cy="47" r="2.6"/><circle class="bulb b2" cx="647" cy="47" r="2.6"/><circle class="bulb b2" cx="665" cy="47" r="2.6"/><circle class="bulb b2" cx="683" cy="47" r="2.6"/><circle class="bulb b2" cx="701" cy="47" r="2.6"/><circle class="bulb b2" cx="719" cy="47" r="2.6"/><circle class="bulb b2" cx="737" cy="47" r="2.6"/><circle class="bulb b2" cx="755" cy="47" r="2.6"/><circle class="bulb b2" cx="773" cy="47" r="2.6"/><circle class="bulb b2" cx="791" cy="47" r="2.6"/><circle class="bulb b2" cx="809" cy="47" r="2.6"/><circle class="bulb b2" cx="827" cy="47" r="2.6"/><circle class="bulb b2" cx="845" cy="47" r="2.6"/>
+        <text class="mq-small" x="640" y="23" text-anchor="middle">NOW SHOWING</text>
+        <text class="mq-title" id="marquee-title" x="640" y="41" text-anchor="middle">Lofi intermission</text>
+      </g>
+      <!-- wall sconces and exit signs -->
+      <g class="th-sconces">
+        <circle cx="90" cy="330" r="60" fill="url(#th-sconce)" class="sconce-glow"/><path d="M76 330 h28 l-6 26 h-16 z" class="sconce"/>
+        <circle cx="1190" cy="330" r="60" fill="url(#th-sconce)" class="sconce-glow"/><path d="M1176 330 h28 l-6 26 h-16 z" class="sconce"/>
+        <circle cx="140" cy="500" r="50" fill="url(#th-sconce)" class="sconce-glow"/><path d="M128 500 h24 l-5 22 h-14 z" class="sconce"/>
+        <circle cx="1140" cy="500" r="50" fill="url(#th-sconce)" class="sconce-glow"/><path d="M1128 500 h24 l-5 22 h-14 z" class="sconce"/>
+      </g>
+      <g class="th-exit"><rect x="54" y="120" width="76" height="30" rx="4"/><text x="92" y="141" text-anchor="middle">EXIT</text></g>
+      <g class="th-exit"><rect x="1100" y="120" width="76" height="30" rx="4"/><text x="1138" y="141" text-anchor="middle">EXIT</text></g>
+      <!-- the aisle on the left, with step lights -->
+      <path class="th-aisle" d="M120 540 L200 540 L250 830 L60 830 Z"/>
+      <g class="th-steps"><rect class="step-light" x="150" y="600" width="10" height="3" rx="1.5"/><rect class="step-light" x="152" y="660" width="10" height="3" rx="1.5"/><rect class="step-light" x="155" y="720" width="10" height="3" rx="1.5"/><rect class="step-light" x="158" y="786" width="10" height="3" rx="1.5"/></g>
+    </svg>
+    <div class="th-light full-screen"></div>
+    <div id="theater-audience"></div>
+    <div class="th-house full-screen"></div>
+  </div>
+  <!-- Theater curtains: open while a show plays, close when paused (above the screen) -->
+  <div class="th-curtains" aria-hidden="true"><div class="th-valance"></div><div class="th-curtain left"></div><div class="th-curtain right"></div></div>
 
   <!-- Glow, vignette, grain -->
   <div class="window-glow"></div>

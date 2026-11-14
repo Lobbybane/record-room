@@ -3,7 +3,7 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
-import { STATIONS, isStation } from './radio.js';
+import { STATIONS, isStation, isShowing } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
 
@@ -12,7 +12,7 @@ const KEY = 'record-room:settings:v1';
 export const OPTIONS = {
   room: {
     label: 'Room',
-    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house', greenhouse: 'Rooftop greenhouse', treehouse: 'Forest treehouse', train: 'Night train' },
+    choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house', greenhouse: 'Rooftop greenhouse', treehouse: 'Forest treehouse', train: 'Night train', theater: 'Movie theater' },
   },
   crowd: {
     label: 'People',
@@ -22,6 +22,11 @@ export const OPTIONS = {
   lively: {
     label: 'Lively people',
     choices: { on: 'On', off: 'Off' },
+  },
+  seat: {
+    label: 'Theater seat',
+    choices: { back: 'Back rows', front: 'Front row' },
+    footer: 'In the movie theater: sit at the back to see the whole crowd, or up front for a bigger screen.',
   },
   time: {
     label: 'Time of day',
@@ -124,6 +129,11 @@ export const OPTIONS = {
   mixFire: { label: 'Fire', range: [0, 100, 5], format: (v) => `${v}%` },
   mixCafe: { label: 'Café', range: [0, 100, 5], format: (v) => `${v}%` },
   mixPurr: { label: 'Purring', range: [0, 100, 5], format: (v) => `${v}%` },
+  showing: {
+    label: 'Now showing',
+    choices: { intermission: 'Lofi intermission' },
+    validate: isShowing, // the theater's videos
+  },
   sound: {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
@@ -139,6 +149,7 @@ export const DEFAULTS = {
   room: 'bedroom',
   crowd: 'busy',
   lively: 'on',
+  seat: 'back',
   time: 'dusk',
   weather: 'rain',
   neonText: 'side a',
@@ -163,6 +174,7 @@ export const DEFAULTS = {
   radio: 'on',
   volume: 100,
   station: 'main',
+  showing: 'intermission',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',
@@ -255,6 +267,7 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.room = decor.room;
     stage.dataset.crowd = decor.crowd;
     stage.dataset.lively = decor.lively;
+    stage.dataset.seat = decor.seat;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
