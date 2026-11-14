@@ -616,14 +616,21 @@
     <div class="tv-idle" id="tv-idle">
       <div class="scanlines"></div>
       <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#F4ECFF" stroke-width="1.6"/><path d="M10 8.5 L16 12 L10 15.5 Z" fill="#F4ECFF"/></svg>
-      <div class="tv-idle-title" id="tv-title">Nothing on yet</div>
-      <div class="tv-idle-sub" id="tv-sub">Pick a record to tune in</div>
+      <div class="tv-idle-title" id="tv-title">Tuning in…</div>
+      <div class="tv-idle-sub" id="tv-sub">lofi hip hop radio</div>
     </div>
+    <div class="tv-static" aria-hidden="true"></div>
+    <button type="button" class="tv-sound" id="tv-sound" hidden>
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span id="tv-sound-text">Tap for sound</span>
+    </button>
   </div>
-  <div class="tv-panel" aria-hidden="true">
-    <div class="knob"></div><div class="knob"></div>
-    <div class="grille"></div>
-    <div class="tv-led"></div>
+  <div class="tv-panel">
+    <!-- The station knob: turns to the next radio station. -->
+    <button type="button" class="knob knob-dial" id="tv-knob" aria-label="Change station"><span class="knob-mark" aria-hidden="true"></span></button>
+    <div class="knob" aria-hidden="true"></div>
+    <div class="grille" aria-hidden="true"></div>
+    <div class="tv-led" aria-hidden="true"></div>
   </div>
   </div>
 
@@ -667,8 +674,10 @@
     <div class="np-progress-row">
       <div class="np-progress"><div class="np-bar" id="np-bar"></div></div>
       <div class="np-time" id="np-time">0:00</div>
+      <div class="np-live" aria-label="Live"><span class="np-live-dot" aria-hidden="true"></span>LIVE</div>
     </div>
     <div class="np-actions">
+      <button type="button" class="np-link" id="np-next" hidden>Next station</button>
       <button type="button" class="np-link" id="np-back" disabled>Put it back</button>
       <button type="button" class="np-link" id="np-remove" hidden>Remove from shelf</button>
     </div>

@@ -20,10 +20,11 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 
 ## Using it
 
+- **The radio:** a Lofi Girl live stream plays on the TV whenever no record is on. It starts quiet (browsers only allow sound after a tap); tap anywhere for sound. Turn the **knob** on the TV, or tap **Next station**, to change station. Decorate > Music picks the station or turns the radio off.
 - Click a **+** spot on a shelf to add a record. Paste a YouTube link (song or full album) and type the artist and album so the cover can be found.
-- Click a record to play it. **Put it back** returns it to the shelf, and clicking another record swaps them.
+- Click a record to play your own music: the radio fades out and the record takes over the TV. **Put it back** returns it to the shelf (it also goes back by itself when it finishes) and the radio comes back. Clicking another record swaps them.
 - **The crate** on the floor holds as many extra records as you like. Click it to flip through covers, play one, move it to the shelf, or add more.
-- A first visit starts with four lofi radio records on the shelf (the list is at the top of `js/records.js`).
+- A first visit starts with a Chillhop record on the shelf (the list is at the top of `js/records.js`).
 - **Decorate** (top right) changes the room (city bedroom, corner café, mountain cabin, beach house), the time of day (or Auto, which follows your clock), the weather, the season (by date or chosen), holiday decorations for 11 holidays (by date, preview any of them, choose which ones you celebrate, and holiday hats), the posters, sound effects, the neon sign's words and color, the pet and fish tank, and the listener's sweater, hair and skin.
 - Click the lamp to switch it off and on. Click the cat or dog to wake it up, or the fish tank to feed the fish.
 - The person in the armchair dozes when nothing's on, looks up when a record is coming, and nods along while it plays.
@@ -49,6 +50,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 | `js/records.js` | Shelf spots, starter records, the crate, saving, reading YouTube links |
 | `js/covers.js` | Cover lookup from the iTunes Search API (songs and albums) |
 | `js/player.js` | Wrapper for the YouTube IFrame Player API |
+| `js/radio.js` | The radio stations that play on the TV |
 
 ## Rules we're following
 

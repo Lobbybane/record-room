@@ -8,6 +8,7 @@ const SECTIONS = [
   { title: 'Neon sign', rows: ['neonText', 'neonColor'] },
   { title: 'Pets', rows: ['pet', 'coat', 'tank'] },
   { title: 'Listener', rows: ['sweater', 'hair', 'skin'] },
+  { title: 'Music', rows: ['radio', 'station'], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
   { title: 'Sound', rows: ['sound'] },
 ];
 
@@ -18,6 +19,7 @@ const PAGE_FOOTERS = {
   holiday: 'Preview shows a holiday’s decorations right now. Choose By date to follow the calendar.',
   celebrate: 'By date only shows the holidays switched on here.',
   posters: 'My records uses covers from your shelf and crate.',
+  station: 'Live streams from YouTube. The knob on the TV changes station too.',
 };
 
 const CHEVRON = '<svg class="ios-chevron" viewBox="0 0 8 14" width="8" height="14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
