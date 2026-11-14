@@ -6,14 +6,13 @@
 // custom page doesn't exist are skipped.
 const SECTIONS = [
   { title: 'Looks', rows: [{ custom: 'presets' }, { custom: 'looks' }] },
-  { title: 'Room', rows: ['room', { sub: 'furniture', label: 'Furniture', rows: ['chair', 'rug', 'wallpaper', 'curtain'] }, 'posters', 'candles', 'fire'], footer: 'The fireplace is in the mountain cabin and the treehouse. You can also click the candles and the fire to light them.' },
+  { title: 'Room', rows: ['room', 'crowd', { sub: 'furniture', label: 'Furniture', rows: ['rug', 'wallpaper', 'curtain'] }, 'candles', 'fire'], footer: 'The fireplace is in the mountain cabin and the treehouse. You can also click the candles and the fire to light them.' },
   { title: 'Outside', rows: ['time', 'weather', 'season', 'parallax'], footer: '“Auto” and “By date” follow your clock and calendar. The moving city follows your mouse, or the tilt of your phone (on iPhone, switch it off and on to allow that).' },
   { title: 'Holidays', rows: ['holiday', 'celebrate', 'hats'], footerId: 'holiday-note' },
   { title: 'Music', rows: ['radio', { custom: 'stations' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
   { title: 'Room sounds', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], footer: 'Soft sounds made in your browser, playing under the music. “Match the room” adds rain when it rains, murmur in the café and crackle when the fire is lit.' },
   { title: 'Neon sign', rows: ['neonText', 'neonColor'] },
   { title: 'Pets', rows: ['pet', 'coat', 'tank'] },
-  { title: 'Listener', rows: ['outfit', { sub: 'colors', label: 'Colors', rows: ['sweater', 'hair', 'skin'] }, 'headphones', 'glasses', 'scarf', 'activity'] },
   { title: 'Sound', rows: ['sound'] },
 ];
 
@@ -23,7 +22,6 @@ const PAGE_FOOTERS = {
   season: 'By date uses northern-hemisphere seasons.',
   holiday: 'Preview shows a holiday’s decorations right now. Choose By date to follow the calendar.',
   celebrate: 'By date only shows the holidays switched on here.',
-  posters: 'My records uses covers from your shelf and crate.',
   station: 'Live streams from YouTube. The knob on the TV changes station too.',
 };
 

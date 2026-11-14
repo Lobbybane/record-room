@@ -1,4 +1,4 @@
-// Decorating the room: time of day, weather, neon sign, pet and the listener's look.
+// Decorating the room: time of day, weather, neon sign, pets and who's in the room.
 // Choices are saved in this browser and applied as data attributes and CSS variables on the stage.
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
@@ -13,6 +13,11 @@ export const OPTIONS = {
   room: {
     label: 'Room',
     choices: { bedroom: 'City bedroom', cafe: 'Corner café', cabin: 'Mountain cabin', beach: 'Beach house', greenhouse: 'Rooftop greenhouse', treehouse: 'Forest treehouse', train: 'Night train' },
+  },
+  crowd: {
+    label: 'People',
+    choices: { busy: 'Busy', cozy: 'A cozy few', empty: 'Nobody' },
+    footer: 'Each room has its own group watching the TV.',
   },
   time: {
     label: 'Time of day',
@@ -49,28 +54,6 @@ export const OPTIONS = {
       midnight: ['Midnight', '#3A3260', '#262046', '#5A5088'],
     },
   },
-  sweater: {
-    label: 'Sweater',
-    swatches: {
-      peach: ['Peach', '#FFB38A', '#D98A66'],
-      pink: ['Pink', '#F28DB2', '#C96A90'],
-      mint: ['Mint', '#7FCDB8', '#5AA592'],
-      lilac: ['Lilac', '#A78BE0', '#7F66B8'],
-      cream: ['Cream', '#EFE3D0', '#C9B9A2'],
-      yellow: ['Yellow', '#FFD38A', '#D9A95E'],
-    },
-  },
-  hair: {
-    label: 'Hair',
-    swatches: {
-      plum: ['Dark plum', '#3A2440'],
-      brown: ['Brown', '#6B4436'],
-      auburn: ['Auburn', '#A4523A'],
-      blonde: ['Blonde', '#E8C27A'],
-      pink: ['Pink', '#F7A9C8'],
-      lilac: ['Lilac', '#B79CFF'],
-    },
-  },
   season: {
     label: 'Season',
     choices: { auto: 'By date', spring: 'Spring', summer: 'Summer', autumn: 'Autumn', winter: 'Winter' },
@@ -92,10 +75,6 @@ export const OPTIONS = {
   hats: {
     label: 'Holiday hats',
     choices: { on: 'On', off: 'Off' },
-  },
-  chair: {
-    label: 'Chair',
-    choices: { armchair: 'Armchair', beanbag: 'Beanbag', rocker: 'Rocking chair' },
   },
   rug: {
     label: 'Rug',
@@ -122,10 +101,6 @@ export const OPTIONS = {
   },
   candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
   fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
-  posters: {
-    label: 'Posters',
-    choices: { records: 'My records', art: 'Art', off: 'Off' },
-  },
   radio: {
     label: 'Lofi radio',
     choices: { on: 'On', off: 'Off' },
@@ -154,32 +129,11 @@ export const OPTIONS = {
     label: 'Lamp',
     choices: { on: 'On', off: 'Off' },
   },
-  outfit: {
-    label: 'Outfit',
-    choices: { hoodie: 'Hoodie', sweater: 'Cozy sweater', pyjamas: 'Pyjamas', cardigan: 'Cardigan' },
-  },
-  headphones: { label: 'Headphones', choices: { on: 'On', off: 'Off' } },
-  glasses: { label: 'Glasses', choices: { on: 'On', off: 'Off' } },
-  scarf: { label: 'Scarf', choices: { on: 'On', off: 'Off' } },
-  activity: {
-    label: 'Activity',
-    choices: { listen: 'Just listening', read: 'Reading', tea: 'Sipping tea', knit: 'Knitting', draw: 'Drawing' },
-    footer: 'The study timer swaps in a book while you focus and tea on breaks.',
-  },
-  skin: {
-    label: 'Skin',
-    swatches: {
-      s1: ['Light', '#F6D6C2'],
-      s2: ['Light medium', '#E8B896'],
-      s3: ['Medium', '#C98E67'],
-      s4: ['Medium dark', '#9C6646'],
-      s5: ['Dark', '#6E4430'],
-    },
-  },
 };
 
 export const DEFAULTS = {
   room: 'bedroom',
+  crowd: 'busy',
   time: 'dusk',
   weather: 'rain',
   neonText: 'side a',
@@ -187,20 +141,10 @@ export const DEFAULTS = {
   pet: 'cat',
   tank: 'on',
   coat: 'ginger',
-  sweater: 'peach',
-  hair: 'plum',
-  skin: 's2',
   lamp: 'on',
-  posters: 'records',
   parallax: 'on',
   candles: 'off',
   fire: 'off',
-  chair: 'armchair',
-  outfit: 'hoodie',
-  headphones: 'off',
-  glasses: 'off',
-  scarf: 'off',
-  activity: 'listen',
   rug: 'round',
   wallpaper: 'plain',
   curtain: 'room',
@@ -213,7 +157,7 @@ export const DEFAULTS = {
   mixPurr: 0,
   radio: 'on',
   volume: 100,
-  station: 'lofi',
+  station: 'main',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',
@@ -252,12 +196,14 @@ export function loadDecor() {
     }
   }
   if (typeof saved.neonText === 'string') decor.neonText = saved.neonText.slice(0, NEON_MAX);
+  // The main broadcast replaced lofi hip hop as the default station: move visitors still on the old default.
+  if (!saved.stationV2 && decor.station === 'lofi') decor.station = 'main';
   return decor;
 }
 
 function saveDecor(decor) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...decor, celebrateKnown: Object.keys(HOLIDAYS) }));
+    localStorage.setItem(KEY, JSON.stringify({ ...decor, celebrateKnown: Object.keys(HOLIDAYS), stationV2: true }));
   } catch { /* private mode: still works until reload */ }
 }
 
@@ -302,17 +248,13 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     const sky = decor.time === 'auto' ? skyForHour(new Date().getHours()) : decor.time;
     stage.dataset.sky = sky;
     stage.dataset.room = decor.room;
+    stage.dataset.crowd = decor.crowd;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
-    stage.dataset.chair = decor.chair;
     stage.dataset.candles = decor.candles;
     stage.dataset.fire = decor.fire;
-    stage.dataset.outfit = decor.outfit;
-    stage.dataset.headphones = decor.headphones;
-    stage.dataset.glasses = decor.glasses;
-    stage.dataset.scarf = decor.scarf;
     stage.dataset.rug = decor.rug;
     stage.dataset.wallpaper = decor.wallpaper;
     stage.dataset.curtain = decor.curtain;
@@ -326,13 +268,9 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
 
     const [, neon, neonText] = OPTIONS.neonColor.swatches[decor.neonColor];
     const [, fur, furShade, furLight] = OPTIONS.coat.swatches[decor.coat];
-    const [, sweater, sweaterShade] = OPTIONS.sweater.swatches[decor.sweater];
     const vars = {
       '--neon': neon, '--neon-text': neonText,
       '--fur': fur, '--fur-shade': furShade, '--fur-light': furLight,
-      '--sweater': sweater, '--sweater-shade': sweaterShade,
-      '--hair': OPTIONS.hair.swatches[decor.hair][1],
-      '--skin': OPTIONS.skin.swatches[decor.skin][1],
     };
     for (const [name, value] of Object.entries(vars)) stage.style.setProperty(name, value);
 

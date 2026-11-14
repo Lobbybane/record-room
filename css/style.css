@@ -104,16 +104,9 @@ html, body {
 .stage[data-wallpaper="stars"] { --wallpaper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg fill='%23FFE7B8' fill-opacity='.14'%3E%3Cpath d='M18 10l2 5 5 .5-4 3.5 1.2 5-4.2-2.7-4.2 2.7 1.2-5-4-3.5 5-.5z'/%3E%3Ccircle cx='54' cy='48' r='2'/%3E%3Ccircle cx='40' cy='20' r='1.2'/%3E%3Ccircle cx='12' cy='56' r='1.4'/%3E%3C/g%3E%3C/svg%3E"); }
 .stage[data-wallpaper="flowers"] { --wallpaper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg fill='%23F7A9C8' fill-opacity='.12'%3E%3Ccircle cx='16' cy='12' r='4'/%3E%3Ccircle cx='22' cy='16' r='4'/%3E%3Ccircle cx='20' cy='23' r='4'/%3E%3Ccircle cx='12' cy='23' r='4'/%3E%3Ccircle cx='10' cy='16' r='4'/%3E%3C/g%3E%3Ccircle cx='16' cy='18' r='2.5' fill='%23FFE7B8' fill-opacity='.18'/%3E%3Cpath d='M44 44q6 -8 12 0q-6 8 -12 0z' fill='%239FE0C8' fill-opacity='.1'/%3E%3C/svg%3E"); }
 
-/* Chairs and rugs (data-chair, data-rug) */
-.chair, .rug { display: none; }
-.stage[data-chair="armchair"] .chair-armchair, .stage[data-chair="beanbag"] .chair-beanbag, .stage[data-chair="rocker"] .chair-rocker { display: inline; }
+/* Rugs (data-rug) */
+.rug { display: none; }
 .stage[data-rug="round"] .rug-round, .stage[data-rug="stripes"] .rug-stripes, .stage[data-rug="checker"] .rug-checker, .stage[data-rug="braided"] .rug-braided { display: inline; }
-.stage:not([data-chair="armchair"]) .throw { display: none !important; }
-/* The rocking chair rocks gently while music plays. */
-.listener { transform-origin: 670px 780px; }
-.stage[data-chair="rocker"].is-on .listener { animation: rock 3.2s ease-in-out infinite; }
-@keyframes rock { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
-@media (prefers-reduced-motion: reduce) { .stage[data-chair="rocker"].is-on .listener { animation: none; } }
 .baseboard { position: absolute; left: var(--fx); top: 594px; width: var(--fw); height: 12px; background: var(--night); }
 .floor { position: absolute; left: var(--fx); top: 606px; width: var(--fw); height: calc(var(--fy) + var(--fh) - 606px); background: var(--floor-pattern), linear-gradient(180deg, var(--floor-a) 0, var(--floor-b) 214px); }
 .floor-lines { overflow: visible; }
@@ -130,9 +123,6 @@ html, body {
 .mullion { position: absolute; left: 625px; top: 84px; width: 10px; height: 322px; background: var(--ink); }
 .sill { position: absolute; left: 340px; top: 418px; width: 580px; height: 18px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 6px 0 var(--night); }
 
-.shelf-unit { position: absolute; left: 40px; top: 110px; width: 270px; height: 290px; border-radius: 4px; background: var(--violet); }
-.shelf-cubby { position: absolute; left: 50px; width: 250px; background: #2A2350; }
-.ledge { position: absolute; left: 950px; top: 212px; width: 280px; height: 12px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 5px 0 var(--night); }
 
 .neon-sign {
   position: absolute;
@@ -178,68 +168,8 @@ html, body {
 .stage.is-on[data-source="record"] .power-led { fill: var(--cyan); }
 .steam { opacity: .55; }
 
-/* ---------- posters ---------- */
-.poster {
-  position: absolute; width: 88px; height: 108px; padding: 6px 6px 18px;
-  background: #EFE3D0; border-radius: 2px;
-  box-shadow: 0 8px 16px rgba(10, 8, 25, .4);
-}
-.poster-a { left: 446px; top: 468px; transform: rotate(-3deg); }
-.poster-b { left: 806px; top: 452px; transform: rotate(2.5deg); }
-.stage[data-posters="off"] .poster { display: none; }
-.poster-art { width: 100%; height: 100%; background-size: cover; background-position: center; border-radius: 1px; }
-.art-moon { background: radial-gradient(circle at 62% 34%, #FFF1D6 0 11px, transparent 12px), linear-gradient(180deg, #2A2350 0%, #6E4C8E 58%, #F28DB2 59%, #FFB38A 74%, #6E4C8E 75%, #3B2F6B 100%); }
-.art-sun { background: radial-gradient(circle at 50% 58%, #FFD38A 0 18px, transparent 19px), repeating-linear-gradient(180deg, transparent 0 7px, rgba(42, 35, 80, .35) 7px 9px) 0 62% / 100% 30% no-repeat, linear-gradient(180deg, #F28DB2, #FFB38A); }
-.poster.has-cover .poster-art { background-color: #2A2350; background-size: cover; background-repeat: no-repeat; background-position: center; }
-.tape { position: absolute; left: 30px; top: -7px; width: 30px; height: 12px; background: rgba(244, 236, 255, .55); transform: rotate(-4deg); }
-.stage[data-lamp="off"] .poster { filter: brightness(.8); }
 
 /* ---------- listener in the armchair ---------- */
-.stage {
-  --sweater: #FFB38A; --sweater-shade: #D98A66;
-  --hair: #3A2440; --skin: #E8B896;
-}
-.p-sweater { fill: var(--sweater); }
-.p-hood { fill: var(--sweater-shade); }
-.p-sleeve { stroke: var(--sweater); }
-.p-sleeve-edge { stroke: var(--sweater-shade); }
-.p-skin { fill: var(--skin); }
-.p-hair { fill: var(--hair); stroke: #FFC9D9; stroke-opacity: .35; stroke-width: 1.5; }
-.p-string { stroke: var(--sweater-shade); }
-.p-pants { fill: #3B3F78; }
-.p-pants-far { fill: #2C2E5E; }
-.p-shoe { fill: #F4ECFF; }
-.listener-body, .listener-head, .listener-foot { transform-box: view-box; }
-.listener-body { transform-origin: 666px 704px; animation: breathe 4.5s ease-in-out infinite; }
-.listener-head { transform-origin: 678px 610px; transition: transform .6s ease; }
-.listener-foot { transform-origin: 752px 776px; }
-.stage.is-on .listener-head { animation: head-bob .8s ease-in-out infinite; }
-.stage.is-on .listener-foot { animation: foot-tap .8s ease-in-out infinite; }
-@keyframes breathe { 50% { transform: scaleY(1.012); } }
-
-/* The listener reacts to the turntable (data-phase is set in js/main.js). */
-.listener .eye-open { display: none; }
-.stage:is([data-phase="moving"], [data-phase="loading"], [data-phase="paused"], [data-phase="ended"], [data-phase="error"], [data-phase="returning"]) .listener .eye-open { display: inline; }
-.stage:is([data-phase="moving"], [data-phase="loading"], [data-phase="paused"], [data-phase="ended"], [data-phase="error"], [data-phase="returning"]) .listener .eye-closed { display: none; }
-.stage[data-phase="idle"] .listener-head { transform: rotate(9deg); transition: transform 2.5s ease; }
-.stage:is([data-phase="moving"], [data-phase="loading"]) .listener-head { transform: rotate(-5deg); }
-.stage[data-phase="ended"] .listener-head { transform: rotate(-7deg); }
-.stage[data-phase="error"] .listener-head { transform: rotate(5deg); }
-
-.listener-fx { position: absolute; left: 700px; top: 470px; width: 80px; height: 90px; pointer-events: none; z-index: 7; }
-.listener-fx span { position: absolute; display: none; opacity: 0; font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; }
-.zz { color: #D9CCF2; }
-.z1 { left: 6px; top: 58px; font-size: 13px; } .z2 { left: 18px; top: 46px; font-size: 16px; } .z3 { left: 32px; top: 32px; font-size: 20px; }
-.stage[data-phase="idle"] .zz { display: block; animation: float-up 4.5s ease-out infinite; }
-.stage[data-phase="idle"] .z1 { animation-delay: 4s; } .stage[data-phase="idle"] .z2 { animation-delay: 5.5s; } .stage[data-phase="idle"] .z3 { animation-delay: 7s; }
-.note { color: var(--pink-soft); text-shadow: 0 0 8px rgba(242, 141, 178, .6); font-size: 18px; }
-.n1 { left: 10px; top: 56px; } .n2 { left: 34px; top: 48px; font-size: 20px; } .n3 { left: 56px; top: 60px; }
-.stage[data-phase="playing"] .note { display: block; animation: float-up 3.6s ease-out infinite; }
-.stage[data-phase="playing"] .n2 { animation-delay: 1.2s; } .stage[data-phase="playing"] .n3 { animation-delay: 2.4s; }
-.bubble { left: 18px; top: 34px; font-size: 22px; color: var(--warm); }
-.stage[data-phase="error"] .bubble { display: block; opacity: 1; animation: pop 2s ease-in-out infinite; }
-.spark { left: 22px; top: 40px; font-size: 20px; color: var(--warm); text-shadow: 0 0 10px rgba(255, 211, 138, .8); }
-.stage[data-phase="ended"] .spark { display: block; animation: float-up 2.4s ease-out 2; }
 @keyframes float-up {
   0% { opacity: 0; transform: translate(0, 8px) scale(.7); }
   20% { opacity: .95; }
@@ -260,7 +190,7 @@ html, body {
 }
 .pet svg { display: block; overflow: visible; }
 .pet-cat { left: 770px; top: 360px; }
-.pet-dog { left: 400px; top: 712px; }
+.pet-dog { left: 60px; top: 712px; }
 .stage[data-pet="cat"] .pet-cat, .stage[data-pet="dog"] .pet-dog { display: block; }
 .pet .fur { fill: var(--fur); }
 .pet .shade { fill: var(--fur-shade); }
@@ -511,9 +441,8 @@ html, body {
 
 /* Room decorations on the wall. */
 .room-prop { display: none; }
-.stage[data-room="cafe"] .chalkboard, .stage[data-room="cabin"] :is(.cabin-sign, .throw),
+.stage[data-room="cafe"] .chalkboard, .stage[data-room="cabin"] .cabin-sign,
 .stage[data-room="beach"] :is(.life-ring, .shells) { display: block; }
-.throw { display: none; }
 .chalkboard {
   position: absolute; left: 962px; top: 26px; width: 150px; height: 72px; padding: 10px 12px;
   border: 6px solid #8A5A4A; border-radius: 4px; background: #23302C;
@@ -660,53 +589,6 @@ html, body {
 .fairy { position: absolute; width: 9px; height: 9px; border-radius: 50%; animation: twinkle 4.4s ease-in-out infinite; transition: background .6s ease, box-shadow .6s ease; }
 @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 
-/* ---------- shelf and sleeves ---------- */
-#shelf { position: absolute; inset: 0; pointer-events: none; }
-
-.sleeve {
-  position: absolute;
-  z-index: 5;
-  width: 100px;
-  height: 100px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-  pointer-events: auto;
-  background: var(--mauve);
-  box-shadow: 0 8px 18px rgba(10, 8, 25, .45);
-  transition: transform .18s ease, opacity .3s ease;
-}
-.sleeve img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.sleeve:hover { transform: translateY(-6px); }
-.sleeve-fallback {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 100%; padding: 10px;
-  background: linear-gradient(180deg, var(--pink), var(--mauve));
-  color: var(--ink);
-  font: 700 13px/1.2 'M PLUS Rounded 1c', sans-serif;
-  text-align: center;
-}
-.sleeve:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
-.sleeve.is-out { opacity: .55; }
-
-.sleeve.empty {
-  background: rgba(244, 236, 255, .04);
-  border: 2px dashed rgba(244, 236, 255, .35);
-  box-shadow: none;
-  color: var(--text-dim);
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.sleeve.empty .plus { font-size: 30px; line-height: 1; color: var(--pink-soft); }
-.sleeve.empty:hover { border-color: var(--pink-soft); color: var(--text); }
 
 /* ---------- traveling record ---------- */
 .vinyl-wrap {
@@ -754,10 +636,10 @@ html, body {
 .stage[data-layout="phone"] .tv-set { z-index: 30; transform: var(--tv-t); transform-origin: 0 0; }
 .stage[data-layout="phone"] .np-card { transform: var(--card-t); transform-origin: 0 0; }
 .stage[data-layout="phone"] .tv-antenna { display: none; }
-.tv { position: absolute; left: 50px; top: 528px; width: 360px; height: 266px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18), 0 14px 26px rgba(10,8,25,.45); }
-.tv-bezel { position: absolute; left: 66px; top: 542px; width: 328px; height: 208px; border-radius: 16px; background: #2B2440; }
-.tv-screen { position: absolute; left: 70px; top: 546px; width: 320px; height: 200px; border-radius: 14px; overflow: hidden; background: #000; }
-.tv-screen iframe, #yt-player { display: block; width: 320px; height: 200px; border: 0; }
+.tv { position: absolute; left: 14px; top: 192px; width: 316px; height: 254px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18), 0 14px 26px rgba(10,8,25,.45); }
+.tv-bezel { position: absolute; left: 26px; top: 202px; width: 292px; height: 210px; border-radius: 16px; background: #2B2440; }
+.tv-screen { position: absolute; left: 32px; top: 207px; width: 280px; height: 200px; border-radius: 14px; overflow: hidden; background: #000; }
+.tv-screen iframe, #yt-player { display: block; width: 280px; height: 200px; border: 0; }
 .tv-idle {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -769,7 +651,7 @@ html, body {
 .scanlines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); pointer-events: none; }
 .tv-idle-title { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: .04em; }
 .tv-idle-sub { font-size: 13px; color: var(--text-dim); }
-.tv-panel { position: absolute; left: 82px; top: 758px; width: 296px; height: 26px; display: flex; align-items: center; gap: 12px; }
+.tv-panel { position: absolute; left: 34px; top: 416px; width: 276px; height: 26px; display: flex; align-items: center; gap: 12px; }
 .knob { width: 18px; height: 18px; border-radius: 50%; background: #8A7A68; }
 /* The station knob: a bigger, turnable button with a pointer mark. */
 .knob-dial {
@@ -1005,8 +887,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .firework { animation: none; opacity: .8; }
   .weed, .tank-bubble, .fish, .fish svg { animation: none; }
   .l1 .fish { transform: translateX(16px); } .l2 .fish { transform: translateX(72px); } .l3 .fish { transform: translateX(44px); }
-  .listener-fx span { animation: none !important; display: none !important; }
-  .vinyl.spinning, .fairy, .neon-sign, .train, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .listener-body, .stage.is-on .listener-head, .stage.is-on .listener-foot, .pet-body, .pet.awake .pet-tail { animation: none; }
+  .tv-fx span, .person .zz, .person .huh { animation: none !important; }
+  .vinyl.spinning, .fairy, .neon-sign, .train, .lightning, .storm-flash, .shooting-star, .decor-panel[open], .pet.awake .pet-heart, .pet-body, .pet.awake .pet-tail { animation: none; }
   .tonearm, .sleeve, .crate-sleeve { transition: none; }
   .crate-cover.flip-next, .crate-cover.flip-prev { animation: none; }
 }
@@ -1353,7 +1235,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* ---------- the café (data-room="cafe") ---------- */
 .cafe-only { display: none; }
 .stage[data-room="cafe"] .cafe-only { display: block; }
-.stage[data-room="cafe"] :is(.curtain, .poster, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
+.stage[data-room="cafe"] :is(.curtain, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
 .stage[data-room="cafe"] .lamp-switch { left: 622px; top: -12px; width: 60px; height: 46px; }
 /* The neon sign hangs in the window like a shop sign. */
 .stage[data-room="cafe"] .neon-sign { left: 700px; top: 288px; transform: rotate(0deg); }
@@ -1434,42 +1316,17 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .study-clock[data-mode] .clock-label { color: #FFFFFF; }
 .study-clock:hover .clock-face { box-shadow: 0 0 0 3px #EADCC6, 0 6px 14px rgba(10, 8, 25, .5); }
 
-.arm-hold, .arm-hold > g { display: none; }
-.stage:not([data-hands="rest"]) .arm-rest { display: none; }
-.stage:not([data-hands="rest"]) .arm-hold { display: inline; }
-.stage[data-hands="book"] .hold-book, .stage[data-hands="tea"] .hold-mug,
-.stage[data-hands="knit"] .hold-knit, .stage[data-hands="draw"] .hold-draw { display: inline; }
-.stage[data-hands="knit"] .needles { animation: knit 1.2s ease-in-out infinite; transform-box: view-box; transform-origin: 728px 651px; }
-.stage[data-hands="draw"] .pencil { animation: scribble 2.4s ease-in-out infinite; }
-@keyframes knit { 50% { transform: rotate(8deg); } }
-@keyframes scribble { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-6px, 2px); } 50% { transform: translate(-2px, -1px); } 75% { transform: translate(-9px, 1px); } }
-
-/* The listener's outfit and extras (data-outfit, data-headphones, data-glasses, data-scarf) */
-.wear { display: none; }
-.stage[data-outfit="hoodie"] .wear-hoodie, .stage[data-outfit="sweater"] .wear-sweater,
-.stage[data-outfit="pyjamas"] .wear-pyjamas, .stage[data-outfit="cardigan"] .wear-cardigan,
-.stage[data-headphones="on"] .wear-headphones, .stage[data-glasses="on"] .wear-glasses, .stage[data-scarf="on"] .wear-scarf { display: inline; }
-.stage[data-outfit="pyjamas"] .p-pants { fill: var(--sweater-shade); }
-.stage[data-outfit="pyjamas"] .p-pants-far { fill: var(--sweater-shade); filter: brightness(.8); }
-.stage[data-outfit="cardigan"] .p-sweater { fill: var(--sweater-shade); }
-.hold-mug, .hold-book { transform-box: view-box; transform-origin: 680px 630px; }
-.stage[data-hands="tea"] .hold-mug { animation: sip 8s ease-in-out infinite; }
-.stage[data-hands="book"] .hold-book { animation: read 6s ease-in-out infinite; }
 .mug-steam { animation: steam-rise 3s ease-in-out infinite; }
-@keyframes sip { 0%, 60%, 100% { transform: rotate(0); } 70%, 82% { transform: rotate(-38deg); } }
-@keyframes read { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-3deg); } }
 @keyframes steam-rise { 0%, 100% { opacity: .2; transform: translateY(2px); } 50% { opacity: .7; transform: translateY(-3px); } }
-/* Reading: the listener looks down at the page instead of nodding along. */
-.stage[data-hands="book"] .listener-head { transform: rotate(8deg); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hold-mug, .hold-book, .mug-steam, .needles, .pencil { animation: none !important; }
+  .mug-steam { animation: none !important; }
 }
 /* In the café the chalkboard menu hangs where the clock usually goes. */
 .stage[data-room="cafe"] .study-clock { left: 1004px; top: 408px; }
 
 /* ---------- living pets (js/life.js) ---------- */
-.dog-cushion { position: absolute; left: 400px; top: 712px; z-index: 5; display: none; overflow: visible; }
+.dog-cushion { position: absolute; left: 60px; top: 712px; z-index: 5; display: none; overflow: visible; }
 .stage[data-pet="dog"] .dog-cushion { display: block; }
 .pet-stand { display: none; }
 .pet.standing .pet-stand { display: inline; }
@@ -1505,7 +1362,6 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="cafe"] .candles { left: 1210px; top: 490px; }
 .fireplace { left: 414px; top: 472px; display: none; }
 .stage:is([data-room="cabin"], [data-room="treehouse"]) .fireplace { display: block; }
-.stage:is([data-room="cabin"], [data-room="treehouse"]) .poster-a { display: none; }
 .candles:focus-visible, .fireplace:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; border-radius: 8px; }
 
 .flame { opacity: 0; transition: opacity .4s ease; }
@@ -1615,3 +1471,57 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .mist, .owl, .lantern-light, .view-train .scroll, .rail-blur, .stage[data-room="train"] .view-train, .stage[data-room="train"] .rack { animation: none !important; }
 }
+
+/* ---------- the left wall: TV on a media console, a floating shelf above ---------- */
+.wall-shelf { position: absolute; left: 30px; top: 110px; width: 288px; height: 10px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 5px 0 var(--night); }
+.wall-shelf .bracket { position: absolute; top: 10px; width: 8px; height: 18px; border-radius: 0 0 3px 3px; background: var(--night); }
+.wall-shelf .b1 { left: 30px; } .wall-shelf .b2 { right: 30px; }
+.stage:is([data-room="cabin"], [data-room="treehouse"], [data-room="train"]) .wall-shelf { background: #6E4C3E; }
+.tv-ghost { display: none; position: absolute; left: 14px; top: 192px; width: 316px; height: 254px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18); }
+.tv-ghost span { position: absolute; left: 18px; top: 15px; width: 280px; height: 200px; border-radius: 14px; background: radial-gradient(ellipse at 50% 45%, #8A5A9E, #2B2440 75%); animation: ghost-glow 4s ease-in-out infinite; }
+@keyframes ghost-glow { 50% { filter: brightness(1.25) hue-rotate(-12deg); } }
+.stage[data-layout="phone"] .tv-ghost { display: block; }
+@media (prefers-reduced-motion: reduce) { .tv-ghost span { animation: none; } }
+
+/* ---------- the people (js/people.js) ---------- */
+.people { pointer-events: none; }
+.person .head { transform-box: fill-box; transform-origin: 55% 92%; transition: transform .8s ease; }
+.stage.is-on .person .head { animation: p-bob .9s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes p-bob { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-7deg) translateY(1px); } }
+.person .eye-closed { display: none; }
+/* When nothing plays, the dozers nod off. */
+.stage[data-phase="idle"] .person.dozer .head { transform: rotate(-12deg); }
+.stage[data-phase="idle"] .person.dozer .eye-open { display: none; }
+.stage[data-phase="idle"] .person.dozer .eye-closed { display: inline; }
+.person .zz, .person .huh { display: none; }
+.person .zz text { font: 700 12px 'M PLUS Rounded 1c', sans-serif; fill: #D9CCF2; }
+.stage[data-phase="idle"] .person.dozer .zz { display: inline; animation: zz-drift 4s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes zz-drift { 0% { opacity: 0; transform: translateY(6px); } 30%, 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px); } }
+.person .huh text { font: 800 14px 'M PLUS Rounded 1c', sans-serif; fill: #2B2440; }
+.stage[data-phase="error"] .person .huh { display: inline; }
+/* The study timer: the studier reads while you focus, and has tea on breaks. */
+.person .study-book, .person .study-tea { display: none; }
+.stage[data-study="focus"] .person.studier .study-book, .stage[data-study="break"] .person.studier .study-tea { display: inline; }
+.stage[data-study] .person.studier .own-hold { display: none; }
+.stage[data-study="focus"] .person.studier .head { animation: none; transform: rotate(-8deg); }
+/* A holiday hat replaces anyone's own hat. */
+.stage:not([data-hat="none"]) .person .own-hat { display: none; }
+.phone-glow, .screen-glow { animation: glow-flicker 3s ease-in-out infinite; }
+/* Notes drifting off the TV while music plays. */
+.tv-fx { position: absolute; left: 286px; top: 208px; width: 60px; height: 120px; pointer-events: none; z-index: 7; }
+.tv-fx span { position: absolute; display: none; opacity: 0; color: var(--pink-soft); text-shadow: 0 0 8px rgba(242, 141, 178, .6); font: 700 18px 'M PLUS Rounded 1c', sans-serif; }
+.tv-fx .n1 { left: 10px; top: 60px; } .tv-fx .n2 { left: 30px; top: 40px; } .tv-fx .n3 { left: 18px; top: 80px; }
+.stage[data-phase="playing"] .tv-fx span { display: block; animation: float-up 3.6s ease-out infinite; }
+.tv-fx .n2 { animation-delay: 1.2s !important; } .tv-fx .n3 { animation-delay: 2.4s !important; }
+.stage[data-layout="phone"] .tv-fx { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .stage.is-on .person .head, .phone-glow, .screen-glow { animation: none; }
+}
+/* The café's own regulars follow the People setting too (the barista always works). */
+.stage[data-crowd="cozy"] :is(.cafe-orderer, .cafe-bar .sipper),
+.stage[data-crowd="empty"] :is(.cafe-orderer, .cafe-bar .sipper, .cafe-bar .typist) { display: none; }
+/* Wall art where the record ledge used to be (one per room; the café has its menu board). */
+.stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
+.stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
+/* The holiday shelf layer (tree on the shelf, stockings on the console) sits in front of the console. */
+.holiday-shelf { z-index: 2; }

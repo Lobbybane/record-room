@@ -1,58 +1,39 @@
-// The shelf: where each sleeve sits on the stage, and saving records in this browser.
+// Your records: they all live in the crate beside the record player, saved in this browser.
 import { youtubeThumb } from './covers.js';
 
-// Top-left corner of each 100 x 100 sleeve, in stage pixels (1280 x 820).
-export const SLOTS = [
-  { x: 62, y: 140 },   // left shelf, top row
-  { x: 178, y: 140 },
-  { x: 62, y: 290 },   // left shelf, bottom row
-  { x: 178, y: 290 },
-  { x: 970, y: 112 },  // right ledge
-  { x: 1100, y: 112 },
-];
+// Before the redesign, records also sat on wall shelves; they're moved into the crate once.
+const SHELF_KEY = 'record-room:records:v1';
+const CRATE_KEY = 'record-room:crate:v1';
 
-const KEY = 'record-room:records:v1';
-
-// A first-time visitor's shelf starts with these, so there's a record to pull straight away.
-// (The Lofi Girl streams now play on the TV as the radio, see js/radio.js.) To change them,
-// swap the 11-character YouTube id (the part after "watch?v=") and the names.
-// Visitors can remove them like any record.
+// A first-time visitor's crate starts with these, so there's a record to pull straight away.
+// To change them, swap the 11-character YouTube id (the part after "watch?v=") and the names.
 export const STARTERS = [
   { id: '5yx6BWlEVcY', artist: 'Chillhop Music', title: 'jazzy & lofi hip hop radio' },
 ];
 
-export function loadRecords() {
-  let saved = [];
+const read = (key) => {
   try {
-    const stored = localStorage.getItem(KEY);
-    // Nothing saved yet means a first visit: put the starter records on the shelf.
-    if (stored === null) saved = STARTERS.map((r) => ({ ...r, cover: youtubeThumb(r.id) }));
-    const parsed = JSON.parse(stored || 'null');
-    if (Array.isArray(parsed)) saved = parsed;
+    return JSON.parse(localStorage.getItem(key) || 'null');
   } catch {
-    // Storage blocked or corrupted: start with an empty shelf.
+    return null;
   }
-  return SLOTS.map((_, i) => (isRecord(saved[i]) ? saved[i] : null));
-}
+};
 
-export function saveRecords(records) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(records));
-  } catch {
-    // Private mode or storage full: the shelf still works until the page reloads.
+export function loadLibrary() {
+  const storedCrate = read(CRATE_KEY);
+  const storedShelf = read(SHELF_KEY);
+  let crate = Array.isArray(storedCrate) ? storedCrate.filter(isRecord) : [];
+  if (Array.isArray(storedShelf)) {
+    // Shelf records go to the front of the crate (skipping any already in it).
+    const ids = new Set(crate.map((r) => r.id));
+    crate = [...storedShelf.filter((r) => isRecord(r) && !ids.has(r.id)), ...crate];
+    saveCrate(crate);
+    try { localStorage.removeItem(SHELF_KEY); } catch { /* fine */ }
+  } else if (storedCrate === null) {
+    // A first visit.
+    crate = STARTERS.map((r) => ({ ...r, cover: youtubeThumb(r.id) }));
   }
-}
-
-// The crate holds any number of extra records, saved separately from the shelf.
-const CRATE_KEY = 'record-room:crate:v1';
-
-export function loadCrate() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(CRATE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed.filter(isRecord) : [];
-  } catch {
-    return [];
-  }
+  return crate;
 }
 
 export function saveCrate(crate) {

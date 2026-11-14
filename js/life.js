@@ -115,7 +115,7 @@ function initWandering(stage) {
     }
   }
 
-  // Click the floor and the dog trots over (it stays clear of the TV on the left).
+  // Click the floor and the dog trots over (it stays clear of the card and crate on the right).
   stage.addEventListener('click', async (event) => {
     if (event.target.closest('button, a, input, dialog, .np-card, .tv-set')) return;
     const point = stagePoint(stage, event);
@@ -130,7 +130,8 @@ function initWandering(stage) {
     dogBusy = true;
     clearTimeout(dogAway);
     try {
-      const target = Math.round(Math.min(440, Math.max(0, point.x - 485)));
+      // The dog's centre is about 85px in from its left edge; its bed is at x 60.
+      const target = Math.round(Math.min(600, Math.max(0, point.x - 145)));
       await walk(dog, target, 160);
     } finally {
       settle(dog);

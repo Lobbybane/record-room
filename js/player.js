@@ -38,7 +38,7 @@ export function createPlayer(elementId, { onState, onError } = {}) {
       if (!player) {
         creating = new Promise((resolve) => {
           player = new YT.Player(elementId, {
-            width: 320,
+            width: 280,
             height: 200,
             videoId,
             playerVars: { playsinline: 1, rel: 0, autoplay: 1, mute: muted ? 1 : 0 },

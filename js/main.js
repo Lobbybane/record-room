@@ -1,8 +1,7 @@
-import { SLOTS, loadRecords, saveRecords, loadCrate, saveCrate, parseYouTubeId } from './records.js';
+import { loadLibrary, saveCrate, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
-import { setPosterMode, setPosterRecords } from './posters.js';
 import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
@@ -11,6 +10,7 @@ import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
+import { drawPeople } from './people.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
@@ -74,12 +74,12 @@ function fitPhone(width, height) {
   const toStageY = (y) => 410 + (y - cy) / scale;
 
   // Enlarge the TV so YouTube's player is at least 200px tall, and centre it under the room.
-  // The TV body spans x 50-410 and y 528-806 in stage pixels; the antenna reaches up to y 462.
-  const k = Math.max((width - 24) / (360 * scale), 206 / (200 * scale));
+  // The TV body spans x 14-330 and y 192-446 in stage pixels (the antenna is hidden on phones).
+  const k = Math.max((width - 24) / (316 * scale), 206 / (200 * scale));
   const tvTop = top + 820 * scale - 6;
-  const tvX = toStageX((width - 360 * scale * k) / 2) - 50 * k;
-  const tvY = toStageY(tvTop) - 528 * k;
-  const tvBottom = tvTop + (806 - 528) * scale * k;
+  const tvX = toStageX((width - 316 * scale * k) / 2) - 14 * k;
+  const tvY = toStageY(tvTop) - 192 * k;
+  const tvBottom = tvTop + (446 - 192) * scale * k;
 
   // The now-spinning card goes full width under the TV.
   const kc = (width - 24) / (320 * scale);
@@ -153,11 +153,11 @@ function buildLights() {
 
 /* ---------------- decorating and little details ---------------- */
 
+let drawnPeople = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
   custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor) },
   onApply: (d) => {
-    setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
     // Room sounds: the sliders, plus the room's own sounds when "Match the room" is on.
@@ -171,16 +171,17 @@ const decor = initDecor(stage, {
       purr: d.mixPurr / 100,
     });
     // After this file has finished setting up (the radio code is further down).
-    queueMicrotask(() => { musicSettingsChanged(d); updateHands(); });
+    queueMicrotask(() => musicSettingsChanged(d));
+    // Redraw the room's group when the room, the crowd or the season changes.
+    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
+    if (peopleKey !== drawnPeople) {
+      drawnPeople = peopleKey;
+      drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season });
+    }
   },
 });
-// What the listener holds: a book while studying, tea on a break.
-const study = initStudyTimer(stage, { onChange: () => updateHands() });
-const HANDS = { listen: 'rest', read: 'book', tea: 'tea', knit: 'knit', draw: 'draw' };
-function updateHands() {
-  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : HANDS[decor.get('activity')] || 'rest';
-}
-updateHands();
+// The study timer: the room's studier reads while you focus and has tea on breaks (CSS, data-study).
+initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
 // Candles and the fireplace: click to light or blow out.
@@ -208,80 +209,19 @@ initCityLife();
 initFishTank();
 buildWeather();
 
-/* ---------------- shelf ---------------- */
+/* ---------------- records ---------------- */
 
-let records = loadRecords();
-let crate = loadCrate();
+let crate = loadLibrary();
 let crateIndex = 0;   // which crate record is showing in the flip-through
-let current = null;   // the record on the turntable: { from: 'shelf' | 'crate', index }
+let current = null;   // the record on the turntable: { from: 'crate', index }
 let phase = 'idle';   // idle | moving | loading | playing | paused | ended | error | returning
 let busy = false;
 
-// Where records come from: a shelf spot, or the crate on the floor.
+// Records come out of the crate on the floor and go back into it.
 const CRATE_SPOT = { x: 818, y: 690 };
-const recordOf = (ref) => (ref ? (ref.from === 'crate' ? crate[ref.index] : records[ref.index]) : null);
-const originOf = (ref) => (ref.from === 'crate' ? CRATE_SPOT : SLOTS[ref.index]);
+const recordOf = (ref) => (ref ? crate[ref.index] : null);
+const originOf = () => CRATE_SPOT;
 const isCurrent = (from, index) => current !== null && current.from === from && current.index === index;
-
-function renderShelf() {
-  setPosterRecords([...records, ...crate]);
-  const shelf = $('#shelf');
-  shelf.replaceChildren();
-  SLOTS.forEach((slot, i) => {
-    const record = records[i];
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'sleeve';
-    button.style.left = `${slot.x}px`;
-    button.style.top = `${slot.y}px`;
-
-    if (record) {
-      const img = document.createElement('img');
-      img.alt = '';
-      img.src = record.cover || youtubeThumb(record.id);
-      img.addEventListener('error', () => {
-        if (img.src !== youtubeThumb(record.id)) {
-          img.src = youtubeThumb(record.id);
-          return;
-        }
-        // No cover at all: show the title on a plain sleeve instead.
-        const fallback = document.createElement('span');
-        fallback.className = 'sleeve-fallback';
-        fallback.textContent = record.title;
-        img.replaceWith(fallback);
-      });
-      button.appendChild(img);
-      button.setAttribute('aria-label', `Play ${record.title} by ${record.artist}`);
-      if (isCurrent('shelf', i)) button.classList.add('is-out');
-    } else {
-      button.classList.add('empty');
-      const plus = document.createElement('span');
-      plus.className = 'plus';
-      plus.textContent = '+';
-      plus.setAttribute('aria-hidden', 'true');
-      const label = document.createElement('span');
-      label.textContent = 'Add record';
-      button.append(plus, label);
-      button.setAttribute('aria-label', 'Add a record to this spot');
-    }
-
-    button.addEventListener('click', () => onSleeve(i));
-    shelf.appendChild(button);
-  });
-}
-
-async function onSleeve(i) {
-  if (!records[i]) {
-    openDialog(i);
-    return;
-  }
-  if (busy || isCurrent('shelf', i)) return;
-  if (current !== null) {
-    await chooseHowToPlay({ from: 'shelf', index: i });
-    return;
-  }
-  await playRecord({ from: 'shelf', index: i });
-}
 
 /* ---------------- record animation ---------------- */
 
@@ -408,9 +348,7 @@ async function upgradeCover(ref) {
   if (!cover || recordOf(ref) !== record) return;
   record.cover = cover;
   if (!known) Object.assign(record, { artist: guess.artist || record.artist, title: guess.title || record.title });
-  saveRecords(records);
   saveCrate(crate);
-  renderShelf();
   renderCrate();
   updateCard();
   $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(cover)})`;
@@ -432,7 +370,6 @@ async function playRecord(ref) {
   radioPhase = 'off';
   updateTvTag();
   $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})`;
-  renderShelf();
   renderCrate();
   updateCard();
 
@@ -480,7 +417,6 @@ async function putBack({ advance = false } = {}) {
   current = null;
   phase = 'idle';
   busy = false;
-  renderShelf();
   renderCrate();
   updateCard();
   if (advance && await playNextInQueue()) return;
@@ -494,8 +430,6 @@ async function putBack({ advance = false } = {}) {
 let queue = [];
 
 function refOfRecord(record) {
-  const shelf = records.indexOf(record);
-  if (shelf >= 0) return { from: 'shelf', index: shelf };
   const inCrate = crate.indexOf(record);
   return inCrate >= 0 ? { from: 'crate', index: inCrate } : null;
 }
@@ -686,6 +620,9 @@ function radioState(state) {
   if (state === 1) {
     asleep = false;
     radioPhase = 'playing';
+    // Show the stream's real title (from YouTube) for stations without a fixed one.
+    const info = player.videoData();
+    if (info && station.key === 'main') station.liveTitle = info.title;
     radioFailures = 0;
     $('#tv-idle').hidden = true;
   } else if (state === 2) {
@@ -822,7 +759,7 @@ function updateCard() {
 
   if (radio) {
     $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
-    $('#np-title').textContent = station.name;
+    $('#np-title').textContent = station.liveTitle || station.name;
     $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
       : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
     $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;
@@ -831,7 +768,7 @@ function updateCard() {
     $('#np-title').textContent = record ? record.title : 'Pick a record';
     $('#np-sub').textContent = record
       ? (phase === 'error' ? errorText : record.artist)
-      : 'Click a sleeve, or + to add one';
+      : 'Open the crate to pick one';
     $('#np-art').style.backgroundImage = record ? `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})` : '';
   }
 
@@ -859,7 +796,7 @@ function updateCard() {
   $('#np-sleep').setAttribute('aria-label', `Sleep timer: ${minutes} minutes left`);
   $('#np-back').disabled = record === null || busy;
   $('#np-remove').hidden = record === null;
-  $('#np-remove').textContent = current?.from === 'crate' ? 'Remove from crate' : 'Remove from shelf';
+  $('#np-remove').textContent = 'Remove from crate';
   $('#np-remove').disabled = busy;
 
   if (!record) {
@@ -900,15 +837,9 @@ $('#np-remove').addEventListener('click', async () => {
   if (busy || current === null) return;
   const ref = current;
   const record = recordOf(ref);
-  const where = ref.from === 'crate' ? 'Remove from Crate?' : 'Remove from Shelf?';
-  if (!await confirmDialog({ title: where, message: `“${record.title}” by ${record.artist}` })) return;
+  if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
   await putBack();
-  if (ref.from === 'crate') takeFromCrate(ref.index);
-  else {
-    records[ref.index] = null;
-    saveRecords(records);
-  }
-  renderShelf();
+  takeFromCrate(ref.index);
 });
 
 /* ---------------- the record crate ---------------- */
@@ -976,10 +907,6 @@ function renderCrateBrowser(direction = '') {
   addToQueue.hidden = current === null || playing;
   addToQueue.disabled = queued;
   addToQueue.textContent = queued ? 'In the Queue' : 'Play Later';
-  const hasSpace = records.some((r) => !r);
-  const toShelf = $('#crate-to-shelf');
-  toShelf.disabled = playing || !hasSpace;
-  toShelf.title = hasSpace ? '' : 'The shelf is full';
   $('#crate-remove').disabled = playing;
 }
 
@@ -1027,25 +954,16 @@ $('#crate-queue').addEventListener('click', () => {
   renderCrateBrowser();
 });
 
-$('#crate-to-shelf').addEventListener('click', () => {
-  const slot = records.findIndex((r) => !r);
-  if (slot < 0 || isCurrent('crate', crateIndex)) return;
-  records[slot] = takeFromCrate(crateIndex);
-  saveRecords(records);
-  renderShelf();
-});
-
 $('#crate-remove').addEventListener('click', async () => {
   const record = crate[crateIndex];
   if (!record || isCurrent('crate', crateIndex)) return;
   if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
   takeFromCrate(crateIndex);
-  renderShelf();
 });
 
 $('#crate-add').addEventListener('click', () => {
   crateDialog.close();
-  openDialog('crate');
+  openDialog();
 });
 
 /* ---------------- add a record ---------------- */
@@ -1054,12 +972,9 @@ const dialog = $('#add-dialog');
 const form = $('#add-form');
 const errorBox = $('#f-error');
 const submit = $('#f-submit');
-let addTarget = null; // a shelf spot number, or 'crate'
-
-function openDialog(target) {
-  addTarget = target;
+function openDialog() {
   submit.textContent = 'Add';
-  $('#add-title').textContent = target === 'crate' ? 'Add to Crate' : 'Add to Shelf';
+  $('#add-title').textContent = 'Add to Crate';
   form.reset();
   errorBox.textContent = '';
   dialog.showModal();
@@ -1098,21 +1013,15 @@ form.addEventListener('submit', async (event) => {
     title: title || 'Untitled record',
     cover: cover || youtubeThumb(id),
   };
-  if (addTarget === 'crate') {
-    crate.push(record);
-    crateIndex = crate.length - 1;
-    saveCrate(crate);
-    renderCrate();
-  } else {
-    records[addTarget] = record;
-    saveRecords(records);
-  }
-  renderShelf();
+  crate.push(record);
+  crateIndex = crate.length - 1;
+  saveCrate(crate);
+  renderCrate();
 
   submit.disabled = false;
   submit.textContent = 'Add';
   dialog.close();
-  if (addTarget === 'crate') openCrate();
+  openCrate();
 });
 
 /* ---------------- full screen ---------------- */
@@ -1145,7 +1054,7 @@ form.addEventListener('submit', async (event) => {
 
 buildStars();
 buildLights();
-renderShelf();
+
 renderCrate();
 updateCard();
 loadYouTubeApi().catch(() => { /* reported when a record is played */ });
