@@ -1484,3 +1484,12 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .pet-cat .pet-head { transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
 .pet-cat.look-left:not(.awake) .pet-head { transform: rotate(-12deg) translate(-2px, -3px); }
 .pet-cat.look-right:not(.awake) .pet-head { transform: rotate(12deg) translate(3px, -4px); }
+
+/* ---------- the moving city (js/parallax.js) ---------- */
+/* Nearer layers move further. `translate` / `scale` add to any running animation. */
+.glass.parallax :is(#stars, .moon, .moon-cut, .sun) { translate: calc(var(--px, 0) * -2px) calc(var(--py, 0) * -1px); }
+.glass.parallax :is(.view-city > .layer-glass:first-of-type, .ridge-far, .snowcap, .island) { translate: calc(var(--px, 0) * -3px) calc(var(--py, 0) * -1.5px); }
+.glass.parallax :is(#buildings, .ridge-near, .pines-back, .cabin-lights) { translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -2px); scale: 1.03; }
+.glass.parallax :is(.track, .pillar, .train, .car, .view-city > .layer-glass:last-of-type, .pines-front, .palm, .rock, .boat) { translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -3px); }
+.glass.parallax :is(.view-city > .layer-glass:last-of-type, .track) { scale: 1.05 1; }
+.glass.parallax .branch { translate: calc(var(--px, 0) * -16px) calc(var(--py, 0) * -5px); }

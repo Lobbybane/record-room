@@ -11,6 +11,7 @@ import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
+import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -158,6 +159,7 @@ const decor = initDecor(stage, {
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
+    setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
     // Room sounds: the sliders, plus the room's own sounds when "Match the room" is on.
     const match = d.mixMatch === 'on';
     const wet = ['rain', 'storm'].includes(d.weather);
@@ -179,6 +181,8 @@ function updateHands() {
 }
 updateHands();
 initThunder(stage);
+initParallax(stage);
+setParallax(decor.get('parallax') === 'on');
 initWeather(stage);
 initPets(stage);
 initLamp(decor);

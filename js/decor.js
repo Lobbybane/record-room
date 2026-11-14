@@ -116,6 +116,10 @@ export const OPTIONS = {
       cream: ['Cream', '#E6D8C2', '#C2B39C', '#F4EAD9'],
     },
   },
+  parallax: {
+    label: 'Moving city',
+    choices: { on: 'On', off: 'Off' },
+  },
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
@@ -186,6 +190,7 @@ export const DEFAULTS = {
   skin: 's2',
   lamp: 'on',
   posters: 'records',
+  parallax: 'on',
   chair: 'armchair',
   outfit: 'hoodie',
   headphones: 'off',
