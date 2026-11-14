@@ -1463,3 +1463,24 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 }
 /* In the café the chalkboard menu hangs where the clock usually goes. */
 .stage[data-room="cafe"] .study-clock { left: 1004px; top: 408px; }
+
+/* ---------- living pets (js/life.js) ---------- */
+.dog-cushion { position: absolute; left: 400px; top: 712px; z-index: 5; display: none; overflow: visible; }
+.stage[data-pet="dog"] .dog-cushion { display: block; }
+.pet-stand { display: none; }
+.pet.standing .pet-stand { display: inline; }
+.pet.standing .pet-lying { display: none; }
+.pet .leg { transform-box: fill-box; transform-origin: 50% 0; }
+.pet.walking .leg-a { animation: step .5s ease-in-out infinite; }
+.pet.walking .leg-b { animation: step .5s ease-in-out infinite reverse; }
+.pet-dog.walking .leg-a, .pet-dog.walking .leg-b { animation-duration: .36s; }
+@keyframes step { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+.pet.standing .stand-tail { animation: wag 1.2s ease-in-out infinite; }
+.pet-dog.standing .stand-tail { animation-duration: .3s; }
+/* A long stretch before setting off. */
+.pet.stretching .stand-body { animation: stretch 1.4s ease-in-out; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes stretch { 30%, 70% { transform: scale(1.12, .82); } }
+/* Looking toward a click. */
+.pet-cat .pet-head { transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
+.pet-cat.look-left:not(.awake) .pet-head { transform: rotate(-12deg) translate(-2px, -3px); }
+.pet-cat.look-right:not(.awake) .pet-head { transform: rotate(12deg) translate(3px, -4px); }

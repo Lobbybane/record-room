@@ -484,6 +484,22 @@
   </svg>
   <button type="button" class="pet pet-cat" aria-label="Pet the cat">
     <svg viewBox="770 360 130 74" width="130" height="74" aria-hidden="true">
+      <!-- standing and walking (js/life.js adds .standing) -->
+      <g class="pet-stand">
+        <path class="stand-tail fur-stroke" d="M852 398 Q872 392 870 372 Q869 364 876 362" fill="none" stroke-width="6" stroke-linecap="round" style="transform-origin: 852px 398px"/>
+        <g class="leg leg-a"><rect x="809" y="402" width="6" height="18" rx="3" class="shade"/><rect x="841" y="402" width="6" height="18" rx="3" class="shade"/></g>
+        <g class="leg leg-b"><rect x="816" y="402" width="6" height="18" rx="3" class="fur"/><rect x="848" y="402" width="6" height="18" rx="3" class="fur"/></g>
+        <ellipse class="stand-body fur" cx="831" cy="398" rx="28" ry="12"/>
+        <path d="M824 388 q3 5 0 10 M836 387 q3 5 0 10" fill="none" class="shade-stroke" stroke-width="2.5" stroke-linecap="round"/>
+        <g class="stand-head">
+          <polygon points="789,382 790,366 801,378" class="fur"/><polygon points="801,377 812,368 812,384" class="fur"/>
+          <polygon points="792,378 793,371 797,377" fill="#F28DB2"/><polygon points="804,377 808,372 809,380" fill="#F28DB2"/>
+          <circle cx="800" cy="389" r="13" class="fur"/>
+          <circle cx="794" cy="388" r="2.2" fill="#15132B"/><circle cx="804" cy="388" r="2.2" fill="#15132B"/>
+          <path d="M797 393 h5 l-2.5 3 z" fill="#F28DB2"/>
+        </g>
+      </g>
+      <g class="pet-lying">
       <g class="pet-tail" style="transform-origin: 858px 414px">
         <path d="M858 414 Q892 414 882 426 Q866 432 834 428" fill="none" class="fur-stroke" stroke-width="7" stroke-linecap="round"/>
       </g>
@@ -501,6 +517,7 @@
         <path d="M791 408 h5 l-2.5 3 z" fill="#F28DB2"/>
         <g class="pet-hat pet-hat-cone"><path d="M786 393 L796 371 L804 391 Z" class="hat-a"/><circle cx="796" cy="371" r="3" class="hat-b"/><rect x="784" y="390" width="22" height="4" rx="2" class="hat-b"/></g>
         <g class="pet-hat pet-hat-witch"><path d="M786 391 Q792 380 790 368 Q796 372 803 390 Z" fill="#2A2040"/><ellipse cx="795" cy="391" rx="14" ry="3" fill="#2A2040"/></g>
+      </g>
       </g>
     </svg>
     <span class="pet-heart" aria-hidden="true">♥</span>
@@ -585,10 +602,29 @@
   </div>
 
   <!-- Dog on a floor cushion -->
+  <!-- The dog's cushion stays put when the dog wanders off -->
+  <svg class="dog-cushion" viewBox="400 712 170 82" width="170" height="82" aria-hidden="true">
+    <ellipse cx="482" cy="778" rx="66" ry="13" fill="#3E3060"/>
+    <ellipse cx="482" cy="772" rx="60" ry="11" fill="#5A4880"/>
+  </svg>
   <button type="button" class="pet pet-dog" aria-label="Pet the dog">
     <svg viewBox="400 712 170 82" width="170" height="82" aria-hidden="true">
-      <ellipse cx="482" cy="778" rx="66" ry="13" fill="#3E3060"/>
-      <ellipse cx="482" cy="772" rx="60" ry="11" fill="#5A4880"/>
+      <g class="pet-stand">
+        <path class="stand-tail fur-stroke" d="M528 740 Q546 734 548 716" fill="none" stroke-width="6" stroke-linecap="round" style="transform-origin: 528px 740px"/>
+        <g class="leg leg-a"><rect x="464" y="744" width="8" height="32" rx="4" class="shade"/><rect x="512" y="744" width="8" height="32" rx="4" class="shade"/></g>
+        <g class="leg leg-b"><rect x="474" y="744" width="8" height="32" rx="4" class="fur"/><rect x="522" y="744" width="8" height="32" rx="4" class="fur"/></g>
+        <ellipse class="stand-body fur" cx="496" cy="740" rx="38" ry="15"/>
+        <ellipse cx="520" cy="742" rx="14" ry="11" class="shade"/>
+        <g class="stand-head">
+          <ellipse cx="458" cy="724" rx="17" ry="14" class="fur"/>
+          <ellipse cx="443" cy="731" rx="11" ry="7" class="light"/>
+          <ellipse cx="434" cy="728" rx="3.4" ry="2.8" fill="#15132B"/>
+          <path d="M462 712 Q478 714 474 738 Q464 736 460 722 Z" class="shade"/>
+          <circle cx="452" cy="720" r="2.4" fill="#15132B"/><circle cx="452.8" cy="719.2" r=".8" fill="#fff"/>
+          <path d="M440 737 q4 6 8 0" fill="#F28DB2"/>
+        </g>
+      </g>
+      <g class="pet-lying">
       <g class="pet-tail" style="transform-origin: 536px 754px">
         <path d="M534 754 Q556 748 554 732" fill="none" class="fur-stroke" stroke-width="7" stroke-linecap="round"/>
       </g>
@@ -606,6 +642,7 @@
         <g class="pet-hat pet-hat-witch"><path d="M440 739 Q446 728 444 716 Q450 720 458 738 Z" fill="#2A2040"/><ellipse cx="449" cy="739" rx="14" ry="3" fill="#2A2040"/></g>
         <path class="eyes-closed" d="M439 750 q3 3 6 0" fill="none" stroke="#15132B" stroke-width="1.6" stroke-linecap="round"/>
         <g class="eyes-open"><circle cx="442" cy="749" r="2.4" fill="#15132B"/><circle cx="442.8" cy="748.2" r=".8" fill="#fff"/></g>
+      </g>
       </g>
     </svg>
     <span class="pet-heart" aria-hidden="true">♥</span>
