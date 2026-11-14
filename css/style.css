@@ -1520,3 +1520,6 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* The café's own regulars follow the People setting too (the barista always works). */
 .stage[data-crowd="cozy"] :is(.cafe-orderer, .cafe-bar .sipper),
 .stage[data-crowd="empty"] :is(.cafe-orderer, .cafe-bar .sipper, .cafe-bar .typist) { display: none; }
+/* Wall art where the record ledge used to be (one per room; the café has its menu board). */
+.stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
+.stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
