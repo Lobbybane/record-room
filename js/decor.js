@@ -134,6 +134,11 @@ export const OPTIONS = {
     choices: { auto: 'Auto', ...Object.fromEntries(STATIONS.map((s) => [s.key, s.label])) },
     validate: isStation, // also your own stations
   },
+  mixMatch: { label: 'Match the room', choices: { on: 'On', off: 'Off' } },
+  mixRain: { label: 'Rain', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixFire: { label: 'Fire', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixCafe: { label: 'Café', range: [0, 100, 5], format: (v) => `${v}%` },
+  mixPurr: { label: 'Purring', range: [0, 100, 5], format: (v) => `${v}%` },
   sound: {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
@@ -192,6 +197,11 @@ export const DEFAULTS = {
   curtain: 'room',
   holiday: 'auto',
   sound: 'on',
+  mixMatch: 'off',
+  mixRain: 0,
+  mixFire: 0,
+  mixCafe: 0,
+  mixPurr: 0,
   radio: 'on',
   volume: 100,
   station: 'lofi',

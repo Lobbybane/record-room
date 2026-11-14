@@ -10,7 +10,7 @@ const SECTIONS = [
   { title: 'Outside', rows: ['time', 'weather', 'season', 'parallax'], footer: '“Auto” and “By date” follow your clock and calendar.' },
   { title: 'Holidays', rows: ['holiday', 'celebrate', 'hats'], footerId: 'holiday-note' },
   { title: 'Music', rows: ['radio', { custom: 'stations' }, 'volume', { custom: 'sleep' }], footer: 'The radio plays on the TV whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' },
-  { title: 'Room sounds', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], footer: 'Soft sounds made in your browser, playing under the music.' },
+  { title: 'Room sounds', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], footer: 'Soft sounds made in your browser, playing under the music. “Match the room” adds rain when it rains, murmur in the café and crackle when the fire is lit.' },
   { title: 'Neon sign', rows: ['neonText', 'neonColor'] },
   { title: 'Pets', rows: ['pet', 'coat', 'tank'] },
   { title: 'Listener', rows: ['outfit', { sub: 'colors', label: 'Colors', rows: ['sweater', 'hair', 'skin'] }, 'headphones', 'glasses', 'scarf', 'activity'] },

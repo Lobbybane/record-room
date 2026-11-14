@@ -3,7 +3,7 @@ import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } 
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor } from './decor.js';
 import { setPosterMode, setPosterRecords } from './posters.js';
-import { sfx, setSoundEnabled, initThunder } from './sounds.js';
+import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
@@ -158,6 +158,15 @@ const decor = initDecor(stage, {
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
+    // Room sounds: the sliders, plus the room's own sounds when "Match the room" is on.
+    const match = d.mixMatch === 'on';
+    const wet = ['rain', 'storm'].includes(d.weather);
+    setAmbience({
+      rain: Math.max(d.mixRain, match && wet ? (d.weather === 'storm' ? 55 : 40) : 0) / 100,
+      fire: Math.max(d.mixFire, match && d.fire === 'on' ? 40 : 0) / 100,
+      cafe: Math.max(d.mixCafe, match && d.room === 'cafe' ? 35 : 0) / 100,
+      purr: d.mixPurr / 100,
+    });
     // After this file has finished setting up (the radio code is further down).
     queueMicrotask(() => { musicSettingsChanged(d); updateHands(); });
   },

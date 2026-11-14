@@ -1234,7 +1234,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* Sliders */
 .ios-spacer { height: 12px; }
 .ios-slider-row { cursor: default; }
-.ios-slider-row .ios-label { flex: 0 0 auto; max-width: 40%; }
+.ios-slider-row .ios-label { flex: 0 0 92px; }
 .ios-slider {
   -webkit-appearance: none; appearance: none;
   flex: 1 1 auto; min-width: 60px; height: 28px; margin: 0; background: none; cursor: pointer;
