@@ -93,6 +93,29 @@ export const OPTIONS = {
     label: 'Holiday hats',
     choices: { on: 'On', off: 'Off' },
   },
+  chair: {
+    label: 'Chair',
+    choices: { armchair: 'Armchair', beanbag: 'Beanbag', rocker: 'Rocking chair' },
+  },
+  rug: {
+    label: 'Rug',
+    choices: { round: 'Round dotted', stripes: 'Striped', checker: 'Checkered', braided: 'Braided', none: 'No rug' },
+  },
+  wallpaper: {
+    label: 'Wallpaper',
+    choices: { plain: 'Plain', stripes: 'Soft stripes', dots: 'Polka dots', stars: 'Tiny stars', flowers: 'Little flowers' },
+  },
+  curtain: {
+    label: 'Curtains',
+    swatches: {
+      room: ['Match the room', '#6E4C8E', '', ''],
+      rose: ['Rose', '#C9708F', '#9C4E6C', '#E092AE'],
+      sage: ['Sage', '#7FA08A', '#5C7C68', '#9CBDA6'],
+      ocean: ['Ocean', '#4F7FB0', '#3A6090', '#6E9CCB'],
+      mustard: ['Mustard', '#D0A048', '#A67C30', '#E8BC68'],
+      cream: ['Cream', '#E6D8C2', '#C2B39C', '#F4EAD9'],
+    },
+  },
   posters: {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
@@ -120,6 +143,18 @@ export const OPTIONS = {
     label: 'Lamp',
     choices: { on: 'On', off: 'Off' },
   },
+  outfit: {
+    label: 'Outfit',
+    choices: { hoodie: 'Hoodie', sweater: 'Cozy sweater', pyjamas: 'Pyjamas', cardigan: 'Cardigan' },
+  },
+  headphones: { label: 'Headphones', choices: { on: 'On', off: 'Off' } },
+  glasses: { label: 'Glasses', choices: { on: 'On', off: 'Off' } },
+  scarf: { label: 'Scarf', choices: { on: 'On', off: 'Off' } },
+  activity: {
+    label: 'Activity',
+    choices: { listen: 'Just listening', read: 'Reading', tea: 'Sipping tea', knit: 'Knitting', draw: 'Drawing' },
+    footer: 'The study timer swaps in a book while you focus and tea on breaks.',
+  },
   skin: {
     label: 'Skin',
     swatches: {
@@ -146,6 +181,15 @@ export const DEFAULTS = {
   skin: 's2',
   lamp: 'on',
   posters: 'records',
+  chair: 'armchair',
+  outfit: 'hoodie',
+  headphones: 'off',
+  glasses: 'off',
+  scarf: 'off',
+  activity: 'listen',
+  rug: 'round',
+  wallpaper: 'plain',
+  curtain: 'room',
   holiday: 'auto',
   sound: 'on',
   radio: 'on',
@@ -243,6 +287,19 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;
     stage.dataset.tank = decor.tank;
+    stage.dataset.chair = decor.chair;
+    stage.dataset.outfit = decor.outfit;
+    stage.dataset.headphones = decor.headphones;
+    stage.dataset.glasses = decor.glasses;
+    stage.dataset.scarf = decor.scarf;
+    stage.dataset.rug = decor.rug;
+    stage.dataset.wallpaper = decor.wallpaper;
+    stage.dataset.curtain = decor.curtain;
+    const [, , curtainA, curtainB] = OPTIONS.curtain.swatches[decor.curtain];
+    for (const [name, value] of [['--curtain-a', curtainA], ['--curtain-b', curtainB]]) {
+      if (value) stage.style.setProperty(name, value);
+      else stage.style.removeProperty(name);
+    }
     stage.dataset.season = decor.season === 'auto' ? seasonForDate(new Date()) : decor.season;
     applyHolidays(stage, decor);
 

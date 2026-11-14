@@ -10,6 +10,7 @@ import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './
 import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
+import { lookPages } from './looks.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -153,18 +154,19 @@ function buildLights() {
 
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { sleep: sleepPage, stations: stationsPage(() => decor) },
+  custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor) },
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
     // After this file has finished setting up (the radio code is further down).
-    queueMicrotask(() => musicSettingsChanged(d));
+    queueMicrotask(() => { musicSettingsChanged(d); updateHands(); });
   },
 });
 // What the listener holds: a book while studying, tea on a break.
 const study = initStudyTimer(stage, { onChange: () => updateHands() });
+const HANDS = { listen: 'rest', read: 'book', tea: 'tea', knit: 'knit', draw: 'draw' };
 function updateHands() {
-  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : 'rest';
+  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : HANDS[decor.get('activity')] || 'rest';
 }
 updateHands();
 initThunder(stage);

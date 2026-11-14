@@ -97,6 +97,23 @@ html, body {
   height: calc(594px - var(--fy));
   background: var(--wall-pattern), linear-gradient(180deg, var(--wall-a) calc(0px - var(--fy)), var(--wall-b) calc(492px - var(--fy)), var(--wall-c) calc(820px - var(--fy)));
 }
+/* Wallpaper (Decorate > Room > Furniture): a soft pattern over any room's wall. */
+.wall::after { content: ''; position: absolute; inset: 0; background: var(--wallpaper, none); pointer-events: none; }
+.stage[data-wallpaper="stripes"] { --wallpaper: repeating-linear-gradient(90deg, rgba(255, 230, 245, .05) 0 22px, transparent 22px 44px); }
+.stage[data-wallpaper="dots"] { --wallpaper: radial-gradient(circle, rgba(255, 230, 245, .1) 2px, transparent 2.5px) 0 0 / 32px 32px, radial-gradient(circle, rgba(255, 230, 245, .1) 2px, transparent 2.5px) 16px 16px / 32px 32px; }
+.stage[data-wallpaper="stars"] { --wallpaper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg fill='%23FFE7B8' fill-opacity='.14'%3E%3Cpath d='M18 10l2 5 5 .5-4 3.5 1.2 5-4.2-2.7-4.2 2.7 1.2-5-4-3.5 5-.5z'/%3E%3Ccircle cx='54' cy='48' r='2'/%3E%3Ccircle cx='40' cy='20' r='1.2'/%3E%3Ccircle cx='12' cy='56' r='1.4'/%3E%3C/g%3E%3C/svg%3E"); }
+.stage[data-wallpaper="flowers"] { --wallpaper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg fill='%23F7A9C8' fill-opacity='.12'%3E%3Ccircle cx='16' cy='12' r='4'/%3E%3Ccircle cx='22' cy='16' r='4'/%3E%3Ccircle cx='20' cy='23' r='4'/%3E%3Ccircle cx='12' cy='23' r='4'/%3E%3Ccircle cx='10' cy='16' r='4'/%3E%3C/g%3E%3Ccircle cx='16' cy='18' r='2.5' fill='%23FFE7B8' fill-opacity='.18'/%3E%3Cpath d='M44 44q6 -8 12 0q-6 8 -12 0z' fill='%239FE0C8' fill-opacity='.1'/%3E%3C/svg%3E"); }
+
+/* Chairs and rugs (data-chair, data-rug) */
+.chair, .rug { display: none; }
+.stage[data-chair="armchair"] .chair-armchair, .stage[data-chair="beanbag"] .chair-beanbag, .stage[data-chair="rocker"] .chair-rocker { display: inline; }
+.stage[data-rug="round"] .rug-round, .stage[data-rug="stripes"] .rug-stripes, .stage[data-rug="checker"] .rug-checker, .stage[data-rug="braided"] .rug-braided { display: inline; }
+.stage:not([data-chair="armchair"]) .throw { display: none !important; }
+/* The rocking chair rocks gently while music plays. */
+.listener { transform-origin: 670px 780px; }
+.stage[data-chair="rocker"].is-on .listener { animation: rock 3.2s ease-in-out infinite; }
+@keyframes rock { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+@media (prefers-reduced-motion: reduce) { .stage[data-chair="rocker"].is-on .listener { animation: none; } }
 .baseboard { position: absolute; left: var(--fx); top: 594px; width: var(--fw); height: 12px; background: var(--night); }
 .floor { position: absolute; left: var(--fx); top: 606px; width: var(--fw); height: calc(var(--fy) + var(--fh) - 606px); background: var(--floor-pattern), linear-gradient(180deg, var(--floor-a) 0, var(--floor-b) 214px); }
 .floor-lines { overflow: visible; }
@@ -104,8 +121,10 @@ html, body {
 
 .curtain-rod { position: absolute; left: 316px; top: 50px; width: 628px; height: 8px; border-radius: 4px; background: var(--ink); }
 .curtain { position: absolute; top: 56px; width: 58px; height: 400px; }
-.curtain-left { left: 322px; border-radius: 0 0 18px 6px; background: linear-gradient(90deg, #5A3F7E, #7A5A9E 45%, #5A3F7E); }
-.curtain-right { left: 880px; border-radius: 0 0 6px 18px; background: linear-gradient(90deg, #5A3F7E, #7A5A9E 55%, #5A3F7E); }
+.curtain-left { left: 322px; border-radius: 0 0 18px 6px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 45%, var(--curtain-a, #5A3F7E)); }
+.curtain-right { left: 880px; border-radius: 0 0 6px 18px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 55%, var(--curtain-a, #5A3F7E)); }
+/* A chosen curtain colour replaces each room's tint. */
+.stage:not([data-curtain="room"]) :is(.curtain-left, .curtain-right) { filter: none !important; }
 
 .window-frame { position: absolute; left: 360px; top: 70px; width: 540px; height: 350px; border-radius: 8px; background: var(--ink); }
 .mullion { position: absolute; left: 625px; top: 84px; width: 10px; height: 322px; background: var(--ink); }
@@ -1209,6 +1228,9 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .ios-select { flex: 1 1 auto; min-width: 0; height: 44px; border: 0; background: none; color: var(--ios-secondary); font: 400 17px var(--ios-font); text-align: right; text-align-last: right; cursor: pointer; }
 .ios-select option { color: #000; }
 
+/* Presets: two-colour swatches */
+.look-swatch { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .3); }
+
 /* Sliders */
 .ios-spacer { height: 12px; }
 .ios-slider-row { cursor: default; }
@@ -1409,9 +1431,23 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .study-clock:hover .clock-face { box-shadow: 0 0 0 3px #EADCC6, 0 6px 14px rgba(10, 8, 25, .5); }
 
 .arm-hold, .arm-hold > g { display: none; }
-.stage:is([data-hands="book"], [data-hands="tea"]) .arm-rest { display: none; }
-.stage:is([data-hands="book"], [data-hands="tea"]) .arm-hold { display: inline; }
-.stage[data-hands="book"] .hold-book, .stage[data-hands="tea"] .hold-mug { display: inline; }
+.stage:not([data-hands="rest"]) .arm-rest { display: none; }
+.stage:not([data-hands="rest"]) .arm-hold { display: inline; }
+.stage[data-hands="book"] .hold-book, .stage[data-hands="tea"] .hold-mug,
+.stage[data-hands="knit"] .hold-knit, .stage[data-hands="draw"] .hold-draw { display: inline; }
+.stage[data-hands="knit"] .needles { animation: knit 1.2s ease-in-out infinite; transform-box: view-box; transform-origin: 728px 651px; }
+.stage[data-hands="draw"] .pencil { animation: scribble 2.4s ease-in-out infinite; }
+@keyframes knit { 50% { transform: rotate(8deg); } }
+@keyframes scribble { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-6px, 2px); } 50% { transform: translate(-2px, -1px); } 75% { transform: translate(-9px, 1px); } }
+
+/* The listener's outfit and extras (data-outfit, data-headphones, data-glasses, data-scarf) */
+.wear { display: none; }
+.stage[data-outfit="hoodie"] .wear-hoodie, .stage[data-outfit="sweater"] .wear-sweater,
+.stage[data-outfit="pyjamas"] .wear-pyjamas, .stage[data-outfit="cardigan"] .wear-cardigan,
+.stage[data-headphones="on"] .wear-headphones, .stage[data-glasses="on"] .wear-glasses, .stage[data-scarf="on"] .wear-scarf { display: inline; }
+.stage[data-outfit="pyjamas"] .p-pants { fill: var(--sweater-shade); }
+.stage[data-outfit="pyjamas"] .p-pants-far { fill: var(--sweater-shade); filter: brightness(.8); }
+.stage[data-outfit="cardigan"] .p-sweater { fill: var(--sweater-shade); }
 .hold-mug, .hold-book { transform-box: view-box; transform-origin: 680px 630px; }
 .stage[data-hands="tea"] .hold-mug { animation: sip 8s ease-in-out infinite; }
 .stage[data-hands="book"] .hold-book { animation: read 6s ease-in-out infinite; }
@@ -1423,5 +1459,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-hands="book"] .listener-head { transform: rotate(8deg); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hold-mug, .hold-book, .mug-steam { animation: none !important; }
+  .hold-mug, .hold-book, .mug-steam, .needles, .pencil { animation: none !important; }
 }
+/* In the café the chalkboard menu hangs where the clock usually goes. */
+.stage[data-room="cafe"] .study-clock { left: 1004px; top: 408px; }
