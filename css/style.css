@@ -1640,8 +1640,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="theater"] :is(.tv-screen iframe, #yt-player) { width: 700px !important; height: 394px !important; }
 .stage[data-room="theater"][data-seat="front"] .tv-screen { left: 210px; top: 40px; width: 860px; height: 484px; }
 .stage[data-room="theater"][data-seat="front"] :is(.tv-screen iframe, #yt-player) { width: 860px !important; height: 484px !important; }
-.stage[data-room="theater"][data-seat="front"] .th-frame { transform: translate(-80px, -52px) scale(1.229, 1.234); transform-box: view-box; transform-origin: 262px 70px; }
-.stage[data-room="theater"][data-seat="front"] :is(.th-screen-surface, .th-screen-glow) { display: none; }
+.stage[data-room="theater"][data-seat="front"] :is(.th-frame, .th-screen-glow) { transform: translate(-80px, -52px) scale(1.229, 1.234); transform-box: view-box; transform-origin: 262px 70px; }
+.stage[data-room="theater"][data-seat="front"] .th-screen-surface { display: none; }
 .stage[data-room="theater"][data-seat="front"] :is(.th-marquee, .th-beam, .th-dust) { display: none; }
 /* On phones the real screen is shown big under the room; the room keeps a glowing screen. */
 .stage[data-room="theater"]:not([data-layout="phone"]) .th-screen-glow { opacity: 0; }
@@ -1683,4 +1683,28 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .th-dust circle, .th-marquee .bulb, .th-light, .leader::before, .leader span, .th-screen-glow { animation: none !important; }
   .leader span:first-child { opacity: 1; }
   .th-curtain { transition: none; }
+}
+
+/* ---------- the theater audience (js/theater.js) ---------- */
+.audience { pointer-events: none; }
+.viewer .face, .viewer .hand, .viewer .phone-light { display: none; }
+.viewer.late { display: none; }
+.viewer .bob, .viewer { transform-box: fill-box; }
+.viewer .bob { transform-origin: 50% 100%; }
+.viewer.laugh .bob { animation: p-laugh .2s ease-in-out 8; }
+.viewer.turn-l .face-l, .viewer.turn-r .face-r { display: inline; }
+.viewer.lean-l .bob { transform: rotate(-7deg); transition: transform .3s ease; }
+.viewer.lean-r .bob { transform: rotate(7deg); transition: transform .3s ease; }
+.viewer.lean-back .bob { transform: translateY(-3px) scale(.97); transition: transform .2s ease; }
+.viewer.munch .hand, .viewer.raise .hand { display: inline; }
+.viewer.munch .hand { animation: munch .9s ease-in-out 2; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes munch { 0%, 100% { transform: translateY(18px); } 50% { transform: translateY(0) rotate(-14deg); } }
+.viewer.raise .hand { transform: translateY(-14px) rotate(-10deg); transform-box: fill-box; }
+.viewer.phone .phone-light { display: inline; opacity: .35; animation: glow-flicker 1.6s ease-in-out infinite; }
+.kernel-fly { fill: #FFF3C4; animation: fly 800ms cubic-bezier(.3, -.5, .7, 1) forwards; }
+.figure-usher .flashlight { animation: glow-flicker 2s ease-in-out infinite; }
+.stage[data-room="theater"] .viewer .own-hat { display: inline; }
+.stage[data-room="theater"]:not([data-hat="none"]) .viewer .own-hat { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .viewer.laugh .bob, .viewer.munch .hand, .viewer.phone .phone-light { animation: none; }
 }

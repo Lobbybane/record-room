@@ -12,6 +12,7 @@ import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
 import { drawPeople } from './people.js';
 import { initPeopleLife, peopleRedrawn } from './life-people.js';
+import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
 
@@ -165,6 +166,7 @@ function buildLights() {
 
 let drawnPeople = '';
 let fittedFor = '';
+let drawnAudience = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
   custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
@@ -188,6 +190,11 @@ const decor = initDecor(stage, {
       fittedFor = `${d.room}|${d.seat}`;
       queueMicrotask(fitStage);
     }
+    // The movie theater's audience depends on the crowd and where you sit.
+    if (d.room === 'theater' && `${d.crowd}|${d.seat}` !== drawnAudience) {
+      drawnAudience = `${d.crowd}|${d.seat}`;
+      drawAudience($('#theater-audience'), { crowd: d.crowd, seat: d.seat });
+    }
     // Redraw the room's group when the room, the crowd or the season changes.
     const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
     if (peopleKey !== drawnPeople) {
@@ -201,6 +208,7 @@ initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
 initPeopleLife(stage);
+initTheater(stage);
 // Candles and the fireplace: click to light or blow out.
 for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {
   const button = $(`#${id}`);
