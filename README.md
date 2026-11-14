@@ -34,6 +34,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 - **On your phone:** Share > Add to Home Screen opens it like an app. On a computer, the button beside Decorate goes full screen.
 - Click the lamp to switch it off and on. Click the cat or dog to wake it up, or the fish tank to feed the fish.
 - Everyone nods along while music plays, and a couple of them doze off when it stops.
+- **Movie theater:** a big screen with red curtains, a Now Showing marquee and rows of people seen from behind (laughing, eating popcorn, shushing, latecomers, the usher and a snack seller). Add your own videos in Decorate > Music > Now showing; choose the back rows or the front row in Decorate > Room.
 - **Lively people:** friends chat in speech bubbles, sip drinks and stretch, someone heads off for snacks and comes back, and visitors drop by (pizza delivery, a snowy skier, a surfer, the train conductor…). Turn it off in Decorate > Room > Lively people.
 - On a phone held upright, the room sits at the top with a big TV and the controls below.
 - Your crate and decorations are saved in this browser.
@@ -55,6 +56,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 | `js/sounds.js` | Sound effects made in the browser (no sound files) |
 | `js/people.js`, `js/groups.js` | The people in each room and how they're drawn |
 | `js/life-people.js` | Chats, snack runs, visitors and each room's little moments |
+| `js/theater.js` | The movie theater's audience and what happens during a show |
 | `js/records.js` | Starter records, the crate, saving, reading YouTube links |
 | `js/covers.js` | Cover lookup from the iTunes Search API (songs and albums) |
 | `js/player.js` | Wrapper for the YouTube IFrame Player API |

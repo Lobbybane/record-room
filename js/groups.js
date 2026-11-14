@@ -89,6 +89,8 @@ export const GROUPS = {
       { x: 590, y: 742, s: 1.35, pose: 'floor', skin: 3, hair: ['short', '#15101A'], top: ['tee', '#C9A86A'], legs: '#4F6E3A', extras: ['scout:#8A6A3C', 'scarf:#E85A6A'], hold: 'cocoa' },
     ],
   },
+  // The movie theater draws its own audience (js/theater.js).
+  theater: { furniture: [], people: [] },
   train: {
     furniture: [
       { type: 'trainseat', x: 640, y: 690, s: 1.45, color: '#3E6E8E', core: true, people: true },

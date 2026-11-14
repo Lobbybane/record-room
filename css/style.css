@@ -1594,3 +1594,117 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .person .torso, .bubble, .stage[data-room="train"] .people-group { animation: none !important; }
 }
+
+/* ---------- the movie theater (data-room="theater") ---------- */
+.theater, .th-curtains { display: none; }
+.stage[data-room="theater"] :is(.theater, .th-curtains) { display: block; }
+.theater { position: absolute; left: 0; top: 0; width: 1280px; height: 820px; z-index: 20; }
+.th-wall { position: absolute; background:
+  linear-gradient(180deg, rgba(0, 0, 0, .55), transparent 40%, rgba(0, 0, 0, .5)),
+  repeating-linear-gradient(90deg, #3A1424 0 62px, #2A0E1A 62px 66px), #2E0F1C; }
+.th-floor { position: absolute; left: var(--fx); top: 540px; width: var(--fw); height: calc(var(--fy) + var(--fh) - 540px); background: linear-gradient(180deg, #1A0A12, #120810); }
+.th-frame { fill: #0A0608; }
+.th-screen-surface { fill: #2A2630; }
+.th-screen-glow { fill: #CFC6E6; opacity: .25; }
+.th-beam { fill: url(#th-beam); }
+.th-dust circle { fill: #FFF6DC; opacity: .6; animation: dust 9s ease-in-out infinite; }
+.th-dust circle:nth-child(2n) { animation-duration: 12s; animation-delay: -3s; }
+@keyframes dust { 50% { transform: translate(14px, 8px); opacity: .2; } }
+.th-marquee rect { fill: #2A1420; stroke: #E0B060; stroke-width: 3; }
+.th-marquee .bulb { fill: #FFE7A8; animation: bulb-chase 1.2s steps(1) infinite; }
+.th-marquee .bulb:nth-child(2n) { animation-delay: .6s; }
+@keyframes bulb-chase { 50% { fill: #8A6A3C; } }
+.mq-small { font: 800 11px 'M PLUS Rounded 1c', sans-serif; letter-spacing: .3em; fill: #F28DB2; }
+.mq-title { font: 800 18px 'M PLUS Rounded 1c', sans-serif; letter-spacing: .06em; fill: #FFF3D6; text-transform: uppercase; }
+.sconce { fill: #8A5A3C; }
+.sconce-glow { transition: opacity .8s ease; }
+.th-exit rect { fill: #0E3A22; stroke: #3EE08A; stroke-width: 1.5; }
+.th-exit text { font: 800 15px 'M PLUS Rounded 1c', sans-serif; letter-spacing: .12em; fill: #7CFFB4; filter: drop-shadow(0 0 4px #3EE08A); }
+.th-aisle { fill: #24101A; }
+.step-light { fill: #FFD38A; filter: drop-shadow(0 0 4px #FFD38A); }
+/* House lights: dim while a show plays, up when paused or between shows. */
+.th-house { position: absolute; background: rgba(4, 2, 8, .1); pointer-events: none; transition: background 1.2s ease; z-index: 3; }
+.stage[data-room="theater"][data-phase="playing"] .th-house { background: rgba(4, 2, 8, .5); }
+.stage[data-room="theater"][data-phase="playing"] .sconce-glow { opacity: .25; }
+/* Screen light flickering over the audience. */
+.th-light { position: absolute; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 60% 55% at 50% 22%, rgba(190, 200, 255, .18), transparent 70%); transition: opacity 1s ease; }
+.stage[data-room="theater"][data-phase="playing"] .th-light { opacity: 1; animation: screen-flicker 2.6s steps(6) infinite; }
+@keyframes screen-flicker { 20% { filter: hue-rotate(60deg) brightness(1.2); } 45% { filter: hue-rotate(-40deg) brightness(.85); } 70% { filter: hue-rotate(20deg) brightness(1.1); } }
+#theater-audience { position: absolute; inset: 0; z-index: 2; }
+.th-house { z-index: 4; }
+
+/* The TV becomes the big screen. */
+.stage[data-room="theater"] .tv-set { z-index: 26; }
+.stage[data-room="theater"] :is(.tv, .tv-bezel, .tv-panel, .tv-set > svg, .tv-ghost, .tonearm-layer, .window-glow, .flame-glow, .tv-fx) { display: none; }
+.stage[data-room="theater"] .tv-screen { left: 290px; top: 92px; width: 700px; height: 394px; border-radius: 2px; }
+.stage[data-room="theater"] :is(.tv-screen iframe, #yt-player) { width: 700px !important; height: 394px !important; }
+.stage[data-room="theater"][data-seat="front"] .tv-screen { left: 210px; top: 40px; width: 860px; height: 484px; }
+.stage[data-room="theater"][data-seat="front"] :is(.tv-screen iframe, #yt-player) { width: 860px !important; height: 484px !important; }
+.stage[data-room="theater"][data-seat="front"] :is(.th-frame, .th-screen-glow) { transform: translate(-80px, -52px) scale(1.229, 1.234); transform-box: view-box; transform-origin: 262px 70px; }
+.stage[data-room="theater"][data-seat="front"] .th-screen-surface { display: none; }
+.stage[data-room="theater"][data-seat="front"] :is(.th-marquee, .th-beam, .th-dust) { display: none; }
+/* On phones the real screen is shown big under the room; the room keeps a glowing screen. */
+.stage[data-room="theater"]:not([data-layout="phone"]) .th-screen-glow { opacity: 0; }
+.stage[data-room="theater"][data-layout="phone"] .th-screen-glow { opacity: .55; animation: ghost-glow 4s ease-in-out infinite; }
+
+/* The film countdown between shows. */
+.leader { display: none; }
+.stage[data-room="theater"] .tv-idle { background: radial-gradient(circle, #6E6458, #2A241E 75%); }
+.stage[data-room="theater"] .tv-idle .leader { display: block; position: relative; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .7); }
+.leader::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(rgba(255, 255, 255, .25) 0 var(--sweep, 0deg), transparent 0); animation: sweep 1s linear infinite; }
+.leader::after { content: ''; position: absolute; left: 50%; top: -20px; bottom: -20px; width: 2px; background: rgba(255, 255, 255, .5); }
+.leader span { position: absolute; inset: 0; display: grid; place-items: center; font: 800 64px 'M PLUS Rounded 1c', sans-serif; color: #FFFFFF; opacity: 0; animation: count 3s steps(1) infinite; }
+.leader span:nth-child(2) { animation-delay: 1s; }
+.leader span:nth-child(3) { animation-delay: 2s; }
+@keyframes count { 0% { opacity: 1; } 33.3% { opacity: 0; } }
+@property --sweep { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes sweep { to { --sweep: 360deg; } }
+
+/* Curtains: open while a show plays; closed only when paused or the screen is off. */
+.th-curtains { position: absolute; left: 0; top: 0; width: 1280px; height: 820px; z-index: 27; pointer-events: none; }
+.th-valance { position: absolute; left: 230px; top: 58px; width: 820px; height: 30px; border-radius: 0 0 14px 14px; background: repeating-linear-gradient(90deg, #A8222E 0 30px, #8A1A26 30px 40px); box-shadow: 0 6px 10px rgba(0, 0, 0, .4); }
+.th-curtain { position: absolute; top: 70px; width: 390px; height: 470px; background: repeating-linear-gradient(90deg, #B42A36 0 22px, #8A1A26 22px 34px, #C8343F 34px 40px); box-shadow: 0 10px 20px rgba(0, 0, 0, .5); transition: transform 1.6s cubic-bezier(.6, 0, .3, 1); }
+.th-curtain.left { left: 240px; border-radius: 0 0 40px 0; }
+.th-curtain.right { left: 650px; border-radius: 0 0 0 40px; }
+/* Open: gathered to the sides. */
+.th-curtain.left { transform: translateX(-40px) scaleX(.22); transform-origin: 0 0; }
+.th-curtain.right { transform: translateX(40px) scaleX(.22); transform-origin: 100% 0; }
+.stage[data-room="theater"]:is([data-phase="paused"], [data-phase="idle"]) .th-curtain { transform: none; }
+.stage[data-room="theater"][data-seat="front"] .th-valance { top: 14px; left: 180px; width: 920px; }
+.stage[data-room="theater"][data-seat="front"] .th-curtain { top: 24px; height: 520px; width: 450px; }
+.stage[data-room="theater"][data-seat="front"] .th-curtain.left { left: 180px; }
+.stage[data-room="theater"][data-seat="front"] .th-curtain.right { left: 650px; }
+.stage[data-room="theater"][data-seat="front"] .th-curtain.left { transform: translateX(-40px) scaleX(.2); }
+.stage[data-room="theater"][data-seat="front"] .th-curtain.right { transform: translateX(40px) scaleX(.2); }
+.stage[data-room="theater"][data-seat="front"]:is([data-phase="paused"], [data-phase="idle"]) .th-curtain { transform: none; }
+.stage[data-room="theater"][data-layout="phone"] .th-curtains { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .th-dust circle, .th-marquee .bulb, .th-light, .leader::before, .leader span, .th-screen-glow { animation: none !important; }
+  .leader span:first-child { opacity: 1; }
+  .th-curtain { transition: none; }
+}
+
+/* ---------- the theater audience (js/theater.js) ---------- */
+.audience { pointer-events: none; }
+.viewer .face, .viewer .hand, .viewer .phone-light { display: none; }
+.viewer.late { display: none; }
+.viewer .bob, .viewer { transform-box: fill-box; }
+.viewer .bob { transform-origin: 50% 100%; }
+.viewer.laugh .bob { animation: p-laugh .2s ease-in-out 8; }
+.viewer.turn-l .face-l, .viewer.turn-r .face-r { display: inline; }
+.viewer.lean-l .bob { transform: rotate(-7deg); transition: transform .3s ease; }
+.viewer.lean-r .bob { transform: rotate(7deg); transition: transform .3s ease; }
+.viewer.lean-back .bob { transform: translateY(-3px) scale(.97); transition: transform .2s ease; }
+.viewer.munch .hand, .viewer.raise .hand { display: inline; }
+.viewer.munch .hand { animation: munch .9s ease-in-out 2; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes munch { 0%, 100% { transform: translateY(18px); } 50% { transform: translateY(0) rotate(-14deg); } }
+.viewer.raise .hand { transform: translateY(-14px) rotate(-10deg); transform-box: fill-box; }
+.viewer.phone .phone-light { display: inline; opacity: .35; animation: glow-flicker 1.6s ease-in-out infinite; }
+.kernel-fly { fill: #FFF3C4; animation: fly 800ms cubic-bezier(.3, -.5, .7, 1) forwards; }
+.figure-usher .flashlight { animation: glow-flicker 2s ease-in-out infinite; }
+.stage[data-room="theater"] .viewer .own-hat { display: inline; }
+.stage[data-room="theater"]:not([data-hat="none"]) .viewer .own-hat { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .viewer.laugh .bob, .viewer.munch .hand, .viewer.phone .phone-light { animation: none; }
+}

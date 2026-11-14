@@ -12,8 +12,9 @@ import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
 import { drawPeople } from './people.js';
 import { initPeopleLife, peopleRedrawn } from './life-people.js';
+import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
-import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
+import { STATIONS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -64,6 +65,14 @@ function fitStage() {
   stage.style.setProperty('--fh', px(height / scale + 2));
 }
 
+// The TV body, or the movie theater's screen.
+function screenBox() {
+  if (stage.dataset.room === 'theater') {
+    return stage.dataset.seat === 'front' ? { x: 210, y: 40, w: 860, h: 484, screenH: 484 } : { x: 290, y: 92, w: 700, h: 394, screenH: 394 };
+  }
+  return { x: 14, y: 192, w: 316, h: 254, screenH: 200 };
+}
+
 function fitPhone(width, height) {
   const px = (n) => `${n.toFixed(1)}px`;
   const scale = Number((width / 1280).toFixed(4));
@@ -74,13 +83,14 @@ function fitPhone(width, height) {
   const toStageX = (x) => 640 + (x - cx) / scale;
   const toStageY = (y) => 410 + (y - cy) / scale;
 
-  // Enlarge the TV so YouTube's player is at least 200px tall, and centre it under the room.
-  // The TV body spans x 14-330 and y 192-446 in stage pixels (the antenna is hidden on phones).
-  const k = Math.max((width - 24) / (316 * scale), 206 / (200 * scale));
+  // Enlarge the TV (or the theater screen) so YouTube's player is at least 200px tall, and
+  // centre it under the room. The box is in stage pixels (the antenna is hidden on phones).
+  const box = screenBox();
+  const k = Math.max((width - 24) / (box.w * scale), 206 / (box.screenH * scale));
   const tvTop = top + 820 * scale - 6;
-  const tvX = toStageX((width - 316 * scale * k) / 2) - 14 * k;
-  const tvY = toStageY(tvTop) - 192 * k;
-  const tvBottom = tvTop + (446 - 192) * scale * k;
+  const tvX = toStageX((width - box.w * scale * k) / 2) - box.x * k;
+  const tvY = toStageY(tvTop) - box.y * k;
+  const tvBottom = tvTop + box.h * scale * k;
 
   // The now-spinning card goes full width under the TV.
   const kc = (width - 24) / (320 * scale);
@@ -155,9 +165,11 @@ function buildLights() {
 /* ---------------- decorating and little details ---------------- */
 
 let drawnPeople = '';
+let fittedFor = '';
+let drawnAudience = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor) },
+  custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
   onApply: (d) => {
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
@@ -173,6 +185,16 @@ const decor = initDecor(stage, {
     });
     // After this file has finished setting up (the radio code is further down).
     queueMicrotask(() => musicSettingsChanged(d));
+    // The phone layout depends on the room (the theater's screen is bigger).
+    if (`${d.room}|${d.seat}` !== fittedFor) {
+      fittedFor = `${d.room}|${d.seat}`;
+      queueMicrotask(fitStage);
+    }
+    // The movie theater's audience depends on the crowd and where you sit.
+    if (d.room === 'theater' && `${d.crowd}|${d.seat}` !== drawnAudience) {
+      drawnAudience = `${d.crowd}|${d.seat}`;
+      drawAudience($('#theater-audience'), { crowd: d.crowd, seat: d.seat });
+    }
     // Redraw the room's group when the room, the crowd or the season changes.
     const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
     if (peopleKey !== drawnPeople) {
@@ -186,6 +208,7 @@ initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
 initPeopleLife(stage);
+initTheater(stage);
 // Candles and the fireplace: click to light or blow out.
 for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {
   const button = $(`#${id}`);
@@ -535,6 +558,7 @@ const vol = () => decor.get('volume');
 let lastVolume = null;
 let station = STATIONS[0];
 let radioOn = null;          // the "Lofi radio" setting; null until the settings first arrive
+let theater = false;         // in the movie theater the screen plays "Now showing" instead
 let radioPhase = 'off';      // off | tuning | playing | paused | error
 let soundOn = false;         // true once a tap has let the radio play out loud
 let radioFailures = 0;
@@ -550,9 +574,11 @@ function musicSettingsChanged(d) {
     knob.setAttribute('aria-label', `Volume ${d.volume}%: turn down`);
     knob.title = `Volume ${d.volume}%`;
   }
-  const nextOn = d.radio === 'on';
-  const next = stationFor(d.station);
-  const wanted = `${d.station}:${next.key}`; // "auto" can change station as the day goes on
+  // In the movie theater the screen plays the "Now showing" list (always on).
+  theater = d.room === 'theater';
+  const nextOn = theater || d.radio === 'on';
+  const next = theater ? showingFor(d.showing) : stationFor(d.station);
+  const wanted = theater ? `theater:${next.key}` : `${d.station}:${next.key}`; // "auto" can change station as the day goes on
   const first = radioOn === null;
   if (!first && nextOn === radioOn && wanted === settingKey) return;
   const retune = nextOn && (wanted !== settingKey || !radioOn);
@@ -570,7 +596,7 @@ function musicSettingsChanged(d) {
 
 // Auto station: check the clock each minute.
 setInterval(() => {
-  if (decor.get('station') === 'auto') musicSettingsChanged({ radio: decor.get('radio'), station: 'auto', volume: decor.get('volume') });
+  if (decor.get('station') === 'auto') musicSettingsChanged(decor.snapshot());
 }, 60_000);
 
 function showRadioOff() {
@@ -624,7 +650,7 @@ function radioState(state) {
     radioPhase = 'playing';
     // Show the stream's real title (from YouTube) for stations without a fixed one.
     const info = player.videoData();
-    if (info && station.key === 'main') station.liveTitle = info.title;
+    if (info && (station.key === 'main' || station.show)) station.liveTitle = info.title;
     radioFailures = 0;
     $('#tv-idle').hidden = true;
   } else if (state === 2) {
@@ -641,9 +667,9 @@ function radioState(state) {
 function radioError() {
   if (!radioOn) return;
   radioFailures++;
-  if (radioFailures < STATIONS.length) {
+  if (radioFailures < (theater ? allShowings().length : STATIONS.length)) {
     // This station won't play here: try the next one without saving the change.
-    station = nextStation(station.key);
+    station = theater ? nextShowing(station.key) : nextStation(station.key);
     tuneRadio({ flash: true });
     return;
   }
@@ -654,6 +680,10 @@ function radioError() {
 }
 
 function nextOnDial() {
+  if (theater) {
+    decor.set('showing', nextShowing(station.key).key);
+    return;
+  }
   const next = nextStation(station.key);
   if (decor.get('radio') !== 'on') decor.set('radio', 'on');
   decor.set('station', next.key); // retunes through musicSettingsChanged
@@ -739,6 +769,7 @@ function formatTime(seconds) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+const THEATER_KICKERS = { tuning: 'Starting soon', playing: 'Now showing', paused: 'Intermission', error: 'Projector trouble' };
 const RADIO_KICKERS = {
   tuning: 'Tuning in',
   playing: 'On the air',
@@ -756,11 +787,12 @@ function updateCard() {
   stage.dataset.phase = shownPhase; // the listener reacts to this in CSS
   stage.dataset.source = current !== null ? 'record' : 'radio';
   stage.classList.toggle('is-on', shownPhase === 'playing');
-  card.classList.toggle('is-live', Boolean(radio));
+  card.classList.toggle('is-live', Boolean(radio) && !theater);
+  $('#marquee-title').textContent = theater ? (station.liveTitle || station.name).slice(0, 34) : '';
   updateKnob();
 
   if (radio) {
-    $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
+    $('#np-kicker').textContent = theater ? (THEATER_KICKERS[radioPhase] || 'Now showing') : RADIO_KICKERS[radioPhase];
     $('#np-title').textContent = station.liveTitle || station.name;
     $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
       : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
@@ -783,7 +815,7 @@ function updateCard() {
 
   const next = $('#np-next');
   next.hidden = current !== null;
-  next.textContent = radioOn ? 'Next station' : 'Turn on the radio';
+  next.textContent = theater ? 'Next showing' : radioOn ? 'Next station' : 'Turn on the radio';
   next.disabled = busy;
   $('#np-back').hidden = current === null;
   $('#np-skip').hidden = current === null || queue.length === 0;
@@ -808,7 +840,9 @@ function updateCard() {
 }
 
 setInterval(() => {
-  if (!['playing', 'paused', 'ended'].includes(phase)) return;
+  // Records, and the theater's showings (which aren't live, so they show progress too).
+  const showing = current === null && theater && ['playing', 'paused'].includes(radioPhase);
+  if (!showing && !['playing', 'paused', 'ended'].includes(phase)) return;
   const { time, duration } = player.progress();
   $('#np-bar').style.width = duration ? `${Math.min(100, (time / duration) * 100)}%` : '0%';
   $('#np-time').textContent = duration ? `${formatTime(time)} / ${formatTime(duration)}` : formatTime(time);
