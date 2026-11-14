@@ -3,6 +3,7 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
+import { STATIONS } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
 
@@ -96,6 +97,14 @@ export const OPTIONS = {
     label: 'Posters',
     choices: { records: 'My records', art: 'Art', off: 'Off' },
   },
+  radio: {
+    label: 'Lofi radio',
+    choices: { on: 'On', off: 'Off' },
+  },
+  station: {
+    label: 'Station',
+    choices: Object.fromEntries(STATIONS.map((s) => [s.key, s.label])),
+  },
   sound: {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
@@ -133,6 +142,8 @@ export const DEFAULTS = {
   posters: 'records',
   holiday: 'auto',
   sound: 'on',
+  radio: 'on',
+  station: 'lofi',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',

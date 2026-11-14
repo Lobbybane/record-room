@@ -13,13 +13,11 @@ export const SLOTS = [
 
 const KEY = 'record-room:records:v1';
 
-// A first-time visitor's shelf starts with these, so there's something to play straight away.
-// They are Lofi Girl and Chillhop live radio streams. To change them, swap the 11-character
-// YouTube id (the part after "watch?v=") and the names. Visitors can remove them like any record.
+// A first-time visitor's shelf starts with these, so there's a record to pull straight away.
+// (The Lofi Girl streams now play on the TV as the radio, see js/radio.js.) To change them,
+// swap the 11-character YouTube id (the part after "watch?v=") and the names.
+// Visitors can remove them like any record.
 export const STARTERS = [
-  { id: 'jfKfPfyJRdk', artist: 'Lofi Girl', title: 'lofi hip hop radio' },
-  { id: 'rUxyKA_-grg', artist: 'Lofi Girl', title: 'beats to sleep/chill to' },
-  { id: '4xDzrJKXOOY', artist: 'Lofi Girl', title: 'synthwave radio' },
   { id: '5yx6BWlEVcY', artist: 'Chillhop Music', title: 'jazzy & lofi hip hop radio' },
 ];
 

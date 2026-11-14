@@ -1,6 +1,6 @@
 # Record Room — notes for Claude
 
-Bobby's hobby project: a cozy lofi room you can play music in. Click a record on the shelf and it slides out of its sleeve, floats to the turntable, the needle drops, and the song plays. Build in small steps and add features as we go.
+Bobby's hobby project: a cozy lofi room you can play music in. A Lofi Girl stream plays on the TV as the room's radio; records are the way to play other music. Click a record on the shelf and it slides out of its sleeve, floats to the turntable, the needle drops, and the song plays. Build in small steps and add features as we go.
 
 Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, root folder).
 
@@ -34,7 +34,8 @@ Live site: https://lobbybane.github.io/record-room/ (GitHub Pages from `main`, r
 - `js/posters.js` — the two wall posters: covers from shelf and crate records (kept as art until the image loads).
 - `js/records.js` — the six shelf spots (`SLOTS`), `STARTERS` for a first visit, the crate (`loadCrate` / `saveCrate`), saving, and `parseYouTubeId()` for watch, youtu.be, music, shorts, embed and live links.
 - `js/covers.js` — iTunes cover lookup: searches songs and albums and picks the best artist/title match; `guessFromVideo()` reads "Artist - Song (Official Video)" titles; `fetchVideoInfo()` tries YouTube oEmbed to fill blank names; records still showing a thumbnail retry once they play (`upgradeCover()` in `main.js`, using the player's `videoData()`).
-- `js/player.js` — YouTube IFrame API wrapper.
+- `js/player.js` — YouTube IFrame API wrapper (load muted, mute/unMute, setVolume, `fade()`).
+- `js/radio.js` — the radio `STATIONS` (Lofi Girl lofi hip hop, sleep, synthwave; Chillhop jazzy). Whenever no record is on, the TV plays the chosen station (`data-source="radio"` on the stage; `"record"` while a record is on). It starts muted because browsers block sound until a tap; the first tap anywhere fades the sound in (`enableSound()` in `main.js`). Picking a record fades the radio out; putting it back (or the record ending, which returns it after about 3 seconds) brings the radio back. The left TV knob (`#tv-knob`) and the card's "Next station" change station; a station that won't play is skipped. Settings: `radio` (on/off) and `station` in Decorate > Music. The station ids couldn't be checked from the build machine.
 - The listener in the armchair is SVG in `index.html`; CSS reacts to `data-phase` (dozing Zs, eyes open, notes, "?") and `.stage.is-on` (head bob, foot tap).
 - Reduced motion: every animation has a still fallback in the `prefers-reduced-motion` block at the end of `css/style.css`.
 
@@ -44,7 +45,7 @@ Run locally: `python3 -m http.server 8000`, then open http://localhost:8000. You
 
 ## Built so far
 
-iOS-style menus, detailed city with mounted signs, canvas weather, reimagined café, song covers, fit-to-screen, 11 holidays with room decorations, hats, a Celebrate checklist and countdown, Decorate panel (room, time, weather, season, holidays, posters, neon, pets, fish tank, listener looks, sound), sound effects, seasons, café/cabin/beach rooms, listener in an armchair who reacts to playback, cat/dog that wake, fish tank with feeding, lamp switch, city details (windows, cars, plane, train), posters from covers, starter shelf, holiday themes by date, record crate, phone layout.
+Always-on lofi radio on the TV (station knob, LIVE card, records take over and hand back), iOS-style menus, detailed city with mounted signs, canvas weather, reimagined café, song covers, fit-to-screen, 11 holidays with room decorations, hats, a Celebrate checklist and countdown, Decorate panel (room, time, weather, season, holidays, posters, neon, pets, fish tank, listener looks, sound), sound effects, seasons, café/cabin/beach rooms, listener in an armchair who reacts to playback, cat/dog that wake, fish tank with feeding, lamp switch, city details (windows, cars, plane, train), posters from covers, starter shelf, holiday themes by date, record crate, phone layout.
 
 Bobby said not to wait between features; still commit and push after each one so nothing is lost if a session ends.
 
@@ -58,6 +59,7 @@ Bobby said not to wait between features; still commit and push after each one so
 
 ## Ideas list (not built yet)
 
+- Volume knob on the TV; "Auto" station that follows time of day and holidays; sleep timer; study (Pomodoro) timer
 - Room-sounds mixer (rain, city, purring) to loop under the music
 - Southern-hemisphere option for seasons; seasonal touches inside the rooms
 - Vinyl speed and tonearm position that follow real track progress
@@ -71,4 +73,5 @@ Bobby said not to wait between features; still commit and push after each one so
 ## Known gaps
 
 - Playback was never tested from the build machine (it can't reach YouTube or its thumbnails); check it in a real browser after changes.
-- The starter record ids in `js/records.js` (Lofi Girl and Chillhop live streams) couldn't be checked from the build machine; replace any that don't play.
+- The station ids in `js/radio.js` and the starter id in `js/records.js` couldn't be checked from the build machine; replace any that don't play.
+- iPhone Safari may refuse to unmute the radio from a tap outside the video; then the TV's tag says "Tap the video to play" and YouTube's own button starts it.

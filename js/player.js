@@ -27,20 +27,25 @@ export function loadYouTubeApi() {
 export function createPlayer(elementId, { onState, onError } = {}) {
   let player = null;
   let ready = false;
+  let creating = null;
+  let fadeToken = 0;
 
   return {
-    async load(videoId) {
+    // muted: start without sound (browsers allow muted autoplay before the first tap).
+    async load(videoId, { muted = false } = {}) {
       const YT = await loadYouTubeApi();
+      if (creating) await creating;
       if (!player) {
-        await new Promise((resolve) => {
+        creating = new Promise((resolve) => {
           player = new YT.Player(elementId, {
             width: 320,
             height: 200,
             videoId,
-            playerVars: { playsinline: 1, rel: 0 },
+            playerVars: { playsinline: 1, rel: 0, autoplay: 1, mute: muted ? 1 : 0 },
             events: {
               onReady: () => {
                 ready = true;
+                if (muted) player.mute();
                 player.playVideo();
                 resolve();
               },
@@ -49,13 +54,38 @@ export function createPlayer(elementId, { onState, onError } = {}) {
             },
           });
         });
+        await creating;
       } else {
+        if (muted) player.mute();
         player.loadVideoById(videoId);
       }
     },
     play() { if (ready) player.playVideo(); },
     pause() { if (ready) player.pauseVideo(); },
-    stop() { if (ready) player.stopVideo(); },
+    stop() { fadeToken++; if (ready) player.stopVideo(); },
+    state() { return ready ? player.getPlayerState() : -1; },
+    mute() { if (ready) player.mute(); },
+    unMute() { if (ready) player.unMute(); },
+    isMuted() { return ready ? player.isMuted() : true; },
+    setVolume(volume) { fadeToken++; if (ready) player.setVolume(volume); },
+    // Glides the volume (0-100) over `ms`; a newer fade or setVolume cancels it.
+    fade(to, ms = 600) {
+      const token = ++fadeToken;
+      if (!ready) return Promise.resolve();
+      const from = player.getVolume();
+      const steps = Math.max(1, Math.round(ms / 50));
+      return new Promise((resolve) => {
+        let step = 0;
+        const tick = () => {
+          if (token !== fadeToken) { resolve(); return; }
+          step++;
+          player.setVolume(Math.round(from + (to - from) * (step / steps)));
+          if (step >= steps) resolve();
+          else setTimeout(tick, 50);
+        };
+        tick();
+      });
+    },
     // The playing video's title and channel, from the official player.
     videoData() {
       if (!ready || !player.getVideoData) return null;

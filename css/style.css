@@ -156,7 +156,7 @@ html, body {
 .stage[data-lamp="off"] .lamp-bulb { fill: #8A7A96; }
 .stage[data-lamp="off"] .room-dim { opacity: 1; }
 .power-led { fill: #4A3A6E; transition: fill .3s ease; }
-.stage.is-on .power-led { fill: var(--cyan); }
+.stage.is-on[data-source="record"] .power-led { fill: var(--cyan); }
 .steam { opacity: .55; }
 
 /* ---------- posters ---------- */
@@ -752,6 +752,49 @@ html, body {
 .tv-idle-sub { font-size: 13px; color: var(--text-dim); }
 .tv-panel { position: absolute; left: 82px; top: 758px; width: 296px; height: 26px; display: flex; align-items: center; gap: 12px; }
 .knob { width: 18px; height: 18px; border-radius: 50%; background: #8A7A68; }
+/* The station knob: a bigger, turnable button with a pointer mark. */
+.knob-dial {
+  position: relative;
+  width: 24px; height: 24px; margin: -3px;
+  padding: 0; border: 0;
+  background: radial-gradient(circle at 40% 35%, #B3A18A 0 30%, #8A7A68 70%);
+  box-shadow: 0 2px 0 #6B5E52, inset 0 -2px 0 rgba(0,0,0,.18);
+  cursor: pointer;
+  transform: rotate(var(--turn, 0deg));
+  transition: transform .3s cubic-bezier(.3, 1.6, .5, 1);
+}
+.knob-dial:hover { filter: brightness(1.12); }
+.knob-dial:active { filter: brightness(.95); }
+.knob-mark { position: absolute; left: 50%; top: 3px; width: 2px; height: 8px; margin-left: -1px; border-radius: 1px; background: #3A3048; }
+/* A little static burst when the station changes. */
+.tv-static {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.22) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 2px, rgba(255,255,255,.12) 2px 3px, transparent 3px 7px),
+    #3A3456;
+}
+.tv-screen.is-static .tv-static { animation: tv-static .65s steps(6) forwards; }
+@keyframes tv-static {
+  0% { opacity: 1; background-position: 0 0, 0 0; }
+  50% { opacity: .9; background-position: 0 7px, 5px 0; }
+  100% { opacity: 0; background-position: 0 14px, 11px 0; }
+}
+/* "Tap for sound": a small tag in the screen corner, so the video stays visible. */
+.tv-sound {
+  position: absolute; left: 8px; bottom: 8px;
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 9px;
+  border: 0; border-radius: 999px;
+  background: rgba(20, 17, 38, .78);
+  color: #FFFFFF;
+  font: 600 11px var(--ios-font);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  cursor: pointer;
+  animation: tag-pulse 2.4s ease-in-out infinite;
+}
+.tv-sound[hidden] { display: none; }
+@keyframes tag-pulse { 50% { box-shadow: 0 0 0 4px rgba(247, 169, 200, .35), 0 2px 8px rgba(0,0,0,.35); } }
 .grille { flex: 1 1 auto; height: 14px; background: repeating-linear-gradient(90deg, #B5A48E 0 3px, transparent 3px 7px); }
 .tv-led { width: 8px; height: 8px; border-radius: 50%; background: #6B5E52; transition: background .3s ease, box-shadow .3s ease; }
 .stage.is-on .tv-led { background: var(--pink); box-shadow: 0 0 8px var(--pink); }
@@ -801,6 +844,12 @@ html, body {
 .np-progress { flex: 1 1 auto; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .2); overflow: hidden; }
 .np-bar { width: 0; height: 4px; background: rgba(255, 255, 255, .9); }
 .np-time { font-size: 12px; color: var(--ios-secondary); font-variant-numeric: tabular-nums; min-width: 72px; text-align: right; }
+/* The radio is live: a LIVE pill replaces the progress bar. */
+.np-live { display: none; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; background: rgba(255, 105, 97, .18); color: #FF8A84; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.np-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ios-red); box-shadow: 0 0 6px var(--ios-red); animation: live-dot 1.6s ease-in-out infinite; }
+@keyframes live-dot { 50% { opacity: .35; } }
+.np-card.is-live .np-progress, .np-card.is-live .np-time { display: none; }
+.np-card.is-live .np-live { display: flex; }
 
 .np-actions { display: flex; gap: 16px; }
 .np-link {
@@ -1256,4 +1305,10 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .orderer-body, .phone-glow { animation: none; }
+}
+
+/* ---------- radio: reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tv-sound, .np-live-dot { animation: none; }
+  .knob-dial { transition: none; }
 }

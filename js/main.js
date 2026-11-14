@@ -8,6 +8,7 @@ import { confirmDialog } from './ui.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
+import { STATIONS, stationFor, nextStation } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -153,6 +154,8 @@ const decor = initDecor(stage, {
   onApply: (d) => {
     setPosterMode(d.posters);
     setSoundEnabled(d.sound === 'on');
+    // After this file has finished setting up (the radio code is further down).
+    queueMicrotask(() => musicSettingsChanged(d));
   },
 });
 initThunder(stage);
@@ -292,7 +295,6 @@ function setDeck({ spinning = false, paused = false, needle = false } = {}) {
   vinyl.classList.toggle('spinning', spinning);
   vinyl.classList.toggle('paused', paused);
   stage.classList.toggle('needle-down', needle);
-  stage.classList.toggle('is-on', spinning && !paused);
 }
 
 /* ---------------- playback ---------------- */
@@ -307,7 +309,12 @@ const ERRORS = {
 
 const player = createPlayer('yt-player', {
   onState(state) {
-    if (current === null || phase === 'returning') return;
+    if (current === null) {
+      radioState(state);
+      return;
+    }
+    // Ignore the radio winding down while the record is still on its way.
+    if (phase === 'returning' || phase === 'moving') return;
     if (state === 1) {
       if (phase !== 'playing') upgradeCover(current);
       phase = 'playing';
@@ -319,11 +326,18 @@ const player = createPlayer('yt-player', {
     } else if (state === 0) {
       phase = 'ended';
       setDeck({ needle: false });
+      // The side is over: the record goes back by itself and the radio returns.
+      const ref = current;
+      setTimeout(() => { if (current === ref && phase === 'ended' && !busy) putBack(); }, 3000);
     }
     updateCard();
   },
   onError(code) {
-    if (current === null) return;
+    if (current === null) {
+      radioError();
+      return;
+    }
+    if (phase === 'moving' || phase === 'returning') return;
     phase = 'error';
     errorText = ERRORS[code] || 'Something went wrong playing this one.';
     setDeck();
@@ -367,12 +381,18 @@ async function playRecord(ref) {
   current = ref;
   phase = 'moving';
   const record = recordOf(ref);
+  // The radio fades out while the record flies over.
+  const radioFade = radioPhase === 'playing' ? player.fade(0, 900) : Promise.resolve();
+  radioPhase = 'off';
+  updateTvTag();
   $('#vinyl-label').style.backgroundImage = `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})`;
   renderShelf();
   renderCrate();
   updateCard();
 
   await moveToPlatter(ref);
+  await radioFade;
+  player.stop();
   phase = 'loading';
   setDeck({ needle: true });
   sfx.crackle();
@@ -381,7 +401,10 @@ async function playRecord(ref) {
   await wait(700);
 
   try {
+    player.unMute();
+    player.setVolume(0);
     await player.load(record.id);
+    player.fade(VOLUME, 500);
   } catch {
     phase = 'error';
     errorText = 'Could not reach YouTube. Check your connection or ad blocker.';
@@ -397,9 +420,11 @@ async function putBack() {
   busy = true;
   phase = 'returning';
   updateCard();
+  await player.fade(0, 500);
   player.stop();
   setDeck();
-  showTv('Nothing on yet', 'Pick a record to tune in');
+  if (radioOn) showTv('Tuning in…', station.name);
+  else showRadioOff();
   await wait(600);
   await moveToSleeve(current);
   current = null;
@@ -408,7 +433,185 @@ async function putBack() {
   renderShelf();
   renderCrate();
   updateCard();
+  if (radioOn) tuneRadio();
 }
+
+/* ---------------- the radio ---------------- */
+
+// Whenever no record is on, the TV plays a live lofi stream (js/radio.js).
+// It starts muted, because browsers only allow sound after a tap; the first tap
+// anywhere turns the sound up.
+
+const VOLUME = 100;
+let station = STATIONS[0];
+let radioOn = null;          // the "Lofi radio" setting; null until the settings first arrive
+let radioPhase = 'off';      // off | tuning | playing | paused | error
+let soundOn = false;         // true once a tap has let the radio play out loud
+let radioFailures = 0;
+let settingKey = null;     // the station chosen in Decorate (a broken one may be skipped)
+let stallTimer = 0;
+
+function musicSettingsChanged(d) {
+  const nextOn = d.radio === 'on';
+  const next = stationFor(d.station);
+  const first = radioOn === null;
+  if (!first && nextOn === radioOn && next.key === settingKey) return;
+  const retune = nextOn && (next.key !== settingKey || !radioOn);
+  radioOn = nextOn;
+  settingKey = next.key;
+  station = next;
+  updateKnob();
+  if (current !== null) { updateCard(); return; } // a record is on; the radio waits
+  if (!radioOn) stopRadio();
+  else if (retune || first) {
+    radioFailures = 0;
+    tuneRadio({ flash: !first });
+  }
+}
+
+function showRadioOff() {
+  showTv('Radio’s off', 'Turn the knob, or pick a record');
+}
+
+async function tuneRadio({ flash = false } = {}) {
+  if (current !== null || !radioOn) return;
+  radioPhase = 'tuning';
+  if (flash) staticFlash();
+  showTv('Tuning in…', station.name);
+  updateCard();
+  updateTvTag();
+  const tuning = station;
+  try {
+    if (soundOn) {
+      player.unMute();
+      player.setVolume(0);
+    }
+    await player.load(station.id, { muted: !soundOn });
+    if (soundOn) player.fade(VOLUME, 1200);
+  } catch {
+    radioPhase = 'error';
+    showTv('No signal', 'Could not reach YouTube. Check your connection or ad blocker.');
+    updateCard();
+    return;
+  }
+  // Some browsers won't start even a muted stream on their own; ask for a tap.
+  clearTimeout(stallTimer);
+  stallTimer = setTimeout(() => {
+    if (current === null && station === tuning && radioPhase === 'tuning') {
+      $('#tv-idle').hidden = true; // show YouTube's own play button so a tap can start it
+      updateTvTag(true);
+    }
+  }, 4000);
+}
+
+function stopRadio() {
+  clearTimeout(stallTimer);
+  player.stop();
+  radioPhase = 'off';
+  showRadioOff();
+  updateCard();
+  updateTvTag();
+}
+
+function radioState(state) {
+  if (!radioOn || radioPhase === 'off') return;
+  if (state === 1) {
+    radioPhase = 'playing';
+    radioFailures = 0;
+    $('#tv-idle').hidden = true;
+  } else if (state === 2) {
+    radioPhase = 'paused';
+  } else if (state === 0) {
+    // A live stream ended (it happens when a stream restarts): move along the dial.
+    nextOnDial();
+    return;
+  }
+  updateCard();
+  updateTvTag();
+}
+
+function radioError() {
+  if (!radioOn) return;
+  radioFailures++;
+  if (radioFailures < STATIONS.length) {
+    // This station won't play here: try the next one without saving the change.
+    station = nextStation(station.key);
+    tuneRadio({ flash: true });
+    return;
+  }
+  radioPhase = 'error';
+  showTv('No signal', 'The radio can’t play here right now. Pick a record instead.');
+  updateCard();
+  updateTvTag();
+}
+
+function nextOnDial() {
+  const next = nextStation(station.key);
+  if (decor.get('radio') !== 'on') decor.set('radio', 'on');
+  decor.set('station', next.key); // retunes through musicSettingsChanged
+}
+
+function staticFlash() {
+  if (reduceMotion) return;
+  const screen = $('.tv-screen');
+  screen.classList.remove('is-static');
+  void screen.offsetWidth;
+  screen.classList.add('is-static');
+  setTimeout(() => screen.classList.remove('is-static'), 650);
+}
+
+// The little "Tap for sound" tag on the TV screen.
+function updateTvTag(stalled = false) {
+  const tag = $('#tv-sound');
+  const show = current === null && radioOn && !['off', 'error'].includes(radioPhase)
+    && (stalled || (!soundOn && radioPhase === 'playing'));
+  tag.hidden = !show;
+  $('#tv-sound-text').textContent = stalled ? 'Tap the video to play' : 'Tap for sound';
+}
+
+function updateKnob() {
+  const knob = $('#tv-knob');
+  const label = current !== null
+    ? 'Change radio station (plays when the record is put back)'
+    : radioOn ? `Change station (now: ${station.label})` : 'Turn on the radio';
+  knob.setAttribute('aria-label', label);
+  knob.title = label;
+}
+
+$('#tv-knob').addEventListener('click', () => {
+  sfx.click();
+  const knob = $('#tv-knob');
+  knob.style.setProperty('--turn', `${(parseFloat(knob.style.getPropertyValue('--turn')) || 0) + 60}deg`);
+  if (!radioOn) decor.set('radio', 'on');
+  else nextOnDial();
+});
+
+// The first tap or key press anywhere lets the radio play out loud.
+function enableSound() {
+  if (soundOn) return;
+  soundOn = true;
+  clearTimeout(stallTimer);
+  if (current !== null || !radioOn) return;
+  player.unMute();
+  if (radioPhase === 'playing') {
+    player.setVolume(0);
+    player.fade(VOLUME, 1500);
+  } else {
+    player.setVolume(VOLUME);
+    player.play();
+  }
+  updateTvTag();
+  // If the browser still kept it quiet or paused it, the next tap tries again.
+  setTimeout(() => {
+    if (current !== null || !radioOn) return;
+    if (player.isMuted() || player.state() !== 1) {
+      soundOn = false;
+      updateTvTag(player.state() !== 1);
+    }
+  }, 1500);
+}
+window.addEventListener('pointerdown', enableSound, { capture: true });
+window.addEventListener('keydown', enableSound, { capture: true });
 
 /* ---------------- now spinning card ---------------- */
 
@@ -428,22 +631,51 @@ function formatTime(seconds) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+const RADIO_KICKERS = {
+  tuning: 'Tuning in',
+  playing: 'On the air',
+  paused: 'Radio paused',
+  error: 'No signal',
+};
+// What the listener sees while the radio plays (data-phase drives their reactions in CSS).
+const RADIO_PHASES = { tuning: 'loading', playing: 'playing', paused: 'paused', error: 'error' };
+
 function updateCard() {
-  stage.dataset.phase = phase; // the listener reacts to this in CSS
   const record = recordOf(current);
-  $('#np-kicker').textContent = KICKERS[phase] || '';
-  $('#np-title').textContent = record ? record.title : 'Pick a record';
-  $('#np-sub').textContent = record
-    ? (phase === 'error' ? errorText : record.artist)
-    : 'Click a sleeve, or + to add one';
-  $('#np-art').style.backgroundImage = record ? `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})` : '';
+  const radio = current === null && radioOn && radioPhase !== 'off';
+  const shownPhase = current !== null ? phase : (RADIO_PHASES[radioPhase] || 'idle');
+  stage.dataset.phase = shownPhase; // the listener reacts to this in CSS
+  stage.dataset.source = current !== null ? 'record' : 'radio';
+  stage.classList.toggle('is-on', shownPhase === 'playing');
+  card.classList.toggle('is-live', Boolean(radio));
+  updateKnob();
+
+  if (radio) {
+    $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
+    $('#np-title').textContent = station.name;
+    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead' : station.by;
+    $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;
+  } else {
+    $('#np-kicker').textContent = KICKERS[phase] || '';
+    $('#np-title').textContent = record ? record.title : 'Pick a record';
+    $('#np-sub').textContent = record
+      ? (phase === 'error' ? errorText : record.artist)
+      : 'Click a sleeve, or + to add one';
+    $('#np-art').style.backgroundImage = record ? `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})` : '';
+  }
 
   const toggle = $('#np-toggle');
-  const canToggle = ['playing', 'paused', 'ended'].includes(phase);
+  const playing = radio ? radioPhase === 'playing' : phase === 'playing';
+  const canToggle = radio ? ['playing', 'paused'].includes(radioPhase) : ['playing', 'paused', 'ended'].includes(phase);
   toggle.disabled = !canToggle;
-  toggle.classList.toggle('is-playing', phase === 'playing');
-  toggle.setAttribute('aria-label', phase === 'playing' ? 'Pause' : 'Play');
+  toggle.classList.toggle('is-playing', playing);
+  toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
 
+  const next = $('#np-next');
+  next.hidden = current !== null;
+  next.textContent = radioOn ? 'Next station' : 'Turn on the radio';
+  next.disabled = busy;
+  $('#np-back').hidden = current === null;
   $('#np-back').disabled = record === null || busy;
   $('#np-remove').hidden = record === null;
   $('#np-remove').textContent = current?.from === 'crate' ? 'Remove from crate' : 'Remove from shelf';
@@ -463,8 +695,16 @@ setInterval(() => {
 }, 500);
 
 $('#np-toggle').addEventListener('click', () => {
-  if (phase === 'playing') player.pause();
+  const playing = current === null ? radioPhase === 'playing' : phase === 'playing';
+  if (playing) player.pause();
   else player.play();
+});
+
+$('#np-next').addEventListener('click', () => {
+  if (busy) return;
+  sfx.click();
+  if (!radioOn) decor.set('radio', 'on');
+  else nextOnDial();
 });
 
 $('#np-back').addEventListener('click', () => {
