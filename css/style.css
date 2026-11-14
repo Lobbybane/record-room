@@ -130,9 +130,6 @@ html, body {
 .mullion { position: absolute; left: 625px; top: 84px; width: 10px; height: 322px; background: var(--ink); }
 .sill { position: absolute; left: 340px; top: 418px; width: 580px; height: 18px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 6px 0 var(--night); }
 
-.shelf-unit { position: absolute; left: 40px; top: 110px; width: 270px; height: 290px; border-radius: 4px; background: var(--violet); }
-.shelf-cubby { position: absolute; left: 50px; width: 250px; background: #2A2350; }
-.ledge { position: absolute; left: 950px; top: 212px; width: 280px; height: 12px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 5px 0 var(--night); }
 
 .neon-sign {
   position: absolute;
@@ -178,21 +175,6 @@ html, body {
 .stage.is-on[data-source="record"] .power-led { fill: var(--cyan); }
 .steam { opacity: .55; }
 
-/* ---------- posters ---------- */
-.poster {
-  position: absolute; width: 88px; height: 108px; padding: 6px 6px 18px;
-  background: #EFE3D0; border-radius: 2px;
-  box-shadow: 0 8px 16px rgba(10, 8, 25, .4);
-}
-.poster-a { left: 446px; top: 468px; transform: rotate(-3deg); }
-.poster-b { left: 806px; top: 452px; transform: rotate(2.5deg); }
-.stage[data-posters="off"] .poster { display: none; }
-.poster-art { width: 100%; height: 100%; background-size: cover; background-position: center; border-radius: 1px; }
-.art-moon { background: radial-gradient(circle at 62% 34%, #FFF1D6 0 11px, transparent 12px), linear-gradient(180deg, #2A2350 0%, #6E4C8E 58%, #F28DB2 59%, #FFB38A 74%, #6E4C8E 75%, #3B2F6B 100%); }
-.art-sun { background: radial-gradient(circle at 50% 58%, #FFD38A 0 18px, transparent 19px), repeating-linear-gradient(180deg, transparent 0 7px, rgba(42, 35, 80, .35) 7px 9px) 0 62% / 100% 30% no-repeat, linear-gradient(180deg, #F28DB2, #FFB38A); }
-.poster.has-cover .poster-art { background-color: #2A2350; background-size: cover; background-repeat: no-repeat; background-position: center; }
-.tape { position: absolute; left: 30px; top: -7px; width: 30px; height: 12px; background: rgba(244, 236, 255, .55); transform: rotate(-4deg); }
-.stage[data-lamp="off"] .poster { filter: brightness(.8); }
 
 /* ---------- listener in the armchair ---------- */
 .stage {
@@ -660,53 +642,6 @@ html, body {
 .fairy { position: absolute; width: 9px; height: 9px; border-radius: 50%; animation: twinkle 4.4s ease-in-out infinite; transition: background .6s ease, box-shadow .6s ease; }
 @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 
-/* ---------- shelf and sleeves ---------- */
-#shelf { position: absolute; inset: 0; pointer-events: none; }
-
-.sleeve {
-  position: absolute;
-  z-index: 5;
-  width: 100px;
-  height: 100px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-  pointer-events: auto;
-  background: var(--mauve);
-  box-shadow: 0 8px 18px rgba(10, 8, 25, .45);
-  transition: transform .18s ease, opacity .3s ease;
-}
-.sleeve img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.sleeve:hover { transform: translateY(-6px); }
-.sleeve-fallback {
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 100%; padding: 10px;
-  background: linear-gradient(180deg, var(--pink), var(--mauve));
-  color: var(--ink);
-  font: 700 13px/1.2 'M PLUS Rounded 1c', sans-serif;
-  text-align: center;
-}
-.sleeve:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
-.sleeve.is-out { opacity: .55; }
-
-.sleeve.empty {
-  background: rgba(244, 236, 255, .04);
-  border: 2px dashed rgba(244, 236, 255, .35);
-  box-shadow: none;
-  color: var(--text-dim);
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-.sleeve.empty .plus { font-size: 30px; line-height: 1; color: var(--pink-soft); }
-.sleeve.empty:hover { border-color: var(--pink-soft); color: var(--text); }
 
 /* ---------- traveling record ---------- */
 .vinyl-wrap {
@@ -754,10 +689,10 @@ html, body {
 .stage[data-layout="phone"] .tv-set { z-index: 30; transform: var(--tv-t); transform-origin: 0 0; }
 .stage[data-layout="phone"] .np-card { transform: var(--card-t); transform-origin: 0 0; }
 .stage[data-layout="phone"] .tv-antenna { display: none; }
-.tv { position: absolute; left: 50px; top: 528px; width: 360px; height: 266px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18), 0 14px 26px rgba(10,8,25,.45); }
-.tv-bezel { position: absolute; left: 66px; top: 542px; width: 328px; height: 208px; border-radius: 16px; background: #2B2440; }
-.tv-screen { position: absolute; left: 70px; top: 546px; width: 320px; height: 200px; border-radius: 14px; overflow: hidden; background: #000; }
-.tv-screen iframe, #yt-player { display: block; width: 320px; height: 200px; border: 0; }
+.tv { position: absolute; left: 14px; top: 192px; width: 316px; height: 254px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18), 0 14px 26px rgba(10,8,25,.45); }
+.tv-bezel { position: absolute; left: 26px; top: 202px; width: 292px; height: 210px; border-radius: 16px; background: #2B2440; }
+.tv-screen { position: absolute; left: 32px; top: 207px; width: 280px; height: 200px; border-radius: 14px; overflow: hidden; background: #000; }
+.tv-screen iframe, #yt-player { display: block; width: 280px; height: 200px; border: 0; }
 .tv-idle {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -769,7 +704,7 @@ html, body {
 .scanlines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); pointer-events: none; }
 .tv-idle-title { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: .04em; }
 .tv-idle-sub { font-size: 13px; color: var(--text-dim); }
-.tv-panel { position: absolute; left: 82px; top: 758px; width: 296px; height: 26px; display: flex; align-items: center; gap: 12px; }
+.tv-panel { position: absolute; left: 34px; top: 416px; width: 276px; height: 26px; display: flex; align-items: center; gap: 12px; }
 .knob { width: 18px; height: 18px; border-radius: 50%; background: #8A7A68; }
 /* The station knob: a bigger, turnable button with a pointer mark. */
 .knob-dial {
@@ -1353,7 +1288,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* ---------- the café (data-room="cafe") ---------- */
 .cafe-only { display: none; }
 .stage[data-room="cafe"] .cafe-only { display: block; }
-.stage[data-room="cafe"] :is(.curtain, .poster, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
+.stage[data-room="cafe"] :is(.curtain, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
 .stage[data-room="cafe"] .lamp-switch { left: 622px; top: -12px; width: 60px; height: 46px; }
 /* The neon sign hangs in the window like a shop sign. */
 .stage[data-room="cafe"] .neon-sign { left: 700px; top: 288px; transform: rotate(0deg); }
@@ -1505,7 +1440,6 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="cafe"] .candles { left: 1210px; top: 490px; }
 .fireplace { left: 414px; top: 472px; display: none; }
 .stage:is([data-room="cabin"], [data-room="treehouse"]) .fireplace { display: block; }
-.stage:is([data-room="cabin"], [data-room="treehouse"]) .poster-a { display: none; }
 .candles:focus-visible, .fireplace:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; border-radius: 8px; }
 
 .flame { opacity: 0; transition: opacity .4s ease; }
@@ -1615,3 +1549,14 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .mist, .owl, .lantern-light, .view-train .scroll, .rail-blur, .stage[data-room="train"] .view-train, .stage[data-room="train"] .rack { animation: none !important; }
 }
+
+/* ---------- the left wall: TV on a media console, a floating shelf above ---------- */
+.wall-shelf { position: absolute; left: 30px; top: 110px; width: 288px; height: 10px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 5px 0 var(--night); }
+.wall-shelf .bracket { position: absolute; top: 10px; width: 8px; height: 18px; border-radius: 0 0 3px 3px; background: var(--night); }
+.wall-shelf .b1 { left: 30px; } .wall-shelf .b2 { right: 30px; }
+.stage:is([data-room="cabin"], [data-room="treehouse"], [data-room="train"]) .wall-shelf { background: #6E4C3E; }
+.tv-ghost { display: none; position: absolute; left: 14px; top: 192px; width: 316px; height: 254px; border-radius: 22px; background: #D8C7B0; box-shadow: inset -10px -12px 0 rgba(60,40,80,.18); }
+.tv-ghost span { position: absolute; left: 18px; top: 15px; width: 280px; height: 200px; border-radius: 14px; background: radial-gradient(ellipse at 50% 45%, #8A5A9E, #2B2440 75%); animation: ghost-glow 4s ease-in-out infinite; }
+@keyframes ghost-glow { 50% { filter: brightness(1.25) hue-rotate(-12deg); } }
+.stage[data-layout="phone"] .tv-ghost { display: block; }
+@media (prefers-reduced-motion: reduce) { .tv-ghost span { animation: none; } }

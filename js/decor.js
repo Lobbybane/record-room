@@ -122,10 +122,6 @@ export const OPTIONS = {
   },
   candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
   fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
-  posters: {
-    label: 'Posters',
-    choices: { records: 'My records', art: 'Art', off: 'Off' },
-  },
   radio: {
     label: 'Lofi radio',
     choices: { on: 'On', off: 'Off' },
@@ -191,7 +187,6 @@ export const DEFAULTS = {
   hair: 'plum',
   skin: 's2',
   lamp: 'on',
-  posters: 'records',
   parallax: 'on',
   candles: 'off',
   fire: 'off',
