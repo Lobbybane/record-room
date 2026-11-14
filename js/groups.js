@@ -98,7 +98,71 @@ export const GROUPS = {
     people: [
       { x: 520, y: 704, s: 1.45, core: true, skin: 1, hair: ['long', '#15101A'], top: ['sweater', '#C9708F'], legs: '#2C2E5E', hold: 'book', extras: ['headphones:#F4ECFF'], studier: true },
       { x: 640, y: 690, s: 1.4, core: true, skin: 3, hair: ['short', '#2A1E1E'], top: ['hoodie', '#6E4C8E'], legs: '#3B3F78', hold: 'mug', dozer: true },
-      { x: 722, y: 696, s: 1.45, pose: 'stand', skin: 0, hair: ['short', '#B0603A'], top: ['uniform', '#2E3A6E'], legs: '#2E3A6E', extras: ['cap:#2E3A6E'], hold: 'ticket', shoes: '#15132B' },
     ],
   },
 };
+
+// What happens in each room (js/life-people.js): chats are lines two neighbours swap;
+// moments are room-only animations; `wanders` people go on snack runs; a visitor drops by.
+// Visitors walk in from the right to x, standing with their hip at y (feet just behind the crate).
+const LIFE = {
+  bedroom: {
+    chats: [['this song!', 'so good'], ['pass the popcorn', 'get your own :P'], ['one more episode?', 'always'], ['love this part', 'shh!']],
+    moments: ['popcorn', 'groove'],
+    wanders: { 3: { snacks: ['pizza', 'snacks', 'popcorn'], snackLines: ['snack run!', 'anyone want chips?'] } },
+    visitor: { x: 790, y: 610, s: 1.3, lines: [["pizza's here!", 'yesss!'], ['knock knock!', 'come in!']],
+      look: { skin: 4, hair: ['buzz', '#15101A'], top: ['hoodie', '#F2B33D'], legs: '#3B3F78', hold: 'pizza', extras: ['cap:#C8443C'] } },
+  },
+  cafe: {
+    chats: [["how's the latte?", 'perfect'], ['love this place', 'same'], ['what are you reading?', 'a mystery'], ['deadline…', 'you got this']],
+    moments: ['type'],
+    wanders: { 2: { snacks: ['latte'], snackLines: ['need more coffee'] } },
+    visitor: { x: 790, y: 610, s: 1.3, lines: [['cute place!', 'the best'], ['love this song', 'right?']],
+      look: { skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['puffer', '#9CBDA6'], legs: '#3B3F78', hold: 'togo' } },
+  },
+  cabin: {
+    chats: [['so cold out there!', "fire's nice though"], ['first run tomorrow?', 'early!'], ['more cocoa?', 'yes please']],
+    moments: ['warm', 'shiver'],
+    warms: [2],
+    wanders: { 3: { snacks: ['cocoa'], snackLines: ['more cocoa?'] } },
+    visitor: { x: 790, y: 610, s: 1.3, effect: 'snow', lines: [['fresh snow out there!', 'jealous'], ['brr! hi all', 'close the door!']],
+      look: { skin: 0, hair: ['short', '#B0603A'], top: ['puffer', '#4F6FA8'], legs: '#2C2E5E', extras: ['goggles:#F2B33D', 'beanie:#4F6FA8'], shoes: '#8A5A3C' } },
+  },
+  beach: {
+    chats: [['best sunset', 'every time'], ["surf's up!", 'later, sleepy'], ['more lemonade?', 'yes!']],
+    moments: ['fan'],
+    wanders: { 3: { snacks: ['lemonade'], snackLines: ['lemonade refill!'] } },
+    visitor: { x: 795, y: 610, s: 1.3, effect: 'drip', lines: [['waves are perfect!', "go get 'em"], ['anyone want to surf?', 'maybe later']],
+      look: { skin: 3, hair: ['curly', '#15101A'], top: ['tee', '#6FE3F2'], legs: '#F28DB2', hold: 'surfboard', extras: ['sunglasses'] } },
+  },
+  greenhouse: {
+    chats: [["it's growing!", 'so green'], ['smell the basil', 'mmm'], ['needs water', 'on it']],
+    moments: ['water'],
+    wanders: { 3: { snacks: ['plant', 'mug'], snackLines: ['getting more pots'] } },
+    visitor: { x: 790, y: 610, s: 1.3, lines: [['brought you a fern!', 'aww thanks!'], ['your tomatoes look great', 'thank you!']],
+      look: { skin: 4, hair: ['bun', '#15101A'], top: ['sweater', '#F28DB2'], legs: '#3B3F78', hold: 'plant' } },
+  },
+  treehouse: {
+    chats: [['did you hear that owl?', 'spooky'], ["s'mores?", 'always'], ['story time?', 'a scary one!']],
+    moments: ['snore', 'owl', 'warm'],
+    warms: [3],
+    wanders: { 1: { snacks: ['cocoa', 'marshmallow'], snackLines: ['getting marshmallows'] } },
+    visitor: { x: 790, y: 610, s: 1.3, lines: [['more wood for the fire', 'perfect'], ['found the trail!', 'nice']],
+      look: { skin: 1, hair: ['ponytail', '#6E3A2A'], top: ['flannel', '#F2B33D'], legs: '#4F6E3A', hold: 'firewood', extras: ['beanie:#C8443C'], shoes: '#8A5A3C' } },
+  },
+  train: {
+    chats: [['next stop?', 'not yet'], ['look, the lights!', 'so pretty'], ['sleep or snacks?', 'snacks']],
+    moments: ['window'],
+    wanders: { 1: { snacks: ['snacks', 'mug'], snackLines: ['dining car?'] } },
+    visitor: { x: 790, y: 610, s: 1.3, lines: [['tickets please!', 'here you go', 'thank you!'], ['next stop, the coast', 'thanks!']],
+      look: { skin: 0, hair: ['short', '#B0603A'], top: ['uniform', '#2E3A6E'], legs: '#2E3A6E', extras: ['cap:#2E3A6E'], hold: 'ticket', shoes: '#15132B' } },
+  },
+};
+
+for (const [room, life] of Object.entries(LIFE)) {
+  const group = GROUPS[room];
+  const { wanders = {}, warms = [], ...rest } = life;
+  Object.assign(group, rest);
+  for (const [i, extra] of Object.entries(wanders)) Object.assign(group.people[i], { wanders: true, ...extra });
+  for (const i of warms) group.people[i].warms = true;
+}

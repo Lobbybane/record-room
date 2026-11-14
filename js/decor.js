@@ -19,6 +19,10 @@ export const OPTIONS = {
     choices: { busy: 'Busy', cozy: 'A cozy few', empty: 'Nobody' },
     footer: 'Each room has its own group watching the TV.',
   },
+  lively: {
+    label: 'Lively people',
+    choices: { on: 'On', off: 'Off' },
+  },
   time: {
     label: 'Time of day',
     choices: { auto: 'Auto', sunrise: 'Sunrise', golden: 'Golden hour', dusk: 'Dusk', midnight: 'Midnight' },
@@ -134,6 +138,7 @@ export const OPTIONS = {
 export const DEFAULTS = {
   room: 'bedroom',
   crowd: 'busy',
+  lively: 'on',
   time: 'dusk',
   weather: 'rain',
   neonText: 'side a',
@@ -249,6 +254,7 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.sky = sky;
     stage.dataset.room = decor.room;
     stage.dataset.crowd = decor.crowd;
+    stage.dataset.lively = decor.lively;
     stage.dataset.weather = decor.weather;
     stage.dataset.pet = decor.pet;
     stage.dataset.lamp = decor.lamp;

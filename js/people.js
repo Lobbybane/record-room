@@ -31,8 +31,8 @@ function legs(pose, color, shoe = '#F4ECFF') {
       <ellipse cx="-46" cy="8" rx="7" ry="5" fill="${shoe}"/>`;
   }
   if (pose === 'stand') {
-    return `<path d="M-6 -2 L6 -2 L5 58 L-6 58 Z" fill="${far}"/><path d="M-14 -2 L0 -2 L-2 58 L-14 58 Z" fill="${color}"/>
-      <path d="M-24 56 L-2 56 Q0 64 -6 64 L-24 64 Q-27 60 -24 56 Z" fill="${shoe}"/><path d="M-12 57 L6 57 Q8 64 2 64 L-14 64 Z" fill="${tint(shoe, -0.15)}"/>`;
+    return `<g class="leg leg-far"><path d="M-6 -2 L6 -2 L5 58 L-6 58 Z" fill="${far}"/><path d="M-12 57 L6 57 Q8 64 2 64 L-14 64 Z" fill="${tint(shoe, -0.15)}"/></g>
+      <g class="leg leg-near"><path d="M-14 -2 L0 -2 L-2 58 L-14 58 Z" fill="${color}"/><path d="M-24 56 L-2 56 Q0 64 -6 64 L-24 64 Q-27 60 -24 56 Z" fill="${shoe}"/></g>`;
   }
   if (pose === 'recline') {
     return `<path d="M6 -2 L-36 6 L-34 18 L8 12 Z" fill="${far}"/><path d="M2 -4 L-40 2 L-38 14 L4 10 Z" fill="${color}"/>
@@ -124,7 +124,7 @@ function head(p) {
     const [name, c = '#F28DB2'] = e.split(':');
     return HEADWEAR[name] ? HEADWEAR[name](c) : '';
   });
-  return `<g class="head">
+  return `<g class="head-turn"><g class="head">
       ${h.back}
       <rect x="-5" y="-56" width="9" height="12" rx="3" fill="${tint(skin, -0.08)}"/>
       <circle cx="-2" cy="-64" r="13" fill="${skin}"/>
@@ -134,14 +134,15 @@ function head(p) {
       <g class="eye-open"><ellipse cx="-9.5" cy="-64" rx="1.7" ry="2.1" fill="#15132B"/></g>
       <path class="eye-closed" d="M-12 -64 q2.5 2 5 0" fill="none" stroke="#15132B" stroke-width="1.4" stroke-linecap="round"/>
       <ellipse cx="-8" cy="-58.5" rx="3" ry="1.6" fill="#F28DB2" opacity=".55"/>
-      <path d="M-13 -55.5 q1.8 1.2 3.6 0" fill="none" stroke="#8A4A4A" stroke-width="1.1" stroke-linecap="round"/>
+      <path class="mouth" d="M-13 -55.5 q1.8 1.2 3.6 0" fill="none" stroke="#8A4A4A" stroke-width="1.1" stroke-linecap="round"/>
+      <ellipse class="mouth-open" cx="-11.2" cy="-55" rx="2" ry="1.6" fill="#8A4A4A"/>
       ${wear.join('')}
       ${holidayHats()}
-    </g>`;
+    </g></g>`;
 }
 
 // Something held in the near hand (hand at about -24,-15).
-function held(item) {
+export function held(item) {
   switch (item) {
     case 'mug': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F7A9C8"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F7A9C8" stroke-width="2"/>';
     case 'latte': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F4ECFF"/><rect x="-33" y="-27" width="10" height="3" rx="1.5" fill="#C9956A"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F4ECFF" stroke-width="2"/>';
@@ -155,6 +156,11 @@ function held(item) {
     case 'plant': return '<path d="M-36 -20 L-24 -20 L-26 -8 L-34 -8 Z" fill="#C8746A"/><g fill="#4FA88E"><ellipse cx="-33" cy="-26" rx="3" ry="6" transform="rotate(-20 -33 -26)"/><ellipse cx="-27" cy="-27" rx="3" ry="7" transform="rotate(15 -27 -27)"/></g>';
     case 'marshmallow': return '<path d="M-22 -16 L-70 8" stroke="#8A5A3C" stroke-width="2"/><rect x="-76" y="5" width="8" height="7" rx="2" fill="#FFF3E6" transform="rotate(-26 -72 8)"/>';
     case 'lantern': return '<path d="M-28 -16 V-22" stroke="#2B2440" stroke-width="1.4"/><rect x="-34" y="-14" width="12" height="15" rx="3" fill="#2B2440"/><rect x="-32" y="-12" width="8" height="11" rx="2" fill="#FFD38A" class="lantern-light"/>';
+    case 'pizza': return '<path d="M-48 -26 L-14 -26 L-14 -18 L-48 -18 Z" fill="#E6C88A"/><path d="M-48 -26 L-14 -26" stroke="#C9A86A" stroke-width="2"/><text x="-31" y="-19.5" text-anchor="middle" font-size="6" font-weight="800" fill="#C8443C">PIZZA</text>';
+    case 'togo': return '<path d="M-33 -30 L-23 -30 L-24.5 -14 L-31.5 -14 Z" fill="#F4ECFF"/><rect x="-34" y="-32" width="12" height="3" rx="1" fill="#2B2440"/><rect x="-33" y="-24" width="10" height="5" fill="#C9956A"/>';
+    case 'firewood': return '<g transform="rotate(-8 -30 -18)"><rect x="-48" y="-24" width="36" height="7" rx="3.5" fill="#8A5A3C"/><rect x="-46" y="-17" width="34" height="7" rx="3.5" fill="#6E4430"/><circle cx="-12" cy="-20.5" r="3" fill="#C9956A"/><circle cx="-12" cy="-13.5" r="3" fill="#C9956A"/></g>';
+    case 'surfboard': return '<g transform="rotate(-70 -24 -15)"><path d="M-24 -15 Q-12 -60 -24 -110 Q-36 -60 -24 -15 Z" fill="#FFB38A"/><path d="M-24 -20 L-24 -104" stroke="#FFFFFF" stroke-width="2" opacity=".7"/></g>';
+    case 'snacks': return '<path d="M-38 -26 L-24 -26 L-26 -12 L-36 -12 Z" fill="#F7A9C8"/><g fill="#FFD34A"><circle cx="-34" cy="-27" r="2.4"/><circle cx="-30" cy="-28" r="2.6"/><circle cx="-27" cy="-27" r="2.2"/></g>';
     case 'ticket': return '<rect x="-34" y="-30" width="12" height="8" rx="1.5" fill="#F4ECFF" transform="rotate(-14 -28 -26)"/>';
     default: return '';
   }
@@ -172,12 +178,13 @@ function arm(color, pose, item) {
 const scarf = (c) => `<path d="M-10 -50 Q2 -42 12 -50 L13 -44 Q2 -36 -11 -44 Z" fill="${c}"/><path d="M-6 -44 L-10 -24 L-3 -23 L0 -42 Z" fill="${tint(c, -0.15)}"/>`;
 
 /** One person as an SVG string. */
-export function personSvg(p, i) {
+export function personSvg(p, i, extraClass = '') {
   const pose = p.pose || 'sit';
+  const pid = p.pid ?? i;
   if (pose === 'lie') {
     // Tucked into a sleeping bag: just the head, resting on its side at the open end.
-    const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : ''].join(' ');
-    return `<g class="${classes}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
+    const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', 'lying'].join(' ');
+    return `<g class="${classes}" data-pid="${pid}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
       <g transform="translate(-30 -8) rotate(-80)">${head(p)}</g>
       <g class="zz"><text x="-100" y="-30">z</text><text x="-90" y="-42">z</text></g></g>`;
   }
@@ -186,20 +193,23 @@ export function personSvg(p, i) {
   const extras = p.extras || [];
   const scarfColor = extras.find((e) => e.startsWith('scarf'))?.split(':')[1];
   const lean = pose === 'recline' ? 26 : pose === 'floor' ? -4 : 0;
-  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : ''].join(' ');
+  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', extraClass].join(' ');
   const study = p.studier
     ? `<g class="study-book">${held('book')}</g><g class="study-tea">${held('mug')}</g>`
     : '';
-  const upper = `<g transform="rotate(${lean})">
-      ${torso(topStyle, topColor, p)}
+  // The arm pivots at the shoulder (2, -42) so it can lift a drink, wave or type.
+  const upper = `<g class="bodywrap"><g transform="rotate(${lean})">
+      <g class="torso">${torso(topStyle, topColor, p)}</g>
       ${scarfColor ? scarf(scarfColor) : ''}
       ${head(p)}
-      <g class="own-hold">${held(p.hold)}</g>${study}
-      ${arm(topColor, pose, p.hold || p.studier).replace('__SKIN__', skin)}
-    </g>`;
+      <g transform="translate(2 -42)"><g class="arm"><g transform="translate(-2 42)">
+        <g class="own-hold">${held(p.hold)}</g>${study}
+        ${arm(topColor, pose, p.hold || p.studier || p.carries).replace('__SKIN__', skin)}
+      </g></g></g>
+    </g></g>`;
   const fx = `<g class="zz"><text x="10" y="-92">z</text><text x="20" y="-104">z</text></g>`
     + (p.core && i === 0 ? '<g class="huh"><circle cx="8" cy="-104" r="11" fill="#F4ECFF"/><text x="8" y="-99" text-anchor="middle">?</text></g>' : '');
-  return `<g class="${classes}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
+  return `<g class="${classes}" data-pid="${pid}" data-y="${p.z ?? p.y}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
     ${legs(pose, p.legs || '#3B3F78', p.shoes)}${skirt(topStyle, topColor, pose)}${upper}${fx}</g>`;
 }
 
@@ -252,7 +262,7 @@ export function drawPeople(container, { room, crowd, season }) {
   const show = (item) => crowd !== 'empty' && (crowd !== 'cozy' || item.core || item.always);
   const items = [
     ...(group.furniture || []).map((f) => ({ ...f, kind: 'f' })),
-    ...(group.people || []).filter(show).map((p, i) => ({ ...p, kind: 'p', index: i })),
+    ...(group.people || []).map((p, i) => ({ ...p, kind: 'p', index: i })).filter(show),
   ];
   // Back to front (higher y is nearer); furniture before people at the same depth.
   items.sort((a, b) => (a.z ?? a.y) - (b.z ?? b.y) || (a.kind === 'f' ? -1 : 1));
@@ -261,11 +271,16 @@ export function drawPeople(container, { room, crowd, season }) {
     if (item.kind === 'f') {
       if (item.people && !show({ core: item.core })) return '';
       const draw = FURNITURE[item.type];
-      return draw ? `<g class="furniture f-${item.type}" transform="translate(${item.x} ${item.y}) scale(${item.s || 1.5})">${draw(item)}</g>` : '';
+      return draw ? `<g class="furniture f-${item.type}" data-y="${item.z ?? item.y}" transform="translate(${item.x} ${item.y}) scale(${item.s || 1.5})">${draw(item)}</g>` : '';
     }
     const extras = [...(item.extras || [])];
     if (cold && !extras.some((e) => e.startsWith('scarf')) && item.top?.[0] !== 'puffer') extras.push('scarf:#E85A6A');
-    return personSvg({ ...item, extras }, item.index);
+    const person = { ...item, extras };
+    // People who get up for snacks have a standing copy at their seat, hidden until they walk.
+    const walker = item.wanders
+      ? personSvg({ ...person, pose: 'stand', studier: false, carries: true, y: item.y + walkerDrop(item), pid: `w${item.index}` }, item.index, 'walker')
+      : '';
+    return personSvg(person, item.index) + walker;
   });
   if (!svgRoot) {
     svgRoot = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -276,5 +291,13 @@ export function drawPeople(container, { room, crowd, season }) {
   }
   // The whole group grows from a point on the floor, so the room's numbers stay simple.
   const { scale = 1.2, ax = 560, ay = 800 } = group;
-  svgRoot.innerHTML = `<g transform="translate(${ax} ${ay}) scale(${scale}) translate(${-ax} ${-ay})">${parts.join('')}</g>`;
+  svgRoot.innerHTML = `<g class="people-group" transform="translate(${ax} ${ay}) scale(${scale}) translate(${-ax} ${-ay})">${parts.join('')}</g>`;
+  return { group, root: svgRoot.firstElementChild, cold };
+}
+
+// How far down a standing copy goes so its feet land where the seated person's feet are.
+const FEET = { sit: 47, floor: 12, recline: 36, stand: 64 };
+export function walkerDrop(p) {
+  const s = p.s || 1.5;
+  return (FEET[p.pose || 'sit'] - FEET.stand) * s;
 }

@@ -11,6 +11,7 @@ import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
 import { drawPeople } from './people.js';
+import { initPeopleLife, peopleRedrawn } from './life-people.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
@@ -176,7 +177,7 @@ const decor = initDecor(stage, {
     const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
     if (peopleKey !== drawnPeople) {
       drawnPeople = peopleKey;
-      drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season });
+      peopleRedrawn({ room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season }) });
     }
   },
 });
@@ -184,6 +185,7 @@ const decor = initDecor(stage, {
 initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
+initPeopleLife(stage);
 // Candles and the fireplace: click to light or blow out.
 for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {
   const button = $(`#${id}`);

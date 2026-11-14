@@ -1525,3 +1525,72 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
 /* The holiday shelf layer (tree on the shelf, stockings on the console) sits in front of the console. */
 .holiday-shelf { z-index: 2; }
+
+/* ---------- lively people (js/life-people.js) ---------- */
+.person .head-turn { transform-box: fill-box; transform-origin: 50% 50%; transition: transform .35s ease; }
+.person.turned .head-turn { transform: scaleX(-1); }
+.person .mouth-open { display: none; }
+.person.talking .mouth { animation: talk-shut .34s steps(1) infinite; }
+.person.talking .mouth-open { display: inline; animation: talk-open .34s steps(1) infinite; }
+@keyframes talk-shut { 50% { opacity: 0; } }
+@keyframes talk-open { 0% { opacity: 0; } 50% { opacity: 1; } }
+.person.blink .eye-open { display: none; }
+.person.blink .eye-closed { display: inline; }
+.person .torso { transform-box: fill-box; transform-origin: 50% 100%; animation: p-breathe 4.2s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes p-breathe { 50% { transform: scale(1.015, 1.03); } }
+/* The arm pivots at the shoulder (a wrapper puts the shoulder at the local origin). */
+.person .arm { transform-box: view-box; transform-origin: 0 0; }
+.person.sip .arm { animation: arm-sip 2.6s ease-in-out; }
+@keyframes arm-sip { 30%, 72% { transform: rotate(62deg); } }
+.person.wave .arm { animation: arm-wave 1.6s ease-in-out; }
+@keyframes arm-wave { 20%, 50%, 80% { transform: rotate(150deg); } 35%, 65% { transform: rotate(125deg); } }
+.person.stretch .arm { animation: arm-stretch 2.6s ease-in-out; }
+@keyframes arm-stretch { 30%, 70% { transform: rotate(165deg); } }
+.person.type .arm { animation: arm-type .18s ease-in-out 14; }
+@keyframes arm-type { 50% { transform: rotate(5deg); } }
+.person.scroll .arm { animation: arm-scroll .7s ease-in-out 4; }
+@keyframes arm-scroll { 50% { transform: rotate(-6deg); } }
+.person.fan .arm { animation: arm-fan .3s ease-in-out 8; }
+@keyframes arm-fan { 50% { transform: rotate(40deg); } }
+.person.pour .arm { animation: arm-pour 1.8s ease-in-out; }
+@keyframes arm-pour { 25%, 75% { transform: rotate(-22deg); } }
+.person.warm .arm { transform: rotate(45deg); transition: transform .6s ease; }
+.person .bodywrap { transform-box: view-box; transform-origin: 0 0; }
+.person.laugh .bodywrap { animation: p-laugh .22s ease-in-out 7; }
+@keyframes p-laugh { 50% { transform: translateY(-1.6px); } }
+.person.shiver .bodywrap { animation: p-shiver .1s linear 18; }
+@keyframes p-shiver { 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+.person.groove .bodywrap { animation: p-groove .5s ease-in-out 8; }
+@keyframes p-groove { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+/* Getting up and walking. */
+.person.away { display: none; }
+.person.walker { display: none; }
+.person.walker.out { display: inline; }
+.person .leg { transform-box: fill-box; transform-origin: 50% 0; }
+.person.walking .leg-near { animation: p-step .5s ease-in-out infinite; }
+.person.walking .leg-far { animation: p-step .5s ease-in-out infinite reverse; }
+@keyframes p-step { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+.person.walking .head { animation: none !important; }
+/* Speech bubbles. */
+.bubble { animation: bubble-in .25s cubic-bezier(.3, 1.6, .5, 1); transform-box: fill-box; transform-origin: 50% 100%; }
+.bubble.leaving { opacity: 0; transition: opacity .3s ease; }
+.bubble rect, .bubble path { fill: #F4ECFF; }
+.bubble rect { filter: drop-shadow(0 2px 3px rgba(10, 8, 25, .35)); }
+.bubble text { font: 700 12px 'M PLUS Rounded 1c', 'Nunito', sans-serif; fill: #2B2440; }
+@keyframes bubble-in { from { transform: scale(.4); opacity: 0; } }
+/* Little room effects: popcorn, water drops, snow off a coat, a growing plant, a wriggling sleeping bag. */
+.kernel, .droplet, .flake { animation: fly 900ms ease-out forwards; }
+.kernel { fill: #FFF3C4; animation-timing-function: cubic-bezier(.3, -.6, .7, 1); }
+.droplet { fill: #9FD8FF; animation-duration: 900ms; animation-timing-function: ease-in; }
+.flake { fill: #FFFFFF; animation-duration: 1400ms; }
+@keyframes fly { to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.f-plantpot.grow { transform-box: fill-box; transform-origin: 50% 100%; animation: grow 1.6s ease-in-out; }
+@keyframes grow { 50% { transform: scale(1.08, 1.14); } }
+.f-sleepingbag.wriggle { transform-box: fill-box; transform-origin: 50% 100%; animation: wriggle .4s ease-in-out 5; }
+@keyframes wriggle { 50% { transform: rotate(1.5deg) translateY(-1px); } }
+/* The night train sways everyone a little. */
+.stage[data-room="train"] .people-group { animation: train-sway 4s ease-in-out infinite; }
+@keyframes train-sway { 50% { transform: translateY(1.2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .person .torso, .bubble, .stage[data-room="train"] .people-group { animation: none !important; }
+}
