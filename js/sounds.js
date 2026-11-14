@@ -79,6 +79,15 @@ function tone({ at = 0, duration, freq, freqEnd, type = 'sine', gain = 0.2, atta
 }
 
 export const sfx = {
+  // The study timer: three soft bell notes going up.
+  chime() {
+    if (!ready()) return;
+    [[784, 0], [988, 0.18], [1319, 0.36]].forEach(([freq, at]) => {
+      tone({ at, duration: 1.6, freq, gain: 0.12, attack: 0.01 });
+      tone({ at, duration: 0.9, freq: freq * 2, gain: 0.03, attack: 0.01 });
+    });
+  },
+
   // The lamp's switch: a small two-part click.
   click() {
     if (!ready()) return;

@@ -127,10 +127,39 @@
     <!-- arm resting on the armrest -->
     <rect x="620" y="672" width="118" height="30" rx="15" fill="#8A63A8"/>
     <rect x="626" y="672" width="106" height="8" rx="4" fill="#9C78BA"/>
-    <path class="p-sleeve-edge" d="M680 630 L688 666 L726 668" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-    <path class="p-sleeve" d="M680 630 L688 666 L726 668" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle class="p-skin" cx="736" cy="668" r="7"/>
+    <g class="arm-rest">
+      <path class="p-sleeve-edge" d="M680 630 L688 666 L726 668" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="p-sleeve" d="M680 630 L688 666 L726 668" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle class="p-skin" cx="736" cy="668" r="7"/>
+    </g>
+    <!-- arm holding something up (data-hands on the stage picks what) -->
+    <g class="arm-hold">
+      <g class="hold-mug">
+        <path class="p-sleeve-edge" d="M680 630 L688 664 L714 648" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L688 664 L714 648" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="716" y="630" width="17" height="20" rx="3" fill="#F7A9C8"/>
+        <path d="M733 635 q7 0 7 6 t-7 6" fill="none" stroke="#F7A9C8" stroke-width="3"/>
+        <rect x="716" y="630" width="17" height="4" rx="2" fill="#B9637F"/>
+        <circle class="p-skin" cx="720" cy="645" r="7"/>
+        <path class="mug-steam" d="M722 624 q-4 -6 0 -12 t0 -12 M729 624 q-4 -6 0 -12" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <g class="hold-book">
+        <path class="p-sleeve-edge" d="M680 630 L688 666 L716 656" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="p-sleeve" d="M680 630 L688 666 L716 656" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M712 664 L736 626 L760 632 L742 670 Z" fill="#6FA6C8"/>
+        <path d="M716 662 L738 628 L740 630 L719 663 Z" fill="#F7F1E6"/>
+        <path d="M739 630 L757 634 L741 667 L722 662 Z" fill="#F7F1E6"/>
+        <path d="M744 640 L752 642 M741 646 L750 648 M738 652 L746 654" stroke="#B9B1D6" stroke-width="1.2"/>
+        <circle class="p-skin" cx="720" cy="660" r="7"/>
+      </g>
+    </g>
   </svg>
+
+  <!-- Study timer: a flip clock on the wall -->
+  <button type="button" class="study-clock" id="study-clock" aria-label="Study timer">
+    <span class="clock-face"><span class="clock-time">12:00</span></span>
+    <span class="clock-label">study</span>
+  </button>
 
   <!-- Curtains and window frame -->
   <div class="curtain-rod"></div>

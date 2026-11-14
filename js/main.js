@@ -9,6 +9,7 @@ import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTim
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
 import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
+import { initStudyTimer } from './study.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -160,6 +161,12 @@ const decor = initDecor(stage, {
     queueMicrotask(() => musicSettingsChanged(d));
   },
 });
+// What the listener holds: a book while studying, tea on a break.
+const study = initStudyTimer(stage, { onChange: () => updateHands() });
+function updateHands() {
+  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : 'rest';
+}
+updateHands();
 initThunder(stage);
 initWeather(stage);
 initPets(stage);

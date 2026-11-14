@@ -1387,3 +1387,41 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .tv-sound, .np-live-dot { animation: none; }
   .knob-dial { transition: none; }
 }
+
+/* ---------- the study timer and what the listener holds ---------- */
+.study-clock {
+  position: absolute; left: 1086px; top: 352px; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 0; border: 0; background: none; cursor: pointer; transform: rotate(2deg);
+}
+.clock-face {
+  display: block; padding: 5px 9px 4px; border-radius: 9px;
+  background: linear-gradient(#2E2650, #1E1A3D); box-shadow: 0 0 0 3px #D8C7B0, 0 6px 12px rgba(10, 8, 25, .4);
+  position: relative;
+}
+/* The fold line across the flip digits. */
+.clock-face::after { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 1px; background: rgba(0, 0, 0, .55); }
+.clock-time { font: 700 20px/1 'M PLUS Rounded 1c', var(--ios-font); color: #FFE7B8; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.clock-label { font: 700 9px var(--ios-font); letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim); }
+.study-clock[data-mode="focus"] .clock-time { color: #F7A9C8; text-shadow: 0 0 8px rgba(247, 169, 200, .6); }
+.study-clock[data-mode="break"] .clock-time { color: #9FE0C8; text-shadow: 0 0 8px rgba(159, 224, 200, .6); }
+.study-clock[data-mode] .clock-label { color: #FFFFFF; }
+.study-clock:hover .clock-face { box-shadow: 0 0 0 3px #EADCC6, 0 6px 14px rgba(10, 8, 25, .5); }
+
+.arm-hold, .arm-hold > g { display: none; }
+.stage:is([data-hands="book"], [data-hands="tea"]) .arm-rest { display: none; }
+.stage:is([data-hands="book"], [data-hands="tea"]) .arm-hold { display: inline; }
+.stage[data-hands="book"] .hold-book, .stage[data-hands="tea"] .hold-mug { display: inline; }
+.hold-mug, .hold-book { transform-box: view-box; transform-origin: 680px 630px; }
+.stage[data-hands="tea"] .hold-mug { animation: sip 8s ease-in-out infinite; }
+.stage[data-hands="book"] .hold-book { animation: read 6s ease-in-out infinite; }
+.mug-steam { animation: steam-rise 3s ease-in-out infinite; }
+@keyframes sip { 0%, 60%, 100% { transform: rotate(0); } 70%, 82% { transform: rotate(-38deg); } }
+@keyframes read { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-3deg); } }
+@keyframes steam-rise { 0%, 100% { opacity: .2; transform: translateY(2px); } 50% { opacity: .7; transform: translateY(-3px); } }
+/* Reading: the listener looks down at the page instead of nodding along. */
+.stage[data-hands="book"] .listener-head { transform: rotate(8deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hold-mug, .hold-book, .mug-steam { animation: none !important; }
+}
