@@ -130,7 +130,8 @@ function initWandering(stage) {
     dogBusy = true;
     clearTimeout(dogAway);
     try {
-      const target = Math.round(Math.min(440, Math.max(-360, point.x - 485)));
+      // The dog's centre is about 85px in from its left edge; its bed is at x 60.
+      const target = Math.round(Math.min(600, Math.max(0, point.x - 145)));
       await walk(dog, target, 160);
     } finally {
       settle(dog);

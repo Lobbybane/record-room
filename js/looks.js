@@ -9,26 +9,25 @@ const SLOTS = 3;
 // Settings a look remembers (not the radio, timers or which holidays you celebrate).
 const LOOK_KEYS = [
   'room', 'time', 'weather', 'season', 'lamp', 'neonText', 'neonColor',
-  'pet', 'coat', 'tank', 'sweater', 'hair', 'skin', 'chair', 'rug', 'wallpaper', 'curtain',
-  'outfit', 'headphones', 'glasses', 'scarf', 'activity', 'candles', 'fire',
+  'pet', 'coat', 'tank', 'crowd', 'rug', 'wallpaper', 'curtain', 'candles', 'fire',
 ];
 
 // Everything a preset doesn't mention goes back to these, so presets don't mix.
-const PRESET_BASE = { outfit: 'hoodie', headphones: 'off', glasses: 'off', scarf: 'off', activity: 'listen', candles: 'off', fire: 'off' };
+const PRESET_BASE = { candles: 'off', fire: 'off', crowd: 'busy' };
 
 export const PRESETS = [
   { name: 'Rainy night', sub: 'City bedroom, midnight rain', colors: ['#2E2558', '#F28DB2'],
-    look: { room: 'bedroom', time: 'midnight', weather: 'rain', season: 'auto', lamp: 'on', chair: 'armchair', rug: 'round', wallpaper: 'plain', curtain: 'room', neonColor: 'pink', activity: 'listen', candles: 'on' } },
+    look: { room: 'bedroom', time: 'midnight', weather: 'rain', season: 'auto', lamp: 'on', rug: 'round', wallpaper: 'plain', curtain: 'room', neonColor: 'pink', candles: 'on' } },
   { name: 'Sunny café', sub: 'Golden hour, clear skies', colors: ['#43283F', '#FFB38A'],
-    look: { room: 'cafe', time: 'golden', weather: 'clear', season: 'summer', lamp: 'on', chair: 'armchair', rug: 'none', wallpaper: 'plain', curtain: 'room', neonColor: 'peach', activity: 'tea' } },
+    look: { room: 'cafe', time: 'golden', weather: 'clear', season: 'summer', lamp: 'on', rug: 'none', wallpaper: 'plain', curtain: 'room', neonColor: 'peach' } },
   { name: 'Snowy cabin', sub: 'Dusk snow by the fire', colors: ['#45313F', '#F4F0FF'],
-    look: { room: 'cabin', time: 'dusk', weather: 'snow', season: 'winter', lamp: 'on', chair: 'rocker', rug: 'braided', wallpaper: 'plain', curtain: 'room', outfit: 'sweater', activity: 'knit', scarf: 'on', fire: 'on', candles: 'on' } },
-  { name: 'Beach sunset', sub: 'Summer, clear, beanbag', colors: ['#263C56', '#FFB38A'],
-    look: { room: 'beach', time: 'golden', weather: 'clear', season: 'summer', lamp: 'off', chair: 'beanbag', rug: 'stripes', wallpaper: 'plain', curtain: 'ocean', neonColor: 'mint', activity: 'draw' } },
+    look: { room: 'cabin', time: 'dusk', weather: 'snow', season: 'winter', lamp: 'on', rug: 'braided', wallpaper: 'plain', curtain: 'room', fire: 'on', candles: 'on' } },
+  { name: 'Beach sunset', sub: 'Summer, clear, beach chairs', colors: ['#263C56', '#FFB38A'],
+    look: { room: 'beach', time: 'golden', weather: 'clear', season: 'summer', lamp: 'off', rug: 'stripes', wallpaper: 'plain', curtain: 'ocean', neonColor: 'mint' } },
   { name: 'Midnight synthwave', sub: 'Starry walls, cyan neon', colors: ['#241E48', '#6FE3F2'],
-    look: { room: 'bedroom', time: 'midnight', weather: 'clear', lamp: 'off', chair: 'beanbag', rug: 'checker', wallpaper: 'stars', curtain: 'ocean', neonColor: 'cyan', headphones: 'on', activity: 'listen' } },
+    look: { room: 'bedroom', time: 'midnight', weather: 'clear', lamp: 'off', rug: 'checker', wallpaper: 'stars', curtain: 'ocean', neonColor: 'cyan', crowd: 'cozy' } },
   { name: 'Autumn reading', sub: 'Dusk rain, a good book', colors: ['#3A2B52', '#D0A048'],
-    look: { room: 'bedroom', time: 'dusk', weather: 'rain', season: 'autumn', lamp: 'on', chair: 'armchair', rug: 'braided', wallpaper: 'flowers', curtain: 'mustard', neonColor: 'peach', outfit: 'cardigan', activity: 'read', glasses: 'on' } },
+    look: { room: 'bedroom', time: 'dusk', weather: 'rain', season: 'autumn', lamp: 'on', rug: 'braided', wallpaper: 'flowers', curtain: 'mustard', neonColor: 'peach', crowd: 'cozy' } },
 ];
 
 function loadLooks() {
@@ -63,7 +62,7 @@ export function lookPages(getDecor) {
           });
           group.append(row);
         }
-        scroll.append(group, el('p', { className: 'ios-footer', textContent: 'A preset changes the room, weather, furniture and the listener. Your records and radio stay as they are.' }));
+        scroll.append(group, el('p', { className: 'ios-footer', textContent: 'A preset changes the room, weather, furniture and who’s there. Your records and radio stay as they are.' }));
       },
     },
     looks: {
@@ -97,7 +96,7 @@ export function lookPages(getDecor) {
           }
           scroll.append(group);
         });
-        scroll.append(el('p', { className: 'ios-footer', textContent: 'A look saves the room, outside, furniture, pets and the listener. It’s kept in this browser.' }));
+        scroll.append(el('p', { className: 'ios-footer', textContent: 'A look saves the room, outside, furniture, pets and who’s there. It’s kept in this browser.' }));
 
         function save(i, name) {
           const all = decor.snapshot();

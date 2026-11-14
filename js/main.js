@@ -10,6 +10,7 @@ import { buildCity as drawCity } from './city.js';
 import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
+import { drawPeople } from './people.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage } from './radio.js';
 
@@ -152,6 +153,7 @@ function buildLights() {
 
 /* ---------------- decorating and little details ---------------- */
 
+let drawnPeople = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
   custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor) },
@@ -169,16 +171,17 @@ const decor = initDecor(stage, {
       purr: d.mixPurr / 100,
     });
     // After this file has finished setting up (the radio code is further down).
-    queueMicrotask(() => { musicSettingsChanged(d); updateHands(); });
+    queueMicrotask(() => musicSettingsChanged(d));
+    // Redraw the room's group when the room, the crowd or the season changes.
+    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
+    if (peopleKey !== drawnPeople) {
+      drawnPeople = peopleKey;
+      drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season });
+    }
   },
 });
-// What the listener holds: a book while studying, tea on a break.
-const study = initStudyTimer(stage, { onChange: () => updateHands() });
-const HANDS = { listen: 'rest', read: 'book', tea: 'tea', knit: 'knit', draw: 'draw' };
-function updateHands() {
-  stage.dataset.hands = study.mode === 'focus' ? 'book' : study.mode === 'break' ? 'tea' : HANDS[decor.get('activity')] || 'rest';
-}
-updateHands();
+// The study timer: the room's studier reads while you focus and has tea on breaks (CSS, data-study).
+initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
 // Candles and the fireplace: click to light or blow out.
