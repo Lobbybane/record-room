@@ -213,7 +213,7 @@ export const DEFAULTS = {
   mixPurr: 0,
   radio: 'on',
   volume: 100,
-  station: 'lofi',
+  station: 'main',
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',
@@ -252,12 +252,14 @@ export function loadDecor() {
     }
   }
   if (typeof saved.neonText === 'string') decor.neonText = saved.neonText.slice(0, NEON_MAX);
+  // The main broadcast replaced lofi hip hop as the default station: move visitors still on the old default.
+  if (!saved.stationV2 && decor.station === 'lofi') decor.station = 'main';
   return decor;
 }
 
 function saveDecor(decor) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...decor, celebrateKnown: Object.keys(HOLIDAYS) }));
+    localStorage.setItem(KEY, JSON.stringify({ ...decor, celebrateKnown: Object.keys(HOLIDAYS), stationV2: true }));
   } catch { /* private mode: still works until reload */ }
 }
 

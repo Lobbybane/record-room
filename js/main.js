@@ -686,6 +686,9 @@ function radioState(state) {
   if (state === 1) {
     asleep = false;
     radioPhase = 'playing';
+    // Show the stream's real title (from YouTube) for stations without a fixed one.
+    const info = player.videoData();
+    if (info && station.key === 'main') station.liveTitle = info.title;
     radioFailures = 0;
     $('#tv-idle').hidden = true;
   } else if (state === 2) {
@@ -822,7 +825,7 @@ function updateCard() {
 
   if (radio) {
     $('#np-kicker').textContent = RADIO_KICKERS[radioPhase];
-    $('#np-title').textContent = station.name;
+    $('#np-title').textContent = station.liveTitle || station.name;
     $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
       : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
     $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;

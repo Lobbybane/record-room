@@ -8,6 +8,8 @@ import { HOLIDAYS, holidaysForDate } from './holidays.js';
 import { parseYouTubeId } from './records.js';
 
 export const STATIONS = [
+  // The main broadcast (Bobby's pick). Its title comes from YouTube once it plays.
+  { key: 'main', id: 'rFZHOHl-L8A', name: 'Main broadcast', by: 'Main broadcast', label: 'Main broadcast' },
   { key: 'lofi', id: 'jfKfPfyJRdk', name: 'lofi hip hop radio', by: 'Lofi Girl', label: 'Lofi hip hop' },
   { key: 'sleep', id: 'rUxyKA_-grg', name: 'beats to sleep/chill to', by: 'Lofi Girl', label: 'Sleep & chill' },
   { key: 'synthwave', id: '4xDzrJKXOOY', name: 'synthwave radio', by: 'Lofi Girl', label: 'Synthwave' },
@@ -42,7 +44,7 @@ export function autoStation(date = new Date()) {
   const holiday = custom.find((s) => s.holiday && today.includes(s.holiday));
   if (holiday) return holiday;
   const hour = date.getHours();
-  const key = hour >= 23 || hour < 6 ? 'sleep' : hour < 10 ? 'jazzy' : hour < 19 ? 'lofi' : 'synthwave';
+  const key = hour >= 23 || hour < 6 ? 'sleep' : hour < 10 ? 'jazzy' : hour < 19 ? 'main' : 'synthwave';
   return STATIONS.find((s) => s.key === key);
 }
 
@@ -94,7 +96,7 @@ export function stationsPage(getDecor) {
       auto.append(choice('auto', 'Auto', `Now: ${autoStation().label}`));
       scroll.append(auto, el('p', {
         className: 'ios-footer',
-        textContent: 'Auto plays jazzy lofi in the morning, lofi hip hop in the day, synthwave in the evening and sleep beats at night. Your stations tagged for a holiday play on that holiday.',
+        textContent: 'Auto plays jazzy lofi in the morning, the main broadcast in the day, synthwave in the evening and sleep beats at night. Your stations tagged for a holiday play on that holiday.',
       }));
 
       scroll.append(el('h3', { className: 'ios-header', textContent: 'Stations' }));
@@ -109,7 +111,7 @@ export function stationsPage(getDecor) {
             event.stopPropagation();
             custom = custom.filter((c) => c !== s);
             saveCustom();
-            if (decor.get('station') === s.key) decor.set('station', 'lofi');
+            if (decor.get('station') === s.key) decor.set('station', 'main');
             rebuild();
           };
           remove.addEventListener('click', drop);
