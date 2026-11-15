@@ -1181,8 +1181,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="cafe"] .cafe-only { display: block; }
 .stage[data-room="cafe"] :is(.curtain, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
 .stage[data-room="cafe"] .lamp-switch { left: 622px; top: -12px; width: 60px; height: 46px; }
-/* The neon sign hangs in the window like a shop sign. */
-.stage[data-room="cafe"] .neon-sign { left: 700px; top: 288px; transform: rotate(0deg); }
+/* The neon sign hangs on the wall above the menu board (centred over it), clear of the window view. */
+.stage[data-room="cafe"] .neon-sign { left: 1076px; top: 164px; transform: translateX(-50%); }
 
 .barista-arm { transform-box: view-box; transform-origin: 1166px 458px; animation: steam-pitcher 3.4s ease-in-out infinite; }
 @keyframes steam-pitcher { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg) translateY(-2px); } }
