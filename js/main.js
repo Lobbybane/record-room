@@ -57,11 +57,11 @@ function fitStage() {
   stage.style.setProperty('--s', scale);
   stage.style.setProperty('--cx', px(centerX));
   stage.style.setProperty('--cy', px(centerY));
-  // 1px of slack on every side so no hairline shows at the screen edges.
-  stage.style.setProperty('--fx', px(640 - centerX / scale - 1));
-  stage.style.setProperty('--fy', px(410 - centerY / scale - 1));
-  stage.style.setProperty('--fw', px(width / scale + 2));
-  stage.style.setProperty('--fh', px(height / scale + 2));
+  // 2px of slack on every side so no hairline shows at the screen edges (the train rocks).
+  stage.style.setProperty('--fx', px(640 - centerX / scale - 2));
+  stage.style.setProperty('--fy', px(410 - centerY / scale - 2));
+  stage.style.setProperty('--fw', px(width / scale + 4));
+  stage.style.setProperty('--fh', px(height / scale + 4));
 }
 
 // The TV body, or the movie theater's screen.
@@ -99,10 +99,10 @@ function fitPhone(width, height) {
   stage.style.setProperty('--cy', px(cy));
   stage.style.setProperty('--tv-t', `translate(${px(tvX)}, ${px(tvY)}) scale(${k.toFixed(4)})`);
   const fullHeight = Math.max(height, contentBottom);
-  stage.style.setProperty('--fx', px(640 - cx / scale - 1));
-  stage.style.setProperty('--fy', px(410 - cy / scale - 1));
-  stage.style.setProperty('--fw', px(width / scale + 2));
-  stage.style.setProperty('--fh', px(fullHeight / scale + 2));
+  stage.style.setProperty('--fx', px(640 - cx / scale - 2));
+  stage.style.setProperty('--fy', px(410 - cy / scale - 2));
+  stage.style.setProperty('--fw', px(width / scale + 4));
+  stage.style.setProperty('--fh', px(fullHeight / scale + 4));
   viewport.classList.toggle('scrolls', contentBottom > height);
   spacer.style.height = px(fullHeight);
 }

@@ -1209,8 +1209,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @keyframes sip { 0%, 64% { opacity: 0; } 65%, 82% { opacity: 1; } 83%, 100% { opacity: 0; } }
 @keyframes sip-down { 0%, 64% { opacity: 1; } 65%, 82% { opacity: 0; } 83%, 100% { opacity: 1; } }
 
-.orderer-body { transform-box: view-box; transform-origin: 896px 604px; animation: sway 6s ease-in-out infinite; }
-@keyframes sway { 50% { transform: rotate(1deg); } }
+.orderer-body { transform-box: view-box; transform-origin: 896px 604px; animation: orderer-sway 6s ease-in-out infinite; }
+@keyframes orderer-sway { 50% { transform: rotate(1deg); } }
 .phone-glow { animation: screen-flicker 3s ease-in-out infinite; }
 
 .pendant-cone { fill: url(#cone-light); }
@@ -1407,16 +1407,35 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .town-lights { fill: #FFD38A; }
 .stage:is([data-sky="golden"], [data-sky="sunrise"]) .town-lights { opacity: .3; }
 .rail-blur { position: absolute; left: 0; bottom: 0; height: 26px; background: repeating-linear-gradient(90deg, #15132B 0 30px, #241E48 30px 34px); animation: roll .5s linear infinite; width: 1024px; }
-.stage[data-room="train"] .view-train { animation: sway 4s ease-in-out infinite; }
-.stage[data-room="train"] .rack { animation: sway 4s ease-in-out infinite; }
-@keyframes sway { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.5px); } }
+/* The whole car rocks gently, with a little clack-clack at the rail joints: the room, the TV,
+   the seats and everyone in them move together (the Decorate button stays still). */
+.stage[data-room="train"] { animation: car-rock 4.4s ease-in-out infinite; }
+@keyframes car-rock {
+  0%, 100% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, 0); }
+  10% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .9px); }
+  13% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .25px); }
+  16% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .8px); }
+  35% { transform: translate(-50%, -50%) scale(var(--s)) translate(.35px, .4px); }
+  58% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, 1px); }
+  61% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .3px); }
+  64% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .9px); }
+  84% { transform: translate(-50%, -50%) scale(var(--s)) translate(-.35px, .3px); }
+}
+.stage[data-room="train"] .room-controls { animation: car-steady 4.4s ease-in-out infinite; }
+@keyframes car-steady {
+  0%, 100% { translate: 0 0; }
+  10% { translate: 0 -.9px; } 13% { translate: 0 -.25px; } 16% { translate: 0 -.8px; }
+  35% { translate: -.35px -.4px; }
+  58% { translate: 0 -1px; } 61% { translate: 0 -.3px; } 64% { translate: 0 -.9px; }
+  84% { translate: .35px -.3px; }
+}
 
 .glass.parallax :is(.forest-far, .hills-far) { translate: calc(var(--px, 0) * -3px) calc(var(--py, 0) * -1.5px); }
 .glass.parallax :is(.forest-mid, .hills-near) { translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -2px); }
 .glass.parallax .forest-near { translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -3px); }
 
 @media (prefers-reduced-motion: reduce) {
-  .mist, .owl, .lantern-light, .view-train .scroll, .rail-blur, .stage[data-room="train"] .view-train, .stage[data-room="train"] .rack { animation: none !important; }
+  .mist, .owl, .lantern-light, .view-train .scroll, .rail-blur, .stage[data-room="train"], .stage[data-room="train"] .room-controls { animation: none !important; }
 }
 
 /* ---------- the left wall: TV on a media console, a floating shelf above ---------- */
@@ -1562,9 +1581,6 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @keyframes grow { 50% { transform: scale(1.08, 1.14); } }
 .f-sleepingbag.wriggle { transform-box: fill-box; transform-origin: 50% 100%; animation: wriggle .4s ease-in-out 5; }
 @keyframes wriggle { 50% { transform: rotate(1.5deg) translateY(-1px); } }
-/* The night train sways everyone a little. */
-.stage[data-room="train"] .people-group { animation: train-sway 4s ease-in-out infinite; }
-@keyframes train-sway { 50% { transform: translateY(1.2px); } }
 @media (prefers-reduced-motion: reduce) {
   .person .torso, .bubble, .stage[data-room="train"] .people-group { animation: none !important; }
 }
