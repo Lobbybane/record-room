@@ -162,7 +162,7 @@ function initWandering(stage) {
 
   // Click the floor and the dog trots over (it stays clear of the card and crate on the right).
   stage.addEventListener('click', async (event) => {
-    if (event.target.closest('button, a, input, dialog, .np-card, .tv-set')) return;
+    if (event.target.closest('button, a, input, dialog, .tv-set')) return;
     const point = stagePoint(stage, event);
     // The cat glances toward clicks.
     if (visible(cat) && !catBusy) {
