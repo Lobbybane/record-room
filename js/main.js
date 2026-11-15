@@ -26,11 +26,10 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reduceMotion ?
 // The whole room is always visible; any spare screen space is filled by the
 // wall and floor. CSS gets the screen's edges in stage pixels (--fx, --fy, --fw, --fh).
 // While the Decorate panel is open, the room fits into the space beside or above it.
-// On a phone held upright, the room sits at the top with a big TV and the card below it.
+// On a phone held upright, the room sits at the top with a big TV below it.
 const viewport = stage.parentElement;
 const decorPanel = $('#decor-panel');
 const spacer = $('#scroll-spacer');
-const card = $('.np-card');
 
 function fitStage() {
   const width = viewport.clientWidth;
@@ -58,11 +57,11 @@ function fitStage() {
   stage.style.setProperty('--s', scale);
   stage.style.setProperty('--cx', px(centerX));
   stage.style.setProperty('--cy', px(centerY));
-  // 1px of slack on every side so no hairline shows at the screen edges.
-  stage.style.setProperty('--fx', px(640 - centerX / scale - 1));
-  stage.style.setProperty('--fy', px(410 - centerY / scale - 1));
-  stage.style.setProperty('--fw', px(width / scale + 2));
-  stage.style.setProperty('--fh', px(height / scale + 2));
+  // 2px of slack on every side so no hairline shows at the screen edges (the train rocks).
+  stage.style.setProperty('--fx', px(640 - centerX / scale - 2));
+  stage.style.setProperty('--fy', px(410 - centerY / scale - 2));
+  stage.style.setProperty('--fw', px(width / scale + 4));
+  stage.style.setProperty('--fh', px(height / scale + 4));
 }
 
 // The TV body, or the movie theater's screen.
@@ -92,24 +91,18 @@ function fitPhone(width, height) {
   const tvY = toStageY(tvTop) - box.y * k;
   const tvBottom = tvTop + box.h * scale * k;
 
-  // The now-spinning card goes full width under the TV.
-  const kc = (width - 24) / (320 * scale);
-  const cardTop = tvBottom + 14;
-  const cardX = toStageX(12) - 930;
-  const cardY = toStageY(cardTop) - 652;
-  const contentBottom = cardTop + card.offsetHeight * scale * kc + 20;
+  const contentBottom = tvBottom + 20;
 
   stage.dataset.layout = 'phone';
   stage.style.setProperty('--s', scale);
   stage.style.setProperty('--cx', px(cx));
   stage.style.setProperty('--cy', px(cy));
   stage.style.setProperty('--tv-t', `translate(${px(tvX)}, ${px(tvY)}) scale(${k.toFixed(4)})`);
-  stage.style.setProperty('--card-t', `translate(${px(cardX)}, ${px(cardY)}) scale(${kc.toFixed(4)})`);
   const fullHeight = Math.max(height, contentBottom);
-  stage.style.setProperty('--fx', px(640 - cx / scale - 1));
-  stage.style.setProperty('--fy', px(410 - cy / scale - 1));
-  stage.style.setProperty('--fw', px(width / scale + 2));
-  stage.style.setProperty('--fh', px(fullHeight / scale + 2));
+  stage.style.setProperty('--fx', px(640 - cx / scale - 2));
+  stage.style.setProperty('--fy', px(410 - cy / scale - 2));
+  stage.style.setProperty('--fw', px(width / scale + 4));
+  stage.style.setProperty('--fh', px(fullHeight / scale + 4));
   viewport.classList.toggle('scrolls', contentBottom > height);
   spacer.style.height = px(fullHeight);
 }
@@ -520,18 +513,6 @@ onSleepChange(() => {
   decor.refresh();
 });
 
-$('#np-sleep').addEventListener('click', async () => {
-  const choice = await actionSheet({
-    title: `Sleep timer: ${sleepMinutesLeft()} min left`,
-    actions: [
-      { label: 'Add 15 Minutes', value: 'add' },
-      { label: 'Turn Off Timer', value: 'off', destructive: true },
-    ],
-  });
-  if (choice === 'add') setSleepTimer(sleepMinutesLeft() + 15);
-  if (choice === 'off') setSleepTimer(0);
-});
-
 /* ---------------- volume knob ---------------- */
 
 let volumeTimer = 0;
@@ -764,11 +745,6 @@ const KICKERS = {
   returning: 'Putting it back',
 };
 
-function formatTime(seconds) {
-  const s = Math.max(0, Math.floor(seconds));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-}
-
 const THEATER_KICKERS = { tuning: 'Starting soon', playing: 'Now showing', paused: 'Intermission', error: 'Projector trouble' };
 const RADIO_KICKERS = {
   tuning: 'Tuning in',
@@ -779,103 +755,70 @@ const RADIO_KICKERS = {
 // What the listener sees while the radio plays (data-phase drives their reactions in CSS).
 const RADIO_PHASES = { tuning: 'loading', playing: 'playing', paused: 'paused', error: 'error' };
 
+// Keeps the room in step with what's playing. There's no card on screen: the TV, its knobs,
+// the record on the turntable and the theater's marquee are the controls; a hidden status
+// line tells screen readers what's on.
 function updateCard() {
   const record = recordOf(current);
   const radio = current === null && radioOn && radioPhase !== 'off';
   let shownPhase = current !== null ? phase : (RADIO_PHASES[radioPhase] || 'idle');
   if (asleep && shownPhase !== 'playing') shownPhase = 'idle';
-  stage.dataset.phase = shownPhase; // the listener reacts to this in CSS
+  stage.dataset.phase = shownPhase; // the people react to this in CSS
   stage.dataset.source = current !== null ? 'record' : 'radio';
   stage.classList.toggle('is-on', shownPhase === 'playing');
-  card.classList.toggle('is-live', Boolean(radio) && !theater);
   $('#marquee-title').textContent = theater ? (station.liveTitle || station.name).slice(0, 34) : '';
   updateKnob();
 
+  let status = '';
   if (radio) {
-    $('#np-kicker').textContent = theater ? (THEATER_KICKERS[radioPhase] || 'Now showing') : RADIO_KICKERS[radioPhase];
-    $('#np-title').textContent = station.liveTitle || station.name;
-    $('#np-sub').textContent = radioPhase === 'error' ? 'Pick a record instead'
-      : decor.get('station') === 'auto' ? `${station.by} · Auto` : station.by;
-    $('#np-art').style.backgroundImage = `url(${JSON.stringify(youtubeThumb(station.id))})`;
-  } else {
-    $('#np-kicker').textContent = KICKERS[phase] || '';
-    $('#np-title').textContent = record ? record.title : 'Pick a record';
-    $('#np-sub').textContent = record
-      ? (phase === 'error' ? errorText : record.artist)
-      : 'Open the crate to pick one';
-    $('#np-art').style.backgroundImage = record ? `url(${JSON.stringify(record.cover || youtubeThumb(record.id))})` : '';
+    const kicker = theater ? (THEATER_KICKERS[radioPhase] || 'Now showing') : RADIO_KICKERS[radioPhase];
+    status = `${kicker}: ${station.liveTitle || station.name}`;
+  } else if (record) {
+    status = `${KICKERS[phase] || ''}: ${record.title} by ${record.artist}${phase === 'error' ? `. ${errorText}` : ''}`;
   }
+  const line = $('#np-status');
+  if (line.textContent !== status) line.textContent = status;
 
-  const toggle = $('#np-toggle');
-  const playing = radio ? radioPhase === 'playing' : phase === 'playing';
-  const canToggle = radio ? ['playing', 'paused'].includes(radioPhase) : ['playing', 'paused', 'ended'].includes(phase);
-  toggle.disabled = !canToggle;
-  toggle.classList.toggle('is-playing', playing);
-  toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
-
-  const next = $('#np-next');
-  next.hidden = current !== null;
-  next.textContent = theater ? 'Next showing' : radioOn ? 'Next station' : 'Turn on the radio';
+  const deck = $('#deck-btn');
+  deck.hidden = record === null || busy;
+  if (record) deck.setAttribute('aria-label', `${record.title} by ${record.artist}: put it back, skip or remove`);
+  const next = $('#th-next');
   next.disabled = busy;
-  $('#np-back').hidden = current === null;
-  $('#np-skip').hidden = current === null || queue.length === 0;
-  $('#np-skip').disabled = busy;
-  const upNext = queue.filter((r) => refOfRecord(r));
-  $('#np-upnext').hidden = upNext.length === 0;
-  $('#np-upnext').textContent = upNext.length
-    ? `Up next: ${upNext[0].title}${upNext.length > 1 ? ` (+${upNext.length - 1})` : ''}` : '';
-  const minutes = sleepMinutesLeft();
-  $('#np-sleep').hidden = !minutes;
-  $('#np-sleep-text').textContent = `${minutes}m`;
-  $('#np-sleep').setAttribute('aria-label', `Sleep timer: ${minutes} minutes left`);
-  $('#np-back').disabled = record === null || busy;
-  $('#np-remove').hidden = record === null;
-  $('#np-remove').textContent = 'Remove from crate';
-  $('#np-remove').disabled = busy;
-
-  if (!record) {
-    $('#np-bar').style.width = '0%';
-    $('#np-time').textContent = '0:00';
-  }
+  next.title = next.ariaLabel = theater && !radioOn ? 'Start the showings' : 'Next showing';
 }
 
-setInterval(() => {
-  // Records, and the theater's showings (which aren't live, so they show progress too).
-  const showing = current === null && theater && ['playing', 'paused'].includes(radioPhase);
-  if (!showing && !['playing', 'paused', 'ended'].includes(phase)) return;
-  const { time, duration } = player.progress();
-  $('#np-bar').style.width = duration ? `${Math.min(100, (time / duration) * 100)}%` : '0%';
-  $('#np-time').textContent = duration ? `${formatTime(time)} / ${formatTime(duration)}` : formatTime(time);
-}, 500);
-
-$('#np-toggle').addEventListener('click', () => {
-  const playing = current === null ? radioPhase === 'playing' : phase === 'playing';
-  if (playing) player.pause();
-  else player.play();
+// Tap the record on the turntable: put it back, skip to the next one, or remove it.
+$('#deck-btn').addEventListener('click', async () => {
+  if (busy || current === null) return;
+  const ref = current;
+  const record = recordOf(ref);
+  const upNext = queue.filter((r) => refOfRecord(r));
+  const actions = [{ label: 'Put It Back', value: 'back' }];
+  if (upNext.length) actions.push({ label: `Skip to “${upNext[0].title}”`, value: 'skip' });
+  actions.push({ label: 'Remove from Crate', value: 'remove', destructive: true });
+  const minutes = sleepMinutesLeft();
+  const message = [
+    record.artist,
+    upNext.length > 1 ? `${upNext.length} records up next` : '',
+    minutes ? `Sleep timer: ${minutes} min left` : '',
+  ].filter(Boolean).join(' · ');
+  const choice = await actionSheet({ title: record.title, message, actions });
+  if (busy || current !== ref) return;
+  if (choice === 'back') putBack();
+  if (choice === 'skip') putBack({ advance: true });
+  if (choice === 'remove') {
+    if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
+    await putBack();
+    takeFromCrate(ref.index);
+  }
 });
 
-$('#np-next').addEventListener('click', () => {
+// Tap the theater's marquee for the next showing.
+$('#th-next').addEventListener('click', () => {
   if (busy) return;
   sfx.click();
   if (!radioOn) decor.set('radio', 'on');
   else nextOnDial();
-});
-
-$('#np-back').addEventListener('click', () => {
-  if (!busy) putBack();
-});
-
-$('#np-skip').addEventListener('click', () => {
-  if (!busy) putBack({ advance: true });
-});
-
-$('#np-remove').addEventListener('click', async () => {
-  if (busy || current === null) return;
-  const ref = current;
-  const record = recordOf(ref);
-  if (!await confirmDialog({ title: 'Remove from Crate?', message: `“${record.title}” by ${record.artist}` })) return;
-  await putBack();
-  takeFromCrate(ref.index);
 });
 
 /* ---------------- the record crate ---------------- */

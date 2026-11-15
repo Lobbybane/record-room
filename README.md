@@ -43,7 +43,7 @@ In the repo on GitHub: **Settings → Pages → Build and deployment → Deploy 
 
 | File | What it does |
 | --- | --- |
-| `index.html` | The room: wall, window, shelves, turntable, TV, card |
+| `index.html` | The room: wall, window, shelves, turntable, TV |
 | `css/style.css` | All styling and the animations (weather, train, lights, pets, people, spin, tonearm) |
 | `js/main.js` | Fits the room to the screen, builds the city, runs the crate, the record animation and playback |
 | `js/decor.js` | The Decorate settings: saving and applying them |

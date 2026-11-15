@@ -773,36 +773,10 @@
   </svg>
 
   <!-- Now spinning card -->
-  <section class="np-card" aria-live="polite" aria-label="Now spinning">
-    <div class="np-row">
-      <div class="np-art" id="np-art"></div>
-      <div class="np-text">
-        <div class="np-kicker" id="np-kicker">Turntable’s free</div>
-        <div class="np-title" id="np-title">Pick a record</div>
-        <div class="np-sub" id="np-sub">Click a sleeve, or + to add one</div>
-      </div>
-      <button type="button" class="np-btn np-play" id="np-toggle" aria-label="Play" disabled>
-        <svg class="icon-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5 L19 12 L8 19 Z" fill="currentColor"/></svg>
-        <svg class="icon-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></svg>
-      </button>
-    </div>
-    <p class="np-upnext" id="np-upnext" hidden></p>
-    <div class="np-progress-row">
-      <div class="np-progress"><div class="np-bar" id="np-bar"></div></div>
-      <div class="np-time" id="np-time">0:00</div>
-      <div class="np-live" aria-label="Live"><span class="np-live-dot" aria-hidden="true"></span>LIVE</div>
-    </div>
-    <div class="np-actions">
-      <button type="button" class="np-link" id="np-next" hidden>Next station</button>
-      <button type="button" class="np-link" id="np-back" disabled>Put it back</button>
-      <button type="button" class="np-link" id="np-skip" hidden>Skip</button>
-      <button type="button" class="np-link" id="np-remove" hidden>Remove from shelf</button>
-      <button type="button" class="np-chip" id="np-sleep" hidden>
-        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
-        <span id="np-sleep-text">30m</span>
-      </button>
-    </div>
-  </section>
+  <!-- What's playing, for screen readers (there's no card on screen: the TV and the turntable are the controls) -->
+  <p class="sr-only" id="np-status" aria-live="polite"></p>
+  <!-- Tap the spinning record for Put it back / Skip / Remove -->
+  <button type="button" class="deck-btn" id="deck-btn" aria-label="The record on the turntable" hidden></button>
 
   <!-- Café: pendant lamps over the window bar (click the middle one to switch them) -->
   <svg class="layer cafe-only cafe-pendants" aria-hidden="true" viewBox="0 0 1280 820">
@@ -824,6 +798,8 @@
 
   <!-- Movie theater (data-room="theater"): a layer over the whole room; the big screen,
        the curtains, the card and the controls sit above it. The audience is drawn by js/theater.js. -->
+  <!-- Tap the marquee for the next showing -->
+  <button type="button" class="th-next" id="th-next" aria-label="Next showing" title="Next showing"></button>
   <div class="theater" aria-hidden="true">
     <div class="th-wall full-screen"></div>
     <div class="th-floor"></div>
