@@ -71,6 +71,7 @@ Bobby said not to wait between features; still commit and push after each one so
 - End every reply with a link to the live site: https://lobbybane.github.io/record-room/
 - His projects share a consistent look with animated backgrounds that change with holiday themes; keep that in mind here.
 - Commit on a branch and open a pull request unless he asks to push straight to `main`.
+- Don't schedule check-ins or reminders to follow up on pull requests; Bobby handles reviewing and merging them himself.
 
 ## Ideas list (not built yet)
 
