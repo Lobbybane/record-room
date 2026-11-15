@@ -174,8 +174,6 @@
     <span class="clock-label">study</span>
   </button>
 
-  <!-- The people in this room, watching the TV (drawn by js/people.js from js/groups.js) -->
-  <div id="people"></div>
 
   <!-- Curtains and window frame -->
   <div class="curtain-rod"></div>
@@ -703,6 +701,10 @@
   </svg>
 
   <!-- The media console on the left wall; the TV sits on it -->
+  <!-- The people in this room, watching the TV (drawn by js/people.js from js/groups.js).
+       They come after the cabinet and café counter, so anyone walking past those is in front. -->
+  <div id="people"></div>
+
   <svg class="layer tv-console" aria-hidden="true" viewBox="0 0 1280 820">
     <rect x="10" y="444" width="324" height="14" rx="4" fill="#8A5A44"/>
     <rect x="16" y="456" width="312" height="128" rx="4" fill="#6E4636"/>
