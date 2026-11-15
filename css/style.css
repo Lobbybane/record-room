@@ -1328,21 +1328,24 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* ---------- living pets (js/life.js) ---------- */
 .dog-cushion { position: absolute; left: 60px; top: 712px; z-index: 5; display: none; overflow: visible; }
 .stage[data-pet="dog"] .dog-cushion { display: block; }
-.pet-stand { display: none; }
-.pet.standing .pet-stand { display: inline; }
-.pet.standing .pet-lying { display: none; }
+/* Standing and lying crossfade, with a small rise and settle, so getting up and lying down never snap. */
+.pet-stand, .pet-lying { transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .38s ease, transform .45s cubic-bezier(.3, .7, .4, 1); }
+.pet-stand { opacity: 0; transform: scale(1.04, .8); }
+.pet.standing .pet-stand { opacity: 1; transform: none; }
+.pet.standing .pet-lying { opacity: 0; transform: scale(.96, 1.12); }
 .pet .leg { transform-box: fill-box; transform-origin: 50% 0; }
 .pet.walking .leg-a { animation: step .5s ease-in-out infinite; }
 .pet.walking .leg-b { animation: step .5s ease-in-out infinite reverse; }
 .pet-dog.walking .leg-a, .pet-dog.walking .leg-b { animation-duration: .36s; }
-@keyframes step { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+/* Each step starts and ends with the leg straight, so stopping never jumps. */
+@keyframes step { 0%, 50%, 100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
 .pet.standing .stand-tail { animation: wag 1.2s ease-in-out infinite; }
 .pet-dog.standing .stand-tail { animation-duration: .3s; }
 /* A long stretch before setting off. */
 .pet.stretching .stand-body { animation: stretch 1.4s ease-in-out; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes stretch { 30%, 70% { transform: scale(1.12, .82); } }
 /* Looking toward a click. */
-.pet-cat .pet-head { transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
+.pet-cat .pet-head { transition: transform .7s cubic-bezier(.35, .1, .25, 1); }
 .pet-cat.look-left:not(.awake) .pet-head { transform: rotate(-12deg) translate(-2px, -3px); }
 .pet-cat.look-right:not(.awake) .pet-head { transform: rotate(12deg) translate(3px, -4px); }
 
@@ -1502,7 +1505,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* The study timer: the studier reads while you focus, and has tea on breaks. */
 .person .study-book, .person .study-tea { display: none; }
 .stage[data-study="focus"] .person.studier .study-book, .stage[data-study="break"] .person.studier .study-tea { display: inline; }
-.stage[data-study] .person.studier .own-hold { display: none; }
+.stage[data-study] .person.studier :is(.own-hold, .lap-hold) { display: none; }
 .stage[data-study="focus"] .person.studier .head { animation: none; transform: rotate(-8deg); }
 /* A holiday hat replaces anyone's own hat. */
 .stage:not([data-hat="none"]) .person .own-hat { display: none; }
@@ -1527,49 +1530,76 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .holiday-shelf { z-index: 2; }
 
 /* ---------- lively people (js/life-people.js) ---------- */
-.person .head-turn { transform-box: fill-box; transform-origin: 50% 50%; transition: transform .35s ease; }
+/* Smooth curves shared by the moments below. */
+.person .head-turn { transform-box: fill-box; transform-origin: 50% 50%; transition: transform .2s cubic-bezier(.3, .7, .4, 1); }
 .person.turned .head-turn { transform: scaleX(-1); }
 .person .mouth-open { display: none; }
-.person.talking .mouth { animation: talk-shut .34s steps(1) infinite; }
-.person.talking .mouth-open { display: inline; animation: talk-open .34s steps(1) infinite; }
+.person.talking .mouth { animation: talk-shut .3s steps(1) infinite; }
+.person.talking .mouth-open { display: inline; animation: talk-open .3s steps(1) infinite; }
 @keyframes talk-shut { 50% { opacity: 0; } }
 @keyframes talk-open { 0% { opacity: 0; } 50% { opacity: 1; } }
 .person.blink .eye-open { display: none; }
 .person.blink .eye-closed { display: inline; }
-.person .torso { transform-box: fill-box; transform-origin: 50% 100%; animation: p-breathe 4.2s ease-in-out infinite; animation-delay: var(--d); }
-@keyframes p-breathe { 50% { transform: scale(1.015, 1.03); } }
-/* The arm pivots at the shoulder (a wrapper puts the shoulder at the local origin). */
-.person .arm { transform-box: view-box; transform-origin: 0 0; }
-.person.sip .arm { animation: arm-sip 2.6s ease-in-out; }
-@keyframes arm-sip { 30%, 72% { transform: rotate(62deg); } }
-.person.wave .arm { animation: arm-wave 1.6s ease-in-out; }
-@keyframes arm-wave { 20%, 50%, 80% { transform: rotate(150deg); } 35%, 65% { transform: rotate(125deg); } }
-.person.stretch .arm { animation: arm-stretch 2.6s ease-in-out; }
-@keyframes arm-stretch { 30%, 70% { transform: rotate(165deg); } }
-.person.type .arm { animation: arm-type .18s ease-in-out 14; }
-@keyframes arm-type { 50% { transform: rotate(5deg); } }
-.person.scroll .arm { animation: arm-scroll .7s ease-in-out 4; }
-@keyframes arm-scroll { 50% { transform: rotate(-6deg); } }
-.person.fan .arm { animation: arm-fan .3s ease-in-out 8; }
-@keyframes arm-fan { 50% { transform: rotate(40deg); } }
-.person.pour .arm { animation: arm-pour 1.8s ease-in-out; }
-@keyframes arm-pour { 25%, 75% { transform: rotate(-22deg); } }
-.person.warm .arm { transform: rotate(45deg); transition: transform .6s ease; }
+/* Breathing: small, slow, and out of step from person to person. */
+.person .torso { transform-box: fill-box; transform-origin: 50% 100%; animation: p-breathe 5s ease-in-out infinite; animation-delay: calc(var(--d) * -6); }
+@keyframes p-breathe { 50% { transform: scale(1.008, 1.018); } }
+/* The arm pivots at the shoulder (a wrapper puts the shoulder at the local origin).
+   Lap items (laptop, popcorn bucket, book) sit outside the arm and never move with it. */
+.person .arm { transform-box: view-box; transform-origin: 0 0; transition: transform .7s cubic-bezier(.45, .05, .55, .95); }
+.person .kernel-hand { display: none; }
+/* Sip: lift to the mouth, a short drink with the head tipped back, then a slow lower. */
+.person.sip .arm { animation: arm-sip 2.8s cubic-bezier(.45, .05, .55, .95) both; }
+@keyframes arm-sip { 0%, 100% { transform: rotate(0); } 28% { transform: rotate(50deg); } 36%, 62% { transform: rotate(54deg); } }
+.person.sip .head { animation: head-sip 2.8s ease-in-out both !important; }
+@keyframes head-sip { 0%, 100% { transform: rotate(0); } 34%, 62% { transform: rotate(6deg); } }
+/* Typing: only the hand taps, in little bursts; the laptop stays put. */
+.person.type .arm { animation: arm-type 2.6s ease-in-out both; }
+@keyframes arm-type {
+  0%, 30%, 36%, 66%, 72%, 100% { transform: rotate(0); }
+  5%, 15%, 25%, 41%, 51%, 61%, 77%, 87% { transform: rotate(2.2deg); }
+  10%, 20%, 46%, 56%, 82%, 92% { transform: rotate(.4deg); }
+}
+.person.type .head { animation: head-read 2.6s ease-in-out both !important; }
+/* Scrolling a phone or reading: a small thumb or page flick, eyes down. */
+.person.scroll .arm { animation: arm-scroll 2.6s ease-in-out both; }
+@keyframes arm-scroll { 0%, 30%, 65%, 100% { transform: rotate(0); } 20%, 55% { transform: rotate(-3deg); } }
+.person.scroll .head { animation: head-read 2.6s ease-in-out both !important; }
+@keyframes head-read { 0%, 100% { transform: rotate(0); } 25%, 75% { transform: rotate(-5deg); } }
+/* Popcorn: dip into the bucket, kernel to the mouth, hand back. */
+.person.munch .arm { animation: arm-munch 2.2s ease-in-out both; }
+@keyframes arm-munch { 0%, 100% { transform: rotate(0); } 18% { transform: rotate(-10deg); } 45%, 58% { transform: rotate(52deg); } }
+.person.munch .kernel-hand { display: inline; animation: kernel-show 2.2s steps(1) both; }
+@keyframes kernel-show { 0% { opacity: 0; } 18% { opacity: 1; } 58% { opacity: 0; } }
+/* Wave, stretch and fan: slow in, a gentle overshoot, and a settle. */
+.person.wave .arm { animation: arm-wave 2s cubic-bezier(.45, .05, .55, .95) both; }
+@keyframes arm-wave { 0%, 100% { transform: rotate(0); } 22%, 50%, 78% { transform: rotate(140deg); } 36%, 64% { transform: rotate(122deg); } }
+.person.stretch .arm { animation: arm-stretch 2.8s cubic-bezier(.45, .05, .55, .95) both; }
+@keyframes arm-stretch { 0%, 100% { transform: rotate(0); } 35%, 65% { transform: rotate(160deg); } 50% { transform: rotate(166deg); } }
+.person.stretch .bodywrap { animation: body-stretch 2.8s ease-in-out both; }
+@keyframes body-stretch { 0%, 100% { transform: none; } 35%, 65% { transform: translateY(-1.5px); } }
+.person.fan .arm { animation: arm-fan 2.4s ease-in-out both; }
+@keyframes arm-fan { 0%, 100% { transform: rotate(0); } 12%, 32%, 52%, 72% { transform: rotate(30deg); } 22%, 42%, 62% { transform: rotate(14deg); } }
+.person.pour .arm { animation: arm-pour 1.8s ease-in-out both; }
+@keyframes arm-pour { 0%, 100% { transform: rotate(0); } 25%, 75% { transform: rotate(-22deg); } }
+.person.warm .arm { transform: rotate(40deg); }
 .person .bodywrap { transform-box: view-box; transform-origin: 0 0; }
-.person.laugh .bodywrap { animation: p-laugh .22s ease-in-out 7; }
-@keyframes p-laugh { 50% { transform: translateY(-1.6px); } }
-.person.shiver .bodywrap { animation: p-shiver .1s linear 18; }
-@keyframes p-shiver { 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
-.person.groove .bodywrap { animation: p-groove .5s ease-in-out 8; }
-@keyframes p-groove { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
-/* Getting up and walking. */
-.person.away { display: none; }
-.person.walker { display: none; }
+/* A laugh: a few bounces that die away. */
+.person.laugh .bodywrap { animation: p-laugh 1.4s ease-out both; }
+@keyframes p-laugh { 0%, 18%, 38%, 58%, 78%, 100% { transform: none; } 8% { transform: translateY(-2px); } 28% { transform: translateY(-1.5px); } 48% { transform: translateY(-1px); } 68% { transform: translateY(-.5px); } }
+.person.shiver .bodywrap { animation: p-shiver .1s linear 16; }
+@keyframes p-shiver { 25% { transform: translateX(-.7px); } 75% { transform: translateX(.7px); } }
+.person.groove .bodywrap { animation: p-groove .64s ease-in-out 6; }
+@keyframes p-groove { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+/* Getting up and walking: the seated person and their standing copy crossfade. */
+.person { transition: opacity .3s ease; }
+.person.away { opacity: 0; }
+.person.walker { display: none; opacity: 0; }
 .person.walker.out { display: inline; }
+.person.walker.shown { opacity: 1; }
 .person .leg { transform-box: fill-box; transform-origin: 50% 0; }
-.person.walking .leg-near { animation: p-step .5s ease-in-out infinite; }
-.person.walking .leg-far { animation: p-step .5s ease-in-out infinite reverse; }
-@keyframes p-step { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+.person.walking .leg-near { animation: p-step .52s ease-in-out infinite; }
+.person.walking .leg-far { animation: p-step .52s ease-in-out infinite reverse; }
+@keyframes p-step { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
 .person.walking .head { animation: none !important; }
 /* Speech bubbles. */
 .bubble { animation: bubble-in .25s cubic-bezier(.3, 1.6, .5, 1); transform-box: fill-box; transform-origin: 50% 100%; }
@@ -1687,24 +1717,26 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 /* ---------- the theater audience (js/theater.js) ---------- */
 .audience { pointer-events: none; }
-.viewer .face, .viewer .hand, .viewer .phone-light { display: none; }
+.viewer .face, .viewer .hand { display: none; }
+.viewer .phone-light { opacity: 0; transition: opacity .5s ease; }
 .viewer.late { display: none; }
 .viewer .bob, .viewer { transform-box: fill-box; }
 .viewer .bob { transform-origin: 50% 100%; }
-.viewer.laugh .bob { animation: p-laugh .2s ease-in-out 8; }
+.viewer.laugh .bob { animation: p-laugh 1.4s ease-out both; }
 .viewer.turn-l .face-l, .viewer.turn-r .face-r { display: inline; }
 .viewer.lean-l .bob { transform: rotate(-7deg); transition: transform .3s ease; }
 .viewer.lean-r .bob { transform: rotate(7deg); transition: transform .3s ease; }
 .viewer.lean-back .bob { transform: translateY(-3px) scale(.97); transition: transform .2s ease; }
 .viewer.munch .hand, .viewer.raise .hand { display: inline; }
-.viewer.munch .hand { animation: munch .9s ease-in-out 2; transform-box: fill-box; transform-origin: 50% 100%; }
-@keyframes munch { 0%, 100% { transform: translateY(18px); } 50% { transform: translateY(0) rotate(-14deg); } }
+.viewer.munch .hand { animation: munch 1.8s ease-in-out both; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes munch { 0%, 100% { transform: translateY(22px); opacity: 0; } 12% { opacity: 1; } 25% { transform: translateY(14px); } 55%, 68% { transform: translateY(0) rotate(-14deg); } 88% { opacity: 1; } }
 .viewer.raise .hand { transform: translateY(-14px) rotate(-10deg); transform-box: fill-box; }
-.viewer.phone .phone-light { display: inline; opacity: .35; animation: glow-flicker 1.6s ease-in-out infinite; }
+.viewer.phone .phone-light { opacity: .35; animation: glow-flicker 1.6s ease-in-out infinite; }
 .kernel-fly { fill: #FFF3C4; animation: fly 800ms cubic-bezier(.3, -.5, .7, 1) forwards; }
 .figure-usher .flashlight { animation: glow-flicker 2s ease-in-out infinite; }
 .stage[data-room="theater"] .viewer .own-hat { display: inline; }
 .stage[data-room="theater"]:not([data-hat="none"]) .viewer .own-hat { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .viewer.laugh .bob, .viewer.munch .hand, .viewer.phone .phone-light { animation: none; }
+  .pet-stand, .pet-lying, .pet-cat .pet-head, .person, .person .arm, .head-turn { transition: none; }
 }

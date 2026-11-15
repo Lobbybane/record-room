@@ -37,6 +37,10 @@ function stagePoint(stage, event) {
   return { x: (event.clientX - rect.left) / scale, y: (event.clientY - rect.top) / scale };
 }
 
+// For testing: petNow('cat') starts a stroll, petNow('dog') a trick.
+let petMoves = null;
+export const petNow = (kind) => petMoves?.[kind]?.();
+
 function initWandering(stage) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const cat = stage.querySelector('.pet-cat');
@@ -48,31 +52,67 @@ function initWandering(stage) {
   let lookTimer = 0;
 
   const visible = (pet) => getComputedStyle(pet).display !== 'none';
+  const facing = new Map([[cat, 1], [dog, 1]]); // 1 = facing left, as drawn; -1 = facing right
+  const pose = (pet, extra = '') => `translateX(${pos.get(pet)}px) ${extra} scaleX(${facing.get(pet)})`;
 
-  // Moves a pet by dx stage pixels, facing the way it walks (both are drawn facing left).
+  // Runs a Web Animation, then writes its end state into the style so cancelling it can't jump.
+  async function play(pet, frames, options, end) {
+    const anim = pet.animate(frames, { fill: 'forwards', ...options });
+    try { await anim.finished; } catch { /* cancelled */ }
+    pet.style.transform = end;
+    anim.cancel();
+  }
+
+  // Turns round smoothly: the pet narrows to a side-on view and dips a little as it turns.
+  async function turn(pet, to) {
+    const from = facing.get(pet);
+    if (from === to) return;
+    const x = pos.get(pet);
+    facing.set(pet, to);
+    await play(pet, [
+      { transform: `translateX(${x}px) translateY(0) scaleX(${from})` },
+      { transform: `translateX(${x}px) translateY(2px) scaleX(${from * 0.12})`, offset: 0.5 },
+      { transform: `translateX(${x}px) translateY(0) scaleX(${to})` },
+    ], { duration: 380, easing: 'ease-in-out' }, pose(pet));
+  }
+
+  // Getting up: the lying pose fades into the standing one (see css/style.css).
+  async function getUp(pet) {
+    if (pet.classList.contains('standing')) return;
+    pet.classList.add('standing');
+    await sleep(420);
+  }
+
+  // Walks to x, easing in and out. The time is rounded to whole leg steps so the legs
+  // finish where they started instead of snapping back.
   async function walk(pet, to, speed) {
     const from = pos.get(pet);
     if (Math.abs(to - from) < 2) return;
-    const facing = to > from ? -1 : 1;
-    pet.classList.add('standing', 'walking');
-    const duration = (Math.abs(to - from) / speed) * 1000;
-    await pet.animate([
-      { transform: `translateX(${from}px) scaleX(${facing})` },
-      { transform: `translateX(${to}px) scaleX(${facing})` },
-    ], { duration, easing: 'linear', fill: 'forwards' }).finished;
+    await getUp(pet);
+    await turn(pet, to > from ? -1 : 1);
+    const stepMs = pet === dog ? 360 : 500;
+    const duration = Math.max(2, Math.round((Math.abs(to - from) / speed) * 1250 / stepMs)) * stepMs;
+    pet.classList.add('walking');
+    const f = facing.get(pet);
     pos.set(pet, to);
+    await play(pet, [
+      { transform: `translateX(${from}px) scaleX(${f})` },
+      { transform: `translateX(${to}px) scaleX(${f})` },
+    ], { duration, easing: 'cubic-bezier(.45, .05, .55, .95)' }, pose(pet));
     pet.classList.remove('walking');
   }
 
-  function settle(pet) {
-    const x = pos.get(pet);
-    pet.getAnimations().forEach((a) => a.cancel());
-    pet.style.transform = `translateX(${x}px)`;
-    pet.classList.remove('standing', 'walking', 'stretching');
+  // Lying back down: face left again, then settle (standing fades into lying).
+  async function lieDown(pet) {
+    pet.classList.remove('walking');
+    await turn(pet, 1);
+    pet.classList.remove('standing', 'stretching');
+    await sleep(500);
   }
 
   async function stretch(pet) {
-    pet.classList.add('standing', 'stretching');
+    await getUp(pet);
+    pet.classList.add('stretching');
     await sleep(1400);
     pet.classList.remove('stretching');
   }
@@ -87,12 +127,12 @@ function initWandering(stage) {
       await sleep(between(1200, 2600));
       await walk(cat, 0, 45);
     } finally {
-      settle(cat);
+      await lieDown(cat);
       catBusy = false;
     }
   }
 
-  // The dog chases its tail, or stretches, then lies down again.
+  // The dog chases its tail (two eased spins with little hops), or stretches, then lies down again.
   async function dogTrick() {
     if (dogBusy || !visible(dog) || document.hidden) return;
     dogBusy = true;
@@ -100,20 +140,25 @@ function initWandering(stage) {
       if (Math.random() < 0.5) {
         await stretch(dog);
       } else {
-        dog.classList.add('standing');
-        const x = pos.get(dog);
-        const frames = [];
-        for (let i = 0; i <= 6; i++) {
-          frames.push({ transform: `translate(${x}px, ${i % 2 ? -6 : 0}px) scaleX(${i % 2 ? -1 : 1})` });
+        await getUp(dog);
+        for (let i = 0; i < 4; i++) {
+          const from = facing.get(dog);
+          const x = pos.get(dog);
+          facing.set(dog, -from);
+          await play(dog, [
+            { transform: `translateX(${x}px) translateY(0) scaleX(${from})` },
+            { transform: `translateX(${x}px) translateY(-6px) scaleX(${from * 0.12})`, offset: 0.5 },
+            { transform: `translateX(${x}px) translateY(0) scaleX(${-from})` },
+          ], { duration: 420, easing: 'ease-in-out' }, pose(dog));
         }
-        await dog.animate(frames, { duration: 1800, easing: 'ease-in-out' }).finished;
       }
       await sleep(600);
     } finally {
-      settle(dog);
+      await lieDown(dog);
       dogBusy = false;
     }
   }
+  petMoves = { cat: catStroll, dog: dogTrick };
 
   // Click the floor and the dog trots over (it stays clear of the card and crate on the right).
   stage.addEventListener('click', async (event) => {
@@ -134,14 +179,14 @@ function initWandering(stage) {
       const target = Math.round(Math.min(600, Math.max(0, point.x - 145)));
       await walk(dog, target, 160);
     } finally {
-      settle(dog);
+      await lieDown(dog);
       dogBusy = false;
     }
     // After a while it goes back to its cushion.
     dogAway = setTimeout(async () => {
       if (dogBusy) return;
       dogBusy = true;
-      try { await walk(dog, 0, 110); } finally { settle(dog); dogBusy = false; }
+      try { await walk(dog, 0, 110); } finally { await lieDown(dog); dogBusy = false; }
     }, 20000);
   });
 

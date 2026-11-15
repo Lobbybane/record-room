@@ -142,6 +142,19 @@ function head(p) {
 }
 
 // Something held in the near hand (hand at about -24,-15).
+const LAP_ITEMS = new Set(['laptop', 'popcorn', 'book']);
+export const isLapItem = (item) => LAP_ITEMS.has(item);
+
+/** Puts an item in a drawn person's lap or hand (whichever suits it). */
+export function setHold(el, item) {
+  const lap = isLapItem(item);
+  const lapSlot = el.querySelector('.lap-hold');
+  const handSlot = el.querySelector('.own-hold');
+  if (lapSlot) lapSlot.innerHTML = lap ? held(item) : '';
+  if (handSlot) handSlot.innerHTML = lap ? '' : held(item);
+  el.dataset.hold = item || '';
+}
+
 export function held(item) {
   switch (item) {
     case 'mug': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F7A9C8"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F7A9C8" stroke-width="2"/>';
@@ -194,22 +207,26 @@ export function personSvg(p, i, extraClass = '') {
   const scarfColor = extras.find((e) => e.startsWith('scarf'))?.split(':')[1];
   const lean = pose === 'recline' ? 26 : pose === 'floor' ? -4 : 0;
   const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', extraClass].join(' ');
-  const study = p.studier
-    ? `<g class="study-book">${held('book')}</g><g class="study-tea">${held('mug')}</g>`
-    : '';
+  // Lap items (laptop, popcorn bucket, book) rest on the lap and never move with the arm;
+  // hand items (drinks, phone, can…) are in the hand and go wherever it goes.
+  const onLap = isLapItem(p.hold);
   // The arm pivots at the shoulder (2, -42) so it can lift a drink, wave or type.
   const upper = `<g class="bodywrap"><g transform="rotate(${lean})">
       <g class="torso">${torso(topStyle, topColor, p)}</g>
       ${scarfColor ? scarf(scarfColor) : ''}
       ${head(p)}
+      <g class="lap-hold">${onLap ? held(p.hold) : ''}</g>
+      ${p.studier ? `<g class="study-book">${held('book')}</g>` : ''}
       <g transform="translate(2 -42)"><g class="arm"><g transform="translate(-2 42)">
-        <g class="own-hold">${held(p.hold)}</g>${study}
+        <g class="own-hold">${onLap ? '' : held(p.hold)}</g>
+        ${p.studier ? `<g class="study-tea">${held('mug')}</g>` : ''}
         ${arm(topColor, pose, p.hold || p.studier || p.carries).replace('__SKIN__', skin)}
+        <circle class="kernel-hand" cx="-25" cy="-19" r="2.6" fill="#FFF3C4"/>
       </g></g></g>
     </g></g>`;
   const fx = `<g class="zz"><text x="10" y="-92">z</text><text x="20" y="-104">z</text></g>`
     + (p.core && i === 0 ? '<g class="huh"><circle cx="8" cy="-104" r="11" fill="#F4ECFF"/><text x="8" y="-99" text-anchor="middle">?</text></g>' : '');
-  return `<g class="${classes}" data-pid="${pid}" data-y="${p.z ?? p.y}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
+  return `<g class="${classes}" data-pid="${pid}" data-y="${p.z ?? p.y}" data-hold="${p.hold || ''}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
     ${legs(pose, p.legs || '#3B3F78', p.shoes)}${skirt(topStyle, topColor, pose)}${upper}${fx}</g>`;
 }
 

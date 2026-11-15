@@ -165,12 +165,18 @@ function travel(el, points, speed = 90) {
     const next = () => {
       if (i >= points.length - 1) { resolve(); return; }
       const [x1, y1, s1] = points[i]; const [x2, y2, s2] = points[i + 1];
-      const dur = Math.max(200, (Math.hypot(x2 - x1, y2 - y1) / speed) * 1000);
+      const ends = (i === 0 ? 1.2 : 1) * (i === points.length - 2 ? 1.2 : 1);
+      const dur = Math.max(200, (Math.hypot(x2 - x1, y2 - y1) / speed) * 1000 * ends);
       const start = performance.now();
       const step = (now) => {
-        const t = Math.min(1, (now - start) / dur);
+        const raw = Math.min(1, (now - start) / dur);
+        // Ease only at the very start and the very end of the whole path.
+        const first = i === 0; const last = i === points.length - 2;
+        const t = first && last ? 0.5 - 0.5 * Math.cos(Math.PI * raw)
+          : first ? 1 - Math.cos(raw * Math.PI / 2) : last ? Math.sin(raw * Math.PI / 2) : raw;
         const x = x1 + (x2 - x1) * t; const y = y1 + (y2 - y1) * t; const s = s1 + (s2 - s1) * t;
-        const bob = Math.abs(Math.sin(t * dur / 160)) * -2 * s;
+        const soft = Math.min(1, (first ? raw : 1) * 5, (last ? 1 - raw : 1) * 5);
+        const bob = Math.abs(Math.sin((now - start) / 280 * Math.PI)) * -1.8 * s * soft;
         el.setAttribute('transform', `translate(${x.toFixed(1)} ${(y + bob).toFixed(1)}) scale(${s.toFixed(3)})`);
         if (t < 1) requestAnimationFrame(step);
         else { i++; next(); }
