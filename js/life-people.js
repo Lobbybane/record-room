@@ -11,7 +11,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const NS = 'http://www.w3.org/2000/svg';
 const OFFSTAGE = 1330;        // where people walk off to (behind the card, on the right)
 const TV_EDGE = 380;          // bubbles stay right of the TV (people-group units)
-const CARD_EDGE = 860;        // ...and left of the now-playing card
+const CARD_EDGE = 1000;       // ...and clear of the right edge of the room
 
 let stage = null;
 let scene = null;             // { room, root, group }
@@ -369,6 +369,7 @@ async function visitor() {
   const gen = generation;
   const look = typeof v.look === 'function' ? v.look(stage) : v.look;
   const p = { ...look, pose: 'stand', x: OFFSTAGE, y: v.y, s: v.s || 1.4, pid: 'v' };
+  if (v.order) { p.hold = ''; p.carries = true; } // picks up their order on the way in
   const holder = document.createElementNS(NS, 'g');
   holder.innerHTML = personSvg(p, 7, 'visitor');
   const el = holder.firstElementChild;
@@ -378,7 +379,17 @@ async function visitor() {
   const before = [...scene.root.children].find((c) => Number(c.dataset.y) > v.y);
   scene.root.insertBefore(el, before || null);
   try {
-    await walkTo(el, { x: OFFSTAGE, y: v.y, s: p.s }, v.x);
+    if (v.order) {
+      await walkTo(el, { x: OFFSTAGE, y: v.y, s: p.s }, v.order.x);
+      if (gen !== generation) return;
+      await wait(1600);
+      setHold(el, v.order.item);
+      await wait(700);
+      if (gen !== generation) return;
+      await walkTo(el, { x: v.order.x, y: v.y, s: p.s }, v.x);
+    } else {
+      await walkTo(el, { x: OFFSTAGE, y: v.y, s: p.s }, v.x);
+    }
     if (gen !== generation) return;
     if (v.effect) effect(v.effect, { ...p, x: v.x });
     const host = present().sort((a, b) => Math.abs(dataOf(a).x - v.x) - Math.abs(dataOf(b).x - v.x))[0];
@@ -393,7 +404,8 @@ async function visitor() {
       }
       await wait(200);
     }
-    await act(el, 'wave');
+    // Only an empty hand waves (a full one would fling its drink).
+    if (!el.dataset.hold) await act(el, 'wave');
     if (gen !== generation) return;
     await walkTo(el, { x: v.x, y: v.y, s: p.s }, OFFSTAGE);
   } finally {

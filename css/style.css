@@ -1451,7 +1451,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 /* ---------- the people (js/people.js) ---------- */
 .people { pointer-events: none; }
-.person .head { transform-box: fill-box; transform-origin: 55% 92%; transition: transform .8s ease; }
+.person .head { transform-box: view-box; transform-origin: -.5px -45px; transition: transform .8s ease; }
 .stage.is-on .person .head { animation: p-bob .9s ease-in-out infinite; animation-delay: var(--d); }
 @keyframes p-bob { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-7deg) translateY(1px); } }
 .person .eye-closed { display: none; }
@@ -1494,7 +1494,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 /* ---------- lively people (js/life-people.js) ---------- */
 /* Smooth curves shared by the moments below. */
-.person .head-turn { transform-box: fill-box; transform-origin: 50% 50%; transition: transform .2s cubic-bezier(.3, .7, .4, 1); }
+/* Heads turn and nod around the neck (x -0.5), so the neck never leaves the shoulders. */
+.person .head-turn { transform-box: view-box; transform-origin: -.5px -50px; transition: transform .2s cubic-bezier(.3, .7, .4, 1); }
 .person.turned .head-turn { transform: scaleX(-1); }
 .person .mouth-open { display: none; }
 .person.talking .mouth { animation: talk-shut .3s steps(1) infinite; }
@@ -1509,10 +1510,18 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* The arm pivots at the shoulder (a wrapper puts the shoulder at the local origin).
    Lap items (laptop, popcorn bucket, book) sit outside the arm and never move with it. */
 .person .arm { transform-box: view-box; transform-origin: 0 0; transition: transform .7s cubic-bezier(.45, .05, .55, .95); }
+/* The forearm turns at the elbow and the hand's item at the wrist (pivots set in people.js). */
+.person :is(.forearm, .wrist) { transform-box: view-box; transform-origin: 0 0; }
 .person .kernel-hand { display: none; }
 /* Sip: lift to the mouth, a short drink with the head tipped back, then a slow lower. */
+/* Sip: the elbow lifts, the forearm brings the cup up to the mouth, and the cup tips
+   toward the lips at the wrist, then everything lowers again. */
 .person.sip .arm { animation: arm-sip 2.8s cubic-bezier(.45, .05, .55, .95) both; }
-@keyframes arm-sip { 0%, 100% { transform: rotate(0); } 28% { transform: rotate(50deg); } 36%, 62% { transform: rotate(54deg); } }
+.person.sip .forearm { animation: forearm-sip 2.8s cubic-bezier(.45, .05, .55, .95) both; }
+.person.sip .wrist { animation: wrist-sip 2.8s cubic-bezier(.45, .05, .55, .95) both; }
+@keyframes arm-sip { 0%, 100% { transform: rotate(0); } 30%, 66% { transform: rotate(28deg); } }
+@keyframes forearm-sip { 0%, 100% { transform: rotate(0); } 30%, 66% { transform: rotate(73deg); } }
+@keyframes wrist-sip { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-74deg); } 40%, 58% { transform: rotate(-64deg); } 66% { transform: rotate(-74deg); } }
 .person.sip .head { animation: head-sip 2.8s ease-in-out both !important; }
 @keyframes head-sip { 0%, 100% { transform: rotate(0); } 34%, 62% { transform: rotate(6deg); } }
 /* Typing: only the hand taps, in little bursts; the laptop stays put. */

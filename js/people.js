@@ -179,13 +179,25 @@ export function held(item) {
   }
 }
 
-function arm(color, pose, item) {
+// The arm in two parts: the upper arm turns at the shoulder (2, -42) and the forearm at the
+// elbow, so a drink can come up to the mouth instead of swinging up on a straight arm.
+// What's in the hand turns at the wrist, so a cup can tip toward the mouth.
+function arm(color, pose, item, skin, inHand) {
   const edge = tint(color, -0.22);
-  const path = pose === 'stand' && !item ? 'M2 -42 L-2 -16 L-4 -2' : 'M2 -42 L-4 -18 L-22 -15';
-  const hand = pose === 'stand' && !item ? [-4, 0] : [-24, -15];
-  return `<path d="${path}" fill="none" stroke="${edge}" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`
-    + `<circle cx="${hand[0]}" cy="${hand[1]}" r="4" fill="__SKIN__"/>`;
+  const down = pose === 'stand' && !item;
+  const [ex, ey] = down ? [-2, -16] : [-4, -18];
+  const [hx, hy] = down ? [-4, 0] : [-24, -15];
+  const [px, py] = down ? [-4, -2] : [-22, -15];
+  const line = (d, stroke, w) => `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const upper = `M2 -42 L${ex} ${ey}`;
+  const fore = `M${ex} ${ey} L${px} ${py}`;
+  const pivot = (x, y, cls, body) => `<g transform="translate(${x} ${y})"><g class="${cls}"><g transform="translate(${-x} ${-y})">${body}</g></g></g>`;
+  return line(upper, edge, 11)
+    + pivot(ex, ey, 'forearm', pivot(hx, hy, 'wrist', inHand)
+      + line(fore, edge, 11) + line(fore, color, 8)
+      + `<circle cx="${hx}" cy="${hy}" r="4" fill="${skin}"/>`
+      + '<circle class="kernel-hand" cx="-25" cy="-19" r="2.6" fill="#FFF3C4"/>')
+    + line(upper, color, 8);
 }
 
 const scarf = (c) => `<path d="M-10 -50 Q2 -42 12 -50 L13 -44 Q2 -36 -11 -44 Z" fill="${c}"/><path d="M-6 -44 L-10 -24 L-3 -23 L0 -42 Z" fill="${tint(c, -0.15)}"/>`;
@@ -218,10 +230,8 @@ export function personSvg(p, i, extraClass = '') {
       <g class="lap-hold">${onLap ? held(p.hold) : ''}</g>
       ${p.studier ? `<g class="study-book">${held('book')}</g>` : ''}
       <g transform="translate(2 -42)"><g class="arm"><g transform="translate(-2 42)">
-        <g class="own-hold">${onLap ? '' : held(p.hold)}</g>
-        ${p.studier ? `<g class="study-tea">${held('mug')}</g>` : ''}
-        ${arm(topColor, pose, p.hold || p.studier || p.carries).replace('__SKIN__', skin)}
-        <circle class="kernel-hand" cx="-25" cy="-19" r="2.6" fill="#FFF3C4"/>
+        ${arm(topColor, pose, p.hold || p.studier || p.carries, skin,
+          `<g class="own-hold">${onLap ? '' : held(p.hold)}</g>${p.studier ? `<g class="study-tea">${held('mug')}</g>` : ''}`)}
       </g></g></g>
     </g></g>`;
   const fx = `<g class="zz"><text x="10" y="-92">z</text><text x="20" y="-104">z</text></g>`
