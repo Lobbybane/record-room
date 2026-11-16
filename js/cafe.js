@@ -64,7 +64,13 @@ const MOVES = ['typing', 'scrolling', 'page-turn', 'reach', 'reach-up', 'sip', '
 
 export function initCafe(theStage) {
   stage = theStage;
-  new MutationObserver(restart).observe(stage, { attributes: true, attributeFilter: ['data-room', 'data-lively'] });
+  // Settings are re-applied now and then (the clock, the weather…), which rewrites these
+  // attributes with the same values; only a real change of room or Lively restarts the café.
+  let was = `${stage.dataset.room}|${stage.dataset.lively}`;
+  new MutationObserver(() => {
+    const now = `${stage.dataset.room}|${stage.dataset.lively}`;
+    if (now !== was) { was = now; restart(); }
+  }).observe(stage, { attributes: true, attributeFilter: ['data-room', 'data-lively'] });
   reduceMotion.addEventListener?.('change', restart);
   restart(); // the people may already be drawn
 }
