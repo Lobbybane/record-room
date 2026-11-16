@@ -1,5 +1,8 @@
 // Weather through the window, drawn on two canvases each frame:
-// - outside: rain at three depths (with splashes), soft snow, and lightning bolts in a storm
+// - outside: rain at three depths, blown about by gusts of wind in a storm, with sheets of
+//   rain sweeping across, splashes on the pavement and road, rings in the puddles and a
+//   low mist of spray; soft snow; lightning bolts, and lightning flickering inside the
+//   clouds between strikes
 // - on the glass: beads of water and drops that run down, gathering beads and leaving trails
 // The glass is 592 x 354 stage pixels; the canvases match the screen size for sharp lines.
 
@@ -8,6 +11,8 @@ const H = 354;
 const LIGHTNING_MS = 12000; // the .lightning CSS animation's length (thunder follows it too)
 
 const rand = (a, b) => a + Math.random() * (b - a);
+// The street's puddles in glass pixels: [x, y, half width] (the city view; harmless elsewhere).
+const PUDDLES = [[126, 340, 18], [348, 345, 24], [506, 338, 14], [220, 350, 20]];
 
 export function initWeather(stage) {
   const sky = document.getElementById('weather-sky');
@@ -27,6 +32,13 @@ export function initWeather(stage) {
   let beads = [];
   let runners = [];
   let bolt = null;
+  let ripples = [];
+  let sheets = [];
+  let gust = 0;          // the wind right now (storms): extra slant, eased toward gustTarget
+  let gustTarget = 0;
+  let nextGust = 0;
+  let glow = null;       // lightning flickering inside a cloud
+  let nextGlow = 0;
   let lastPhase = 0;
   let nextRunner = 0;
   let mode = '';
@@ -80,7 +92,11 @@ export function initWeather(stage) {
     beads = wet ? Array.from({ length: storm ? 110 : 70 }, makeBead) : [];
     runners = [];
     splashes = [];
+    ripples = [];
+    sheets = storm ? Array.from({ length: 3 }, (_, i) => ({ x: rand(-200, W), w: rand(60, 130), a: rand(0.04, 0.08), speed: rand(70, 120), i })) : [];
     bolt = null;
+    glow = null;
+    gust = 0; gustTarget = 0;
   }
 
   // ---------- glass ----------
@@ -136,17 +152,42 @@ export function initWeather(stage) {
     if (next !== mode) reset(next);
 
     const storm = mode === 'storm';
-    const slant = storm ? 0.42 : 0.2; // sideways movement per unit of fall
+    // Wind: in a storm it gusts, blowing the rain harder sideways for a few seconds.
+    if (storm) {
+      nextGust -= dt;
+      if (nextGust <= 0) { gustTarget = Math.random() < 0.5 ? rand(0.25, 0.5) : rand(-0.05, 0.1); nextGust = rand(2.5, 6); }
+      gust += (gustTarget - gust) * Math.min(1, dt * 1.6);
+    }
+    const slant = (storm ? 0.38 : 0.2) + gust; // sideways movement per unit of fall
 
     // Outside
     skyCtx.setTransform(scale, 0, 0, scale, 0, 0);
     skyCtx.clearRect(0, 0, W, H);
     skyCtx.lineCap = 'round';
+    // Sheets of heavier rain sweeping across in a storm.
+    for (const sh of sheets) {
+      sh.x += (sh.speed + gust * 260) * dt;
+      if (sh.x > W + 160) Object.assign(sh, { x: rand(-320, -160), w: rand(60, 130), a: rand(0.04, 0.08) });
+      const g = skyCtx.createLinearGradient(sh.x - sh.w, 0, sh.x + sh.w, 0);
+      g.addColorStop(0, 'rgba(200, 210, 255, 0)');
+      g.addColorStop(0.5, `rgba(200, 210, 255, ${sh.a + gust * 0.06})`);
+      g.addColorStop(1, 'rgba(200, 210, 255, 0)');
+      skyCtx.fillStyle = g;
+      skyCtx.beginPath();
+      skyCtx.moveTo(sh.x - sh.w - H * slant, 0); skyCtx.lineTo(sh.x + sh.w - H * slant, 0);
+      skyCtx.lineTo(sh.x + sh.w, H); skyCtx.lineTo(sh.x - sh.w, H); skyCtx.closePath();
+      skyCtx.fill();
+    }
     for (const d of rain) {
       d.y += d.speed * dt;
       d.x += d.speed * slant * dt;
       if (d.y > H + 20) {
-        if (d.layer.depth === 1 && Math.random() < 0.5) splashes.push({ x: d.x, y: rand(H - 26, H - 4), t: 0 });
+        // Splashes on the pavement and the road (nearer drops), rings in the puddles.
+        if (d.layer.depth >= 0.65 && Math.random() < (storm ? 0.7 : 0.5)) {
+          const puddle = PUDDLES.find((p) => Math.abs(d.x - p[0]) < p[2]);
+          if (puddle && Math.random() < 0.6) ripples.push({ x: d.x, y: puddle[1] + rand(-1, 1), t: 0 });
+          else splashes.push({ x: d.x, y: Math.random() < 0.35 ? rand(327, 331) : rand(334, H - 2), t: 0 });
+        }
         Object.assign(d, makeDrop(storm, false));
       }
       const len = d.layer.length * (storm ? 1.25 : 1);
@@ -165,6 +206,29 @@ export function initWeather(stage) {
       skyCtx.beginPath();
       skyCtx.ellipse(s.x, s.y, 1 + p * 5, 0.5 + p * 1.6, 0, Math.PI, 0);
       skyCtx.stroke();
+      // a couple of droplets thrown up
+      if (p < 0.6) {
+        skyCtx.fillStyle = `rgba(230, 238, 255, ${0.5 * (1 - p)})`;
+        skyCtx.fillRect(s.x - 2 - p * 3, s.y - 2 - p * 4 + p * p * 6, 0.8, 0.8);
+        skyCtx.fillRect(s.x + 2 + p * 3, s.y - 2 - p * 5 + p * p * 7, 0.8, 0.8);
+      }
+    }
+    ripples = ripples.filter((r) => (r.t += dt) < 0.8);
+    for (const r of ripples) {
+      const p = r.t / 0.8;
+      skyCtx.strokeStyle = `rgba(230, 236, 255, ${0.5 * (1 - p)})`;
+      skyCtx.lineWidth = 0.6;
+      skyCtx.beginPath();
+      skyCtx.ellipse(r.x, r.y, 0.6 + p * 6, 0.2 + p * 1.2, 0, 0, Math.PI * 2);
+      skyCtx.stroke();
+    }
+    // Spray hanging over the street in heavy rain.
+    if (rain.length) {
+      const mist = skyCtx.createLinearGradient(0, H - 40, 0, H);
+      mist.addColorStop(0, 'rgba(200, 205, 240, 0)');
+      mist.addColorStop(1, `rgba(200, 205, 240, ${storm ? 0.16 + gust * 0.1 : 0.08})`);
+      skyCtx.fillStyle = mist;
+      skyCtx.fillRect(0, H - 40, W, 40);
     }
     for (const f of snow) {
       f.phase += f.freq * dt;
@@ -184,6 +248,22 @@ export function initWeather(stage) {
       if (lastPhase < 0.586 && phase >= 0.586) bolt = makeBolt();
       if (bolt && lastPhase < 0.626 && phase >= 0.626) bolt.life = 0.8;
       lastPhase = phase;
+    }
+    // Between strikes, lightning flickers inside the clouds now and then.
+    if (storm) {
+      nextGlow -= dt;
+      if (nextGlow <= 0 && !glow) { glow = { x: rand(40, W - 40), y: rand(10, 90), r: rand(60, 120), t: 0, flicks: Math.floor(rand(1, 4)) }; nextGlow = rand(3, 8); }
+      if (glow) {
+        glow.t += dt;
+        const len = 0.18 * glow.flicks + 0.1;
+        const on = Math.sin((glow.t / len) * Math.PI * glow.flicks) ** 2 * (1 - glow.t / len);
+        const g = skyCtx.createRadialGradient(glow.x, glow.y, 0, glow.x, glow.y, glow.r);
+        g.addColorStop(0, `rgba(215, 210, 255, ${0.35 * on})`);
+        g.addColorStop(1, 'rgba(215, 210, 255, 0)');
+        skyCtx.fillStyle = g;
+        skyCtx.fillRect(glow.x - glow.r, glow.y - glow.r, glow.r * 2, glow.r * 2);
+        if (glow.t > len) glow = null;
+      }
     }
     if (bolt) {
       bolt.life -= dt * 3.2;

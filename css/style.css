@@ -557,8 +557,31 @@ html, body {
 /* Wet pavement: puddles shine with the lamps and neon. */
 .street .puddles { fill: #9C8CD8; opacity: 0; transition: opacity 2s ease; }
 .stage:is([data-weather="rain"], [data-weather="storm"]) .street .puddles { opacity: .45; }
-.passersby { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
-.passerby { position: absolute; top: 0; left: 0; overflow: visible; }
+.passersby, .road-life, .birds { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
+.passerby, .bus, .cyclist, .bird { position: absolute; top: 0; left: 0; overflow: visible; }
+/* Walking: legs scissor from the hip and the body bobs, at the walker's own pace (--step). */
+.passerby.walking :is(.leg-a, .leg-b, .dog-a, .dog-b) { transform-box: fill-box; transform-origin: 50% 0; animation: tiny-step var(--step, .6s) ease-in-out infinite alternate; }
+.passerby.walking :is(.leg-b, .dog-b) { animation-direction: alternate-reverse; }
+@keyframes tiny-step { from { transform: rotate(-24deg); } to { transform: rotate(24deg); } }
+.passerby.walking .bob { animation: tiny-bob calc(var(--step, .6s) / 1) ease-in-out infinite; }
+@keyframes tiny-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-.5px); } }
+/* In a storm people hurry along, leaning into the wind under their umbrellas. */
+.passerby.hurry .bob { transform: rotate(5deg); }
+.passerby.hurry .umbrella { transform: rotate(-12deg); transform-box: fill-box; transform-origin: 50% 100%; }
+/* Cyclists' wheels spin; the bus and bikes have little headlights at night. */
+.cyclist .wheels { transform-box: fill-box; }
+.cyclist, .bus { filter: brightness(.85); }
+.headlight { filter: drop-shadow(0 0 2px #FFF4D6); }
+.stage:is([data-sky="golden"], [data-sky="sunrise"]) .headlight { filter: none; }
+/* Birds flap as they fly. */
+.bird .wings { animation: wing-flap var(--flap, .34s) ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes wing-flap { from { transform: scaleY(1); } to { transform: scaleY(-.55) translateY(-1px); } }
+.bird.gull .wings { animation-duration: .5s; }
+/* A manhole steams on the road, more on cold and wet nights. */
+.vent-steam .puff { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: vent-puff 4.5s ease-out infinite; }
+.vent-steam .p2 { animation-delay: -1.5s; } .vent-steam .p3 { animation-delay: -3s; }
+@keyframes vent-puff { 0% { opacity: 0; transform: translateY(0) scale(.5); } 20% { opacity: .35; } 100% { opacity: 0; transform: translateY(-22px) scale(1.8); } }
+.stage:is([data-weather="rain"], [data-weather="snow"], [data-season="winter"]) .vent-steam .puff { animation-duration: 3.4s; }
 /* Umbrellas come out in the rain. */
 .passerby .umbrella { display: none; }
 .stage:is([data-weather="rain"], [data-weather="storm"]) .passerby .umbrella { display: inline; }
@@ -1377,6 +1400,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .phone-glow { animation: none; }
   .drink.hot .st, .bar-cup .st, .pickup-cup .st { animation: none; opacity: .45; }
+  .vent-steam .puff { animation: none; opacity: .2; }
+  .clouds g { animation: none !important; }
 }
 
 /* ---------- radio: reduced motion ---------- */
