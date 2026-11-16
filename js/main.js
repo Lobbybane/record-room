@@ -13,6 +13,7 @@ import { lookPages } from './looks.js';
 import { drawPeople } from './people.js';
 import { initPeopleLife, peopleRedrawn } from './life-people.js';
 import { initCafe, cafeRedrawn } from './cafe.js';
+import { initOutside } from './outside.js';
 import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
@@ -131,7 +132,8 @@ function buildCity(sky) {
 }
 
 function buildStars() {
-  const stars = [[30, 20, 2], [96, 44, 1.6], [150, 14, 2.2], [210, 58, 1.6], [262, 24, 2], [320, 50, 1.6], [460, 90, 2], [488, 20, 1.6], [60, 86, 1.4], [300, 96, 1.4]];
+  const stars = [[30, 20, 2], [96, 44, 1.6], [150, 14, 2.2], [210, 58, 1.6], [262, 24, 2], [320, 50, 1.6], [460, 90, 2], [488, 20, 1.6], [60, 86, 1.4], [300, 96, 1.4],
+    [-16, 6, 1.6], [70, -18, 1.8], [190, -22, 1.4], [350, -14, 2], [440, -24, 1.6], [530, 10, 1.8], [548, 60, 1.4], [522, -18, 1.4]];
   $('#stars').replaceChildren(...stars.map(([x, y, d], i) => {
     const star = document.createElement('div');
     star.className = 'star';
@@ -147,8 +149,8 @@ function buildLights() {
     const dot = document.createElement('div');
     dot.className = 'fairy';
     Object.assign(dot.style, {
-      left: `${Math.round(352 + t * 556 - 4)}px`,
-      top: `${Math.round(64 + 96 * t * (1 - t) - 1)}px`,
+      left: `${Math.round(322 + t * 616 - 4)}px`,
+      top: `${Math.round(34 + 124 * t * (1 - t) - 1)}px`,
       animationDelay: `${(-i * 0.73).toFixed(2)}s`,
     });
     dots.push(dot);
@@ -205,6 +207,7 @@ initThunder(stage);
 initParallax(stage);
 initPeopleLife(stage);
 initCafe(stage);
+initOutside(stage);
 initTheater(stage);
 // Candles and the fireplace: click to light or blow out.
 for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {

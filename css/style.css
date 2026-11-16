@@ -112,15 +112,23 @@ html, body {
 .floor-lines { overflow: visible; }
 .spill { fill: var(--spill); opacity: .10; transition: fill .8s ease; }
 
-.curtain-rod { position: absolute; left: 316px; top: 50px; width: 628px; height: 8px; border-radius: 4px; background: var(--ink); }
-.curtain { position: absolute; top: 56px; width: 58px; height: 400px; }
-.curtain-left { left: 322px; border-radius: 0 0 18px 6px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 45%, var(--curtain-a, #5A3F7E)); }
-.curtain-right { left: 880px; border-radius: 0 0 6px 18px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 55%, var(--curtain-a, #5A3F7E)); }
+/* The window is big (glass 592 x 354 from 344, 52); the curtains are tied back at the
+   sides, gathered at a tie and flaring below it, so more of the view shows. */
+.curtain-rod { position: absolute; left: 300px; top: 26px; width: 680px; height: 8px; border-radius: 4px; background: var(--ink); }
+.curtain { position: absolute; top: 30px; width: 46px; height: 428px; }
+.curtain-left { left: 314px; border-radius: 0 0 14px 6px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 45%, var(--curtain-a, #5A3F7E));
+  clip-path: polygon(0 0, 100% 0, 92% 18%, 58% 52%, 46% 60%, 64% 72%, 100% 100%, 0 100%); }
+.curtain-right { left: 920px; border-radius: 0 0 6px 14px; background: linear-gradient(90deg, var(--curtain-a, #5A3F7E), var(--curtain-b, #7A5A9E) 55%, var(--curtain-a, #5A3F7E));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 36% 72%, 54% 60%, 42% 52%, 8% 18%); }
+/* the tie-backs */
+.curtain::after { content: ''; position: absolute; top: 57%; width: 22px; height: 7px; border-radius: 4px; background: #C9A86A; box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.curtain-left::after { left: 10px; transform: rotate(-12deg); }
+.curtain-right::after { right: 10px; transform: rotate(12deg); }
 /* A chosen curtain colour replaces each room's tint. */
 .stage:not([data-curtain="room"]) :is(.curtain-left, .curtain-right) { filter: none !important; }
 
-.window-frame { position: absolute; left: 360px; top: 70px; width: 540px; height: 350px; border-radius: 8px; background: var(--ink); }
-.mullion { position: absolute; left: 625px; top: 84px; width: 10px; height: 322px; background: var(--ink); }
+.window-frame { position: absolute; left: 330px; top: 38px; width: 620px; height: 382px; border-radius: 8px; background: var(--ink); }
+.mullion { position: absolute; left: 625px; top: 52px; width: 10px; height: 354px; background: var(--ink); }
 .sill { position: absolute; left: 340px; top: 418px; width: 580px; height: 18px; border-radius: 3px; background: #4A3A6E; box-shadow: 0 6px 0 var(--night); }
 
 
@@ -422,16 +430,16 @@ html, body {
 .stage:is([data-sky="sunrise"], [data-sky="golden"]) .cabin-lights { display: none; }
 
 .island { fill: var(--far-city); }
-.sea { position: absolute; left: 0; right: 0; top: 204px; bottom: 0; background: linear-gradient(180deg, rgba(60, 52, 120, .7), rgba(21, 19, 43, .97)); }
+.sea { position: absolute; left: -30px; right: -50px; top: 204px; bottom: 0; background: linear-gradient(180deg, rgba(60, 52, 120, .7), rgba(21, 19, 43, .97)); }
 .stage:is([data-sky="sunrise"], [data-sky="golden"]) .sea { background: linear-gradient(180deg, rgba(180, 120, 160, .55), rgba(59, 47, 107, .95)); }
 .glow-path { position: absolute; left: 380px; top: 206px; width: 48px; height: 116px; background: repeating-linear-gradient(180deg, rgba(255, 241, 214, .55) 0 2px, transparent 2px 7px); -webkit-mask-image: linear-gradient(180deg, #000, transparent); mask-image: linear-gradient(180deg, #000, transparent); animation: shimmer 2.4s ease-in-out infinite; }
 .stage[data-sky="sunrise"] .glow-path { left: 272px; }
 .stage[data-sky="golden"] .glow-path { left: 340px; background: repeating-linear-gradient(180deg, rgba(255, 214, 150, .65) 0 2px, transparent 2px 7px); }
 @keyframes shimmer { 50% { opacity: .55; transform: scaleX(1.15); } }
-.waves { position: absolute; left: 0; right: 0; top: 212px; bottom: 0; background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(220, 232, 255, .08) 14px 15px); animation: waves 6s linear infinite; }
+.waves { position: absolute; left: -30px; right: -50px; top: 212px; bottom: 0; background: repeating-linear-gradient(180deg, transparent 0 14px, rgba(220, 232, 255, .08) 14px 15px); animation: waves 6s linear infinite; }
 @keyframes waves { to { background-position: 0 30px; } }
 .boat { position: absolute; left: 0; top: 184px; animation: sail 70s linear infinite; animation-delay: -20s; }
-@keyframes sail { from { transform: translateX(-40px); } to { transform: translateX(540px); } }
+@keyframes sail { from { transform: translateX(-70px); } to { transform: translateX(590px); } }
 .rock { fill: #15132B; }
 .palm { fill: #15132B; }
 .lamp-room { fill: #FFF1C8; }
@@ -470,15 +478,18 @@ html, body {
 /* ---------- city through the glass ---------- */
 .glass {
   position: absolute;
-  left: 374px;
-  top: 84px;
-  width: 512px;
-  height: 322px;
+  left: 344px;
+  top: 52px;
+  width: 592px;
+  height: 354px;
   overflow: hidden;
   border-radius: 3px;
   background: var(--sky);
 }
-.layer-glass { position: absolute; left: 0; top: 0; width: 512px; height: 322px; }
+/* The scenery keeps the old window's coordinates (512 x 322), 30px in and 32px down;
+   its layers reach out to fill the whole glass. */
+.glass-in { position: absolute; left: 30px; top: 32px; width: 512px; height: 322px; }
+.layer-glass { position: absolute; left: -30px; top: -32px; width: 592px; height: 354px; }
 .far-city { fill: var(--far-city); }
 
 .star { position: absolute; border-radius: 50%; background: #FFF1D6; }
@@ -510,7 +521,47 @@ html, body {
 .stage { --bld-1: #2E2558; --bld-2: #352B63; --bld-3: #2A2350; --bld-4: #3B2F6B; --roof: #221C44; }
 .stage[data-sky="midnight"] { --bld-1: #262050; --bld-2: #2C2458; --bld-3: #221C48; --bld-4: #31285E; --roof: #1A1638; }
 .stage:is([data-sky="sunrise"], [data-sky="golden"]) { --bld-1: #4A3A72; --bld-2: #55447E; --bld-3: #463868; --bld-4: #5E4A88; --roof: #3B2F62; }
-.city-svg { position: absolute; left: 0; top: 0; width: 512px; height: 322px; overflow: visible; }
+.city-svg { position: absolute; left: -30px; top: -32px; width: 592px; height: 354px; overflow: visible; }
+
+/* ---------- weather in the sky: rain clouds and a gloomy light ---------- */
+/* Clouds gather in rain, snow and storms; storm clouds are darker, hang lower and light up
+   with each lightning flash (same timing as .lightning). They drift slowly. */
+.clouds { opacity: 0; transition: opacity 2s ease; --cloud-far: #3A3262; --cloud-near: #2B2550; --cloud-storm: #1E1A38; }
+.stage[data-sky="golden"] .clouds, .stage[data-sky="sunrise"] .clouds { --cloud-far: #8A7C9E; --cloud-near: #6E6288; --cloud-storm: #4E4466; }
+.stage[data-weather="snow"] .clouds { --cloud-far: #8E88AE; --cloud-near: #7A7398; }
+.stage:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .clouds { opacity: 1; }
+.cloud-far { fill: var(--cloud-far); opacity: .85; animation: cloud-drift 90s ease-in-out infinite alternate; }
+.cloud-near { fill: var(--cloud-near); opacity: .92; animation: cloud-drift 60s ease-in-out -20s infinite alternate-reverse; }
+.cloud-storm, .cloud-flash { display: none; }
+.stage[data-weather="storm"] .cloud-storm { display: inline; fill: var(--cloud-storm); animation: cloud-drift 45s ease-in-out -10s infinite alternate; }
+.stage[data-weather="storm"] .cloud-flash { display: inline; fill: #D8D4FF; opacity: 0; animation: lightning 12s infinite; mix-blend-mode: screen; }
+@keyframes cloud-drift { from { transform: translateX(-24px); } to { transform: translateX(24px); } }
+/* The moon and stars hide behind the clouds. */
+.glass :is(.moon, #stars, .sun, .shooting-star) { transition: opacity 2s ease; }
+.stage[data-weather="rain"] .glass :is(.moon, #stars, .sun) { opacity: .4; }
+.stage:is([data-weather="storm"], [data-weather="snow"]) .glass :is(.moon, #stars, .sun) { opacity: .15; }
+/* The whole view goes grey and dim in the rain, darker in a storm. */
+.overcast { position: absolute; inset: 0; pointer-events: none; background: #1A1630; opacity: 0; transition: opacity 2s ease; }
+.stage[data-weather="rain"] .overcast { opacity: .22; }
+.stage[data-weather="storm"] .overcast { opacity: .36; }
+.stage[data-weather="snow"] .overcast { background: #DCD8F0; opacity: .08; }
+
+/* ---------- the street below ---------- */
+.street .pavement { fill: #2E2756; }
+.street .kerb { fill: #4A4080; }
+.street .lamps { fill: #15132B; }
+.street .lamps path { fill: none; stroke: #15132B; stroke-width: 2; }
+.street .lamps rect + path + rect { fill: #FFE2A8; }
+.street-glow { fill: #FFD38A; opacity: .22; }
+.stage:is([data-sky="golden"], [data-sky="sunrise"]) .street-glow { opacity: 0; }
+/* Wet pavement: puddles shine with the lamps and neon. */
+.street .puddles { fill: #9C8CD8; opacity: 0; transition: opacity 2s ease; }
+.stage:is([data-weather="rain"], [data-weather="storm"]) .street .puddles { opacity: .45; }
+.passersby { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
+.passerby { position: absolute; top: 0; left: 0; overflow: visible; }
+/* Umbrellas come out in the rain. */
+.passerby .umbrella { display: none; }
+.stage:is([data-weather="rain"], [data-weather="storm"]) .passerby .umbrella { display: inline; }
 .bld.t1 { fill: var(--bld-1); } .bld.t2 { fill: var(--bld-2); } .bld.t3 { fill: var(--bld-3); } .bld.t4 { fill: var(--bld-4); }
 .cornice { fill: rgba(255, 255, 255, .09); }
 .win { fill: rgba(200, 190, 255, .07); }
@@ -541,20 +592,20 @@ html, body {
 .car-east.late { top: 315px; animation-duration: 15s; animation-delay: -6s; }
 .car-west { top: 313px; animation: drive-west 13s linear infinite; animation-delay: -4s; }
 .car-west::before, .car-west::after { background: #FF5A6E; box-shadow: 0 0 6px 2px rgba(255, 90, 110, .6); }
-@keyframes drive-east { 0% { transform: translateX(-40px); } 60%, 100% { transform: translateX(540px); } }
-@keyframes drive-west { 0% { transform: translateX(540px); } 70%, 100% { transform: translateX(-40px); } }
+@keyframes drive-east { 0% { transform: translateX(-70px); } 60%, 100% { transform: translateX(590px); } }
+@keyframes drive-west { 0% { transform: translateX(590px); } 70%, 100% { transform: translateX(-70px); } }
 
-.plane { position: absolute; top: 46px; left: 0; width: 3px; height: 3px; border-radius: 50%; background: #F4ECFF; opacity: .8; animation: fly 46s linear infinite; animation-delay: -30s; }
+.plane { position: absolute; top: 46px; left: 0; width: 3px; height: 3px; border-radius: 50%; background: #F4ECFF; opacity: .8; animation: plane-fly 46s linear infinite; animation-delay: -30s; }
 .plane::after { content: ''; position: absolute; left: 6px; top: 0; width: 3px; height: 3px; border-radius: 50%; background: #FF5A6E; box-shadow: 0 0 6px 2px rgba(255, 90, 110, .7); animation: blink 1.2s steps(1) infinite; }
-@keyframes fly { 0% { transform: translate(540px, 14px); } 45%, 100% { transform: translate(-30px, -6px); } }
+@keyframes plane-fly { 0% { transform: translate(590px, 14px); } 45%, 100% { transform: translate(-70px, -8px); } }
 @keyframes blink { 50% { opacity: 0; } }
 
-.track { position: absolute; left: 0; top: 268px; width: 512px; height: 8px; background: var(--ink); }
+.track { position: absolute; left: -30px; top: 268px; width: 592px; height: 8px; background: var(--ink); }
 .pillar { position: absolute; top: 276px; width: 10px; height: 46px; background: var(--ink); }
 .train { position: absolute; left: 70px; top: 240px; width: 290px; height: 28px; border-radius: 8px 8px 2px 2px; background: #2A2450; animation: train-pass 28s linear infinite; }
 @keyframes train-pass {
-  0% { transform: translateX(-380px); }
-  32%, 100% { transform: translateX(560px); }
+  0% { transform: translateX(-420px); }
+  32%, 100% { transform: translateX(610px); }
 }
 .train-windows {
   position: absolute; left: 10px; right: 10px; top: 7px; height: 11px;
@@ -564,7 +615,7 @@ html, body {
 }
 
 /* Rain, snow and drops on the glass are drawn on canvases by js/weather.js. */
-.weather-canvas { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
+.weather-canvas { position: absolute; left: 0; top: 0; width: 592px; height: 354px; pointer-events: none; }
 
 .lightning { display: none; position: absolute; inset: 0; background: #EEF0FF; opacity: 0; animation: lightning 12s infinite; }
 .storm-flash { display: none; z-index: 19; pointer-events: none; background: #C8CCFF; mix-blend-mode: soft-light; opacity: 0; animation: lightning-room 12s infinite; }
@@ -757,7 +808,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .pill[aria-pressed="false"] { color: var(--text-dim); }
 
 /* ---------- overlays ---------- */
-.window-glow { position: absolute; inset: 0; z-index: 20; pointer-events: none; background: radial-gradient(ellipse 520px 380px at 630px 250px, var(--glow), transparent 70%); }
+.window-glow { position: absolute; inset: 0; z-index: 20; pointer-events: none; background: radial-gradient(ellipse 600px 420px at 640px 236px, var(--glow), transparent 70%); }
 .full-screen { position: absolute; left: var(--fx); top: var(--fy); width: var(--fw); height: var(--fh); }
 .vignette { z-index: 21; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(10, 8, 25, .55) 100%); }
 .grain { z-index: 22; pointer-events: none; mix-blend-mode: soft-light; opacity: .55; }
@@ -1214,7 +1265,24 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .barista :is(.b-phone, .b-cup, .b-mouth-open) { display: none; }
 
 /* ---------- the barista's day (states set on .cafe-back by js/cafe.js) ---------- */
-.barista { transition: transform .5s cubic-bezier(.45, .05, .55, .95); }
+/* The barista slides along behind the counter (--bx, set by js/cafe.js: 0 at the machine,
+   -156px at the register end) and dips to the ice well (--by). */
+.barista { transform: translate(var(--bx, 0px), var(--by, 0px)); transition: transform 1.2s cubic-bezier(.45, .05, .55, .95), opacity .35s ease; }
+.cafe-back.b-sliding .barista { animation: b-bob .5s ease-in-out infinite; }
+@keyframes b-bob { 50% { translate: 0 -1.6px; } }
+/* Carrying a finished drink at chest height, above the turntable. */
+.cafe-back.b-carry .b-arm-l { transform: rotate(-20deg); }
+.cafe-back.b-carry .b-fore-l { transform: rotate(-92deg); }
+.cafe-back:is(.b-carry-hot, .b-carry-iced) .b-cup { display: inline; }
+.cafe-back:not(.b-carry-hot) .b-cup-hot, .cafe-back:not(.b-carry-iced) .b-cup-iced { display: none; }
+/* Out from behind the counter (a walking copy clears a table). */
+.cafe-back.b-out .barista { opacity: 0; }
+/* The drink waiting on the pickup mat slides in from behind the turntable. */
+.pickup-cup { opacity: 0; transition: opacity .2s ease; }
+.cafe-counter.pick-hot .pickup-cup.hot, .cafe-counter.pick-iced .pickup-cup.iced { opacity: 1; animation: pickup-slide .5s ease-out; }
+@keyframes pickup-slide { from { transform: translateX(16px); } }
+.pickup-cup .st { opacity: 0; animation: steam-wisp 2.8s ease-in-out infinite; }
+.pickup-cup .st2 { animation-delay: -.9s; } .pickup-cup .st3 { animation-delay: -1.8s; }
 /* Steaming milk at the machine: the pitcher comes out beside the machine, under the wand,
    and jiggles while the wand steams. */
 .cafe-back.b-steam .barista-arm { transform: rotate(25deg); }
@@ -1237,7 +1305,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .cafe-back.b-look-l .barista-head { transform: rotate(-9deg); }
 .cafe-back.b-look-r .barista-head { transform: rotate(9deg); }
 /* Bending down to the ice well under the counter. */
-.cafe-back.b-dip .barista { transform: translateY(16px); }
+.cafe-back.b-dip .barista { --by: 16px; transition-duration: .5s; }
 /* Talking (taking an order). */
 .cafe-back.b-talk .b-mouth { display: none; }
 .cafe-back.b-talk .b-mouth-open { display: inline; animation: talk-open .3s steps(1) infinite; }
@@ -1269,7 +1337,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .phone-glow { animation: none; }
-  .drink.hot .st, .bar-cup .st { animation: none; opacity: .45; }
+  .drink.hot .st, .bar-cup .st, .pickup-cup .st { animation: none; opacity: .45; }
 }
 
 /* ---------- radio: reduced motion ---------- */
@@ -1310,6 +1378,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* ---------- living pets (js/life.js) ---------- */
 .dog-cushion { position: absolute; left: 60px; top: 712px; z-index: 5; display: none; overflow: visible; }
 .stage[data-pet="dog"] .dog-cushion { display: block; }
+/* In the café the front-left floor has a table, so the dog's bed is by the counter instead. */
+.stage[data-room="cafe"] :is(.pet-dog, .dog-cushion) { left: 1040px; }
 /* Standing and lying crossfade, with a small rise and settle, so getting up and lying down never snap. */
 .pet-stand, .pet-lying { transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .38s ease, transform .45s cubic-bezier(.3, .7, .4, 1); }
 .pet-stand { opacity: 0; transform: scale(1.04, .8); }
@@ -1433,7 +1503,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .lantern-light { animation: glow-flicker 3s ease-in-out infinite; }
 
 /* The night train: hills, lights and poles rolling past, with a gentle sway. */
-.view-train .scroll { position: absolute; left: 0; top: 0; width: 1024px; height: 322px; animation: roll linear infinite; }
+.view-train .scroll { position: absolute; left: -30px; top: 0; width: 1536px; height: 322px; animation: roll linear infinite; }
+.view-train .scroll svg { position: absolute; top: 0; left: 0; }
 .scroll-far { animation-duration: 60s !important; }
 .scroll-near { animation-duration: 22s !important; }
 .scroll-poles { animation-duration: 3.2s !important; }
@@ -1444,7 +1515,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-season="winter"] .hills-near { fill: #8A86B4; }
 .town-lights { fill: #FFD38A; }
 .stage:is([data-sky="golden"], [data-sky="sunrise"]) .town-lights { opacity: .3; }
-.rail-blur { position: absolute; left: 0; bottom: 0; height: 26px; background: repeating-linear-gradient(90deg, #15132B 0 30px, #241E48 30px 34px); animation: roll .5s linear infinite; width: 1024px; }
+.rail-blur { position: absolute; left: -30px; bottom: 0; height: 26px; background: repeating-linear-gradient(90deg, #15132B 0 30px, #241E48 30px 34px); animation: roll .5s linear infinite; width: 1600px; }
 /* The whole car rocks gently, with a little clack-clack at the rail joints: the room, the TV,
    the seats and everyone in them move together (the Decorate button stays still). */
 .stage[data-room="train"] { animation: car-rock 4.4s ease-in-out infinite; }
@@ -1556,6 +1627,16 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .table-things .put-down { opacity: 0; }
 .table-things.down .put-down { opacity: 1; }
 .table-front.lifted .table-drink { opacity: 0; }
+/* Customers who come and go (js/cafe.js): fade in and out, and an empty cup left behind. */
+#people :is(.table-things, .table-front) { transition: opacity .3s ease; }
+#people .cafe-fade { opacity: 0 !important; }
+#people .gone { display: none; }
+#people .empty-cup .wisps { display: none; }
+#people .empty-cup .drink :is(ellipse, path[fill="#9A6440"]) { opacity: .35; }
+/* Standing at the counter: reaching up onto it for the drink (the cup stays upright). */
+.person.reach-up .arm { transform: rotate(78deg); }
+.person.reach-up .forearm { transform: rotate(9deg); }
+.person.reach-up .wrist { transform: rotate(-87deg); }
 /* Typing: the near hand taps in little bursts; the screen flickers with what's typed. */
 .person.typing .forearm { animation: key-taps .9s ease-in-out infinite; }
 @keyframes key-taps { 0%, 26%, 52%, 100% { transform: rotate(0); } 12% { transform: rotate(-3deg); } 38% { transform: rotate(-2deg); } 70% { transform: rotate(-3.5deg); } 84% { transform: rotate(-1deg); } }
@@ -1655,15 +1736,44 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .person.groove .bodywrap { animation: p-groove .64s ease-in-out 6; }
 @keyframes p-groove { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
 /* Getting up and walking: the seated person and their standing copy crossfade. */
-.person { transition: opacity .3s ease; }
 .person.away { opacity: 0; }
 .person.walker { display: none; opacity: 0; }
 .person.walker.out { display: inline; }
 .person.walker.shown { opacity: 1; }
-.person .leg { transform-box: fill-box; transform-origin: 50% 0; }
-.person.walking .leg-near { animation: p-step .52s ease-in-out infinite; }
-.person.walking .leg-far { animation: p-step .52s ease-in-out infinite reverse; }
-@keyframes p-step { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+/* ---------- walking: a real stride ---------- */
+/* Legs turn at the hip (.thigh) and the knee (.shin). One cycle is two steps: heel strike
+   with the leg forward, weight on it, push off behind, then swing through with the knee
+   bent and the foot lifted; the far leg runs half a cycle behind. --stride eases from 0 to 1
+   when someone sets off and back to 0 as they stop, so legs grow into the stride and settle
+   straight instead of snapping. (Forward is a positive turn: people are drawn facing left.) */
+@property --stride { syntax: '<number>'; inherits: true; initial-value: 0; }
+.person { --stride: 0; transition: opacity .3s ease, --stride .4s ease; }
+.person.walking { --stride: 1; }
+.person :is(.thigh, .shin) { transform-box: view-box; transform-origin: 0 0; }
+.person.stepping .leg-near .thigh { animation: walk-thigh 1s linear infinite; }
+.person.stepping .leg-near .shin { animation: walk-shin 1s linear infinite; }
+.person.stepping .leg-far .thigh { animation: walk-thigh 1s linear -.5s infinite; }
+.person.stepping .leg-far .shin { animation: walk-shin 1s linear -.5s infinite; }
+@keyframes walk-thigh {
+  0%, 100% { transform: rotate(calc(var(--stride) * 24deg)); }
+  20% { transform: rotate(calc(var(--stride) * 11deg)); }
+  50% { transform: rotate(calc(var(--stride) * -22deg)); }
+  64% { transform: rotate(calc(var(--stride) * -12deg)); }
+  84% { transform: rotate(calc(var(--stride) * 16deg)); }
+}
+@keyframes walk-shin {
+  0%, 100% { transform: rotate(calc(var(--stride) * -2deg)); }
+  20% { transform: rotate(calc(var(--stride) * -9deg)); }
+  44% { transform: rotate(calc(var(--stride) * -5deg)); }
+  56% { transform: rotate(calc(var(--stride) * -30deg)); }
+  70% { transform: rotate(calc(var(--stride) * -58deg)); }
+  88% { transform: rotate(calc(var(--stride) * -16deg)); }
+}
+/* The body dips as each heel lands and rises as the other leg passes; empty hands swing. */
+.person.stepping .bodywrap { animation: walk-dip .5s ease-in-out infinite; }
+@keyframes walk-dip { 0%, 100% { transform: translateY(calc(var(--stride) * 1.3px)); } 50% { transform: translateY(calc(var(--stride) * -1.4px)); } }
+.person.stepping[data-hold=""] .arm { animation: walk-arm 1s ease-in-out infinite; }
+@keyframes walk-arm { 0%, 100% { transform: rotate(calc(var(--stride) * -11deg)); } 50% { transform: rotate(calc(var(--stride) * 11deg)); } }
 .person.walking .head { animation: none !important; }
 /* Speech bubbles. */
 .bubble { animation: bubble-in .25s cubic-bezier(.3, 1.6, .5, 1); transform-box: fill-box; transform-origin: 50% 100%; }

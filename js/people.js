@@ -31,8 +31,15 @@ function legs(pose, color, shoe = '#F4ECFF') {
       <ellipse cx="-46" cy="8" rx="7" ry="5" fill="${shoe}"/>`;
   }
   if (pose === 'stand') {
-    return `<g class="leg leg-far"><path d="M-6 -2 L6 -2 L5 58 L-6 58 Z" fill="${far}"/><path d="M-12 57 L6 57 Q8 64 2 64 L-14 64 Z" fill="${tint(shoe, -0.15)}"/></g>
-      <g class="leg leg-near"><path d="M-14 -2 L0 -2 L-2 58 L-14 58 Z" fill="${color}"/><path d="M-24 56 L-2 56 Q0 64 -6 64 L-24 64 Q-27 60 -24 56 Z" fill="${shoe}"/></g>`;
+    // Each leg bends at the knee: a thigh turning at the hip holds a shin (and shoe) turning
+    // at the knee, so walking has a proper stride (css/style.css, "walking").
+    const joint = (x, y, cls, body) => `<g transform="translate(${x} ${y})"><g class="${cls}"><g transform="translate(${-x} ${-y})">${body}</g></g></g>`;
+    const leg = (side, hx, fill, thigh, shin, shoeSvg) => `<g class="leg leg-${side}">${joint(hx, 0, 'thigh',
+      `<path d="${thigh}" fill="${fill}"/>${joint(hx, 30, 'shin', `<path d="${shin}" fill="${fill}"/><circle cx="${hx}" cy="30" r="${side === 'near' ? 6.6 : 5.6}" fill="${fill}"/>${shoeSvg}`)}`)}</g>`;
+    return leg('far', 0, far, 'M-6 -2 L6 -2 L5.6 31 L-5.6 31 Z', 'M-5.6 29 L5.6 29 L5 58 L-6 58 Z',
+      `<path d="M-12 57 L6 57 Q8 64 2 64 L-14 64 Z" fill="${tint(shoe, -0.15)}"/>`)
+      + leg('near', -7, color, 'M-14 -2 L0 -2 L-0.4 31 L-13.6 31 Z', 'M-13.6 29 L-0.4 29 L-2 58 L-14 58 Z',
+        `<path d="M-24 56 L-2 56 Q0 64 -6 64 L-24 64 Q-27 60 -24 56 Z" fill="${shoe}"/>`);
   }
   if (pose === 'recline') {
     return `<path d="M6 -2 L-36 6 L-34 18 L8 12 Z" fill="${far}"/><path d="M2 -4 L-40 2 L-38 14 L4 10 Z" fill="${color}"/>
@@ -83,6 +90,11 @@ function torso(style, color, extra = {}) {
   } else if (style === 'uniform') {
     out += `<path d="M-2 -46 L-6 0" stroke="${shade}" stroke-width="2"/>
       <g fill="#E0C068"><circle cx="-8" cy="-34" r="1.6"/><circle cx="-9" cy="-24" r="1.6"/><circle cx="-10" cy="-14" r="1.6"/></g>`;
+  }
+  // The barista's green apron, over the front of whatever they wear.
+  if ((extra.extras || []).includes('apron')) {
+    out += '<path d="M-14 -34 Q-18 -16 -14 2 L3 2 L3 -34 Z" fill="#2E6E66"/><path d="M-8 -34 L-4 -47" stroke="#2E6E66" stroke-width="2.4"/>'
+      + '<rect x="-12" y="-18" width="9" height="7" rx="1.5" fill="#285E57"/>';
   }
   return out;
 }

@@ -8,6 +8,27 @@
 // Each room can set scale / ax / ay: the whole group is scaled from that floor point (default 1.2 from 560, 800).
 // Keep the right-most person left of the record crate (x 808 after scaling).
 
+// The café's tables (people-group units): one at the front left in front of the TV
+// console, the two front tables, and two little tables for one in the back row by the
+// window bar, set in the gaps between the front customers so everyone stays in view.
+// A table for two seats <id>1 on the left (facing right) and <id>2 on the right (facing
+// left); a table for one (`solo`) has just <id>2, on its right.
+export const CAFE_TABLES = [
+  { id: 'P', x: 292.5, y: 640, s: 1, solo: true },
+  { id: 'Q', x: 515, y: 640, s: 1, solo: true },
+  { id: 'A', x: 468, y: 700, s: 1.15 },
+  { id: 'L', x: 247.5, y: 718, s: 1.15 },
+  { id: 'B', x: 668, y: 726, s: 1.15 },
+];
+export const CAFE_SEATS = CAFE_TABLES.flatMap((t) => [
+  ...(t.solo ? [] : [{ id: `${t.id}1`, table: t.id, x: t.x - 55 * t.s, y: t.y, s: t.s, face: 'right' }]),
+  { id: `${t.id}2`, table: t.id, x: t.x + 55 * t.s, y: t.y, s: t.s, face: 'left' },
+]);
+const atSeat = (id, look) => {
+  const seat = CAFE_SEATS.find((s) => s.id === id);
+  return { ...look, seat: id, x: seat.x, y: seat.y, s: seat.s, face: seat.face === 'right' ? 'right' : undefined, pose: 'chair' };
+};
+
 export const GROUPS = {
   bedroom: {
     furniture: [
@@ -27,19 +48,19 @@ export const GROUPS = {
   // (and each other); the TV is just the café's radio. `act` is what they're doing
   // (type, phone, read, or hold for just enjoying a drink) and `drink` what they ordered.
   cafe: {
-    furniture: [
-      { type: 'cafechair', x: 404.75, y: 700, s: 1.15, face: 'right' },
-      { type: 'cafechair', x: 531.25, y: 700, s: 1.15 },
-      { type: 'bistro', x: 468, y: 700, s: 1.15 },
-      { type: 'cafechair', x: 604.75, y: 726, s: 1.15, face: 'right' },
-      { type: 'cafechair', x: 731.25, y: 726, s: 1.15 },
-      { type: 'bistro', x: 668, y: 726, s: 1.15 },
-    ],
+    furniture: CAFE_TABLES.flatMap((t) => [
+      ...(t.solo ? [] : [{ type: 'cafechair', x: t.x - 55 * t.s, y: t.y, s: t.s, face: 'right' }]),
+      { type: 'cafechair', x: t.x + 55 * t.s, y: t.y, s: t.s },
+      { type: 'bistro', x: t.x, y: t.y, s: t.s },
+    ]),
+    // The customers already here when you arrive (js/cafe.js sends more in, and sends
+    // everyone home in time). `core` ones stay for "A cozy few".
     people: [
-      { x: 404.75, y: 700, s: 1.15, pose: 'chair', shoes: '#3A2A3A', face: 'right', core: true, act: 'type', drink: 'hotlatte:#F4ECFF', skin: 2, hair: ['short', '#2A1E1E'], top: ['flannel', '#4F6FA8'], legs: '#2C2E5E', extras: ['glasses'] },
-      { x: 531.25, y: 700, s: 1.15, pose: 'chair', shoes: '#6B4436', act: 'read', hold: 'bookopen:#6FA6C8', skin: 0, hair: ['long', '#B0603A'], top: ['tee', '#9FE0C8'], legs: '#3B3F78' },
-      { x: 604.75, y: 726, s: 1.15, pose: 'chair', shoes: '#E8DDF5', face: 'right', act: 'phone', hold: 'phone', drink: 'iced', skin: 4, hair: ['bun', '#15101A'], top: ['sweater', '#F2B33D'], legs: '#3E2E3E' },
-      { x: 731.25, y: 726, s: 1.15, pose: 'chair', shoes: '#2B2440', core: true, act: 'hold', hold: 'hot:#F7A9C8', plate: true, skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['hoodie', '#E8955A'], legs: '#3B3F78' },
+      atSeat('A1', { core: true, act: 'type', drink: 'hotlatte:#F4ECFF', skin: 2, hair: ['short', '#2A1E1E'], top: ['flannel', '#4F6FA8'], legs: '#2C2E5E', shoes: '#3A2A3A', extras: ['glasses'] }),
+      atSeat('A2', { act: 'read', hold: 'bookopen:#6FA6C8', skin: 0, hair: ['long', '#B0603A'], top: ['tee', '#9FE0C8'], legs: '#3B3F78', shoes: '#6B4436' }),
+      atSeat('B1', { act: 'phone', hold: 'phone', drink: 'iced', skin: 4, hair: ['bun', '#15101A'], top: ['sweater', '#F2B33D'], legs: '#3E2E3E', shoes: '#E8DDF5' }),
+      atSeat('B2', { core: true, act: 'hold', hold: 'hot:#F7A9C8', plate: true, skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['hoodie', '#E8955A'], legs: '#3B3F78', shoes: '#2B2440' }),
+      atSeat('Q2', { act: 'type', drink: 'hot:#7FA08A', skin: 3, hair: ['curly', '#1E1620'], top: ['hoodie', '#B79CFF'], legs: '#2C2E5E', shoes: '#3A2A3A', extras: ['headphones:#6FE3F2'] }),
     ],
   },
   cabin: {
@@ -124,9 +145,7 @@ const LIFE = {
   cafe: {
     chats: [["how's the latte?", 'perfect'], ['love this place', 'same'], ['what are you reading?', 'a mystery'], ['deadline…', 'you got this']],
     moments: [],
-    // Comes in from the street on the right, picks up a to-go cup at the counter, then says hi.
-    visitor: { x: 893, y: 708, s: 1.3, order: { x: 965, item: 'togo' }, lines: [['cute place!', 'the best'], ['love this song', 'right?']],
-      look: { skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['puffer', '#9CBDA6'], legs: '#3B3F78', hold: 'togo' } },
+    // No visitor: js/cafe.js brings customers in to order at the counter.
   },
   cabin: {
     chats: [['so cold out there!', "fire's nice though"], ['first run tomorrow?', 'early!'], ['more cocoa?', 'yes please']],
