@@ -188,10 +188,15 @@ export function held(item) {
       + '<path d="M-26.5 -31 L-23.5 -41" stroke="#F28DB2" stroke-width="1.7" stroke-linecap="round"/>'
       + '<g fill="#FFFFFF" fill-opacity=".7"><circle cx="-32.2" cy="-18" r=".6"/><circle cx="-24.4" cy="-20" r=".55"/><circle cx="-25" cy="-16" r=".5"/></g></g>';
     // An open book held up to read, with a page that can turn (css/style.css).
-    case 'bookopen': return '<path d="M-40 -14 L-30 -34 L-18 -31 L-26 -10 Z" fill="' + (tone || '#6FA6C8') + '"/>'
-      + '<path d="M-38 -15 L-29 -33 L-28 -32 L-36 -14 Z" fill="#F7F1E6"/><path d="M-28 -32 L-19 -30 L-26 -11 L-35 -13 Z" fill="#F7F1E6"/>'
-      + '<path d="M-33 -27 l6 1.4 M-34 -24 l6 1.4 M-35 -21 l6 1.4" stroke="#C9C0D6" stroke-width=".7"/>'
-      + '<path class="page" d="M-28 -32 L-19 -30 L-26 -11 L-35 -13 Z" fill="#FFFBF2"/>';
+    // An open book seen from the side, held up to read: the cover makes a shallow V under
+    // the two page blocks, and the pages open toward the reader's eyes (not toward us).
+    // The loose `.page` lies on the near block and turns over the spine (-25.4, -17.5).
+    case 'bookopen': return '<g class="book-read" transform="translate(-25.4 -17.5) scale(1.4) translate(25.4 17.5)">'
+      + '<path d="M-25.4 -17.5 L-15.9 -17.8 L-16.0 -20.4 Q-20.3 -21.9 -25.5 -19.8 Z" fill="#F7F1E6"/>'
+      + '<path d="M-25.4 -17.5 L-31.5 -24.8 L-29.5 -26.5 Q-25.5 -24.2 -23.6 -19.0 Z" fill="#EFE7D6"/>'
+      + '<path d="M-17 -19 Q-20.5 -20.2 -24 -18.9 M-28.6 -24 Q-26.6 -22.4 -25 -19.6" fill="none" stroke="#D8CDB8" stroke-width=".5"/>'
+      + '<path class="page" d="M-25.5 -19.9 Q-20.8 -22.2 -16.0 -20.7 L-16.0 -20.0 Q-20.7 -20.8 -25.4 -19.1 Z" fill="#FFFBF2"/>'
+      + '<path d="M-31.5 -24.8 L-25.4 -17.5 L-15.9 -17.8" fill="none" stroke="' + (tone || '#6FA6C8') + '" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g>';
     case 'mug': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F7A9C8"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F7A9C8" stroke-width="2"/>';
     case 'latte': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F4ECFF"/><rect x="-33" y="-27" width="10" height="3" rx="1.5" fill="#C9956A"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F4ECFF" stroke-width="2"/>';
     case 'cocoa': return '<rect x="-34" y="-27" width="11" height="12" rx="2" fill="#C8443C"/><ellipse cx="-28.5" cy="-27" rx="5" ry="1.8" fill="#6E3A2A"/><circle cx="-30" cy="-28" r="1.8" fill="#FFFFFF"/><circle cx="-27" cy="-28.5" r="1.6" fill="#FFFFFF"/><path class="mug-steam" d="M-30 -32 q-2 -4 0 -8 M-26 -32 q-2 -4 0 -8" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="1.4"/>';

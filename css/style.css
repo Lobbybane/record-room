@@ -1499,12 +1499,19 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-room="cafe"].is-on .person .head { animation: none; }
 /* Poses: laptop users look down at the screen; phone and book are held up to read. */
 .person.act-type .head { transform: rotate(-6deg); }
-.person:is(.act-phone, .act-read) .head { transform: rotate(-11deg); }
-.person:is(.act-phone, .act-read) .arm { transform: rotate(8deg); }
-.person:is(.act-phone, .act-read) .forearm { transform: rotate(38deg); }
+.person.act-phone .head { transform: rotate(-11deg); }
+.person.act-phone .arm { transform: rotate(8deg); }
+.person.act-phone .forearm { transform: rotate(38deg); }
 .person.act-phone .wrist { transform: rotate(-26deg); }
-.person.act-read .wrist { transform: rotate(-34deg); }
-.person .page { transform-box: view-box; transform-origin: -28px -32px; }
+/* Reading: the book sits at chest height, its pages open toward her eyes, and she looks
+   down into it (head tipped, eyes lowered). The arm, forearm and wrist turns cancel out,
+   so the book keeps the angle it's drawn at. */
+.person.act-read .head { transform: rotate(-14deg); }
+.person.act-read .arm { transform: rotate(6deg); }
+.person.act-read .forearm { transform: rotate(22deg); }
+.person.act-read .wrist { transform: rotate(-28deg); }
+.person.act-read .eye-open { transform: translate(-.4px, 1px); }
+.person .page { transform-box: view-box; transform-origin: -25.4px -17.5px; }
 /* Wall art where the record ledge used to be (one per room; the café has its menu board). */
 .stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
 .stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
