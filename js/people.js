@@ -193,7 +193,8 @@ export function held(item) {
     // The hidden `.page` is a page that sweeps across when she turns one (css/style.css).
     case 'bookopen': {
       const c = tone || '#6FA6C8';
-      return '<g class="book-read" transform="translate(3 0)">'
+      // Leaned back from the hand, as a book is naturally held.
+      return '<g class="book-read" transform="rotate(-14 -23 -17) translate(3 0)">'
         + `<path d="M-39.4 -37.5 L-26.4 -37.5 L-22.4 -16.5 L-35.4 -16.5 Z" fill="${c}"/>`
         + '<path d="M-26.4 -37.5 L-24.6 -37.1 L-20.6 -16.9 L-22.4 -16.5 Z" fill="#F7F1E6"/>'
         + '<path d="M-39.4 -37.5 L-26.4 -37.5 L-25.4 -39.3 L-38.2 -39.3 Z" fill="#F7F1E6"/>'
