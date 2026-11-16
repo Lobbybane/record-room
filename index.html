@@ -605,7 +605,11 @@
           <g class="b-phone"><g transform="rotate(112 1132 511)"><rect x="1128" y="495" width="9" height="14" rx="1.6" fill="#15132B"/><rect class="b-phone-glow" x="1129.2" y="496.6" width="6.6" height="10.6" rx="1" fill="#9FD8FF"/></g></g>
           <path d="M1118 496 L1130 510" fill="none" stroke="#EFE3D0" stroke-width="9" stroke-linecap="round"/>
           <circle cx="1132" cy="511" r="4.5" fill="#C98E67"/>
-          <g class="b-cup"><path d="M1126 500 H1138 L1136.5 514 H1127.5 Z" fill="#F4ECFF"/><rect x="1125" y="498" width="14" height="3" rx="1" fill="#2B2440"/></g>
+          <!-- a finished drink carried to the pickup mat (turned like the phone, so it's upright when the arm is up) -->
+          <g class="b-cup"><g transform="rotate(112 1132 511)">
+            <g class="b-cup-hot"><rect x="1126" y="496" width="12" height="14" rx="2" fill="#F4ECFF"/><path d="M1138 499 q4.5 0 4.5 3.5 t-4.5 3.5" fill="none" stroke="#F4ECFF" stroke-width="2"/><ellipse cx="1132" cy="496.6" rx="5" ry="1.3" fill="#E6C9A0"/></g>
+            <g class="b-cup-iced"><path d="M1125 490 L1139 490 L1137.4 510 L1126.6 510 Z" fill="#E8DDF5" fill-opacity=".35"/><path d="M1125.6 496 L1138.4 496 L1137.4 510 L1126.6 510 Z" fill="#9A6440" fill-opacity=".9"/><path d="M1124 490 H1140" stroke="#F4ECFF" stroke-width="1.6" stroke-linecap="round"/><path d="M1133 490 L1136.5 478" stroke="#F28DB2" stroke-width="2" stroke-linecap="round"/></g>
+          </g></g>
         </g></g></g>
       </g></g></g>
       <!-- right arm: steams milk at the machine -->
@@ -705,8 +709,13 @@
     <text x="1202" y="580" text-anchor="middle" class="cafe-chalk small">order here</text>
     <rect x="1186" y="508" width="20" height="20" rx="3" fill="rgba(200, 230, 255, .25)" stroke="rgba(255, 255, 255, .5)"/>
     <text x="1196" y="522" text-anchor="middle" class="cafe-chalk tiny">tips</text>
-      <!-- the pickup spot at the counter's left end -->
+      <!-- the pickup spot at the counter's left end, and the drink waiting on it (js/cafe.js) -->
     <rect class="pickup-mat" x="926" y="523" width="22" height="4" rx="1.5" fill="#2E6E66"/>
+    <g class="pickup-cup hot"><rect x="931" y="509" width="12" height="14" rx="2" fill="#F4ECFF"/><path d="M943 512 q4.5 0 4.5 3.5 t-4.5 3.5" fill="none" stroke="#F4ECFF" stroke-width="2"/><ellipse cx="937" cy="509.6" rx="5" ry="1.3" fill="#E6C9A0"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round"><path class="st st1" d="M934 506 q-2 -3 0 -6 q2 -3 0 -6"/><path class="st st2" d="M937.5 505.5 q2 -3 0 -6 q-2 -3 0 -6"/><path class="st st3" d="M940.5 506 q-2 -3 0 -6"/></g></g>
+    <g class="pickup-cup iced"><path d="M930 502 L944 502 L942.4 523 L931.6 523 Z" fill="#E8DDF5" fill-opacity=".35"/><path d="M930.6 508 L943.4 508 L942.4 523 L931.6 523 Z" fill="#9A6440" fill-opacity=".9"/>
+      <g fill="#F4F8FF" fill-opacity=".8"><rect x="932" y="504" width="5" height="5" rx="1" transform="rotate(12 934.5 506.5)"/><rect x="937" y="506" width="4.5" height="4.5" rx="1"/></g>
+      <path d="M929 502 H945" stroke="#F4ECFF" stroke-width="1.6" stroke-linecap="round"/><path d="M938 502 L941.5 490" stroke="#F28DB2" stroke-width="2" stroke-linecap="round"/></g>
   </svg>
 
   <!-- The media console on the left wall; the TV sits on it -->

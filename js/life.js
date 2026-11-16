@@ -175,8 +175,11 @@ function initWandering(stage) {
     dogBusy = true;
     clearTimeout(dogAway);
     try {
-      // The dog's centre is about 85px in from its left edge; its bed is at x 60.
-      const target = Math.round(Math.min(600, Math.max(0, point.x - 145)));
+      // The dog's centre is about 85px in from its left edge. Its bed is at x 60, or by the
+      // counter (x 1040) in the café, where it trots only as far as the crate.
+      const base = dog.offsetLeft;
+      const [min, max] = base > 500 ? [-170, 40] : [0, 600];
+      const target = Math.round(Math.min(max, Math.max(min, point.x - base - 85)));
       await walk(dog, target, 160);
     } finally {
       await lieDown(dog);

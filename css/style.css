@@ -1214,7 +1214,24 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .barista :is(.b-phone, .b-cup, .b-mouth-open) { display: none; }
 
 /* ---------- the barista's day (states set on .cafe-back by js/cafe.js) ---------- */
-.barista { transition: transform .5s cubic-bezier(.45, .05, .55, .95); }
+/* The barista slides along behind the counter (--bx, set by js/cafe.js: 0 at the machine,
+   -156px at the register end) and dips to the ice well (--by). */
+.barista { transform: translate(var(--bx, 0px), var(--by, 0px)); transition: transform 1.2s cubic-bezier(.45, .05, .55, .95), opacity .35s ease; }
+.cafe-back.b-sliding .barista { animation: b-bob .5s ease-in-out infinite; }
+@keyframes b-bob { 50% { translate: 0 -1.6px; } }
+/* Carrying a finished drink at chest height, above the turntable. */
+.cafe-back.b-carry .b-arm-l { transform: rotate(-20deg); }
+.cafe-back.b-carry .b-fore-l { transform: rotate(-92deg); }
+.cafe-back:is(.b-carry-hot, .b-carry-iced) .b-cup { display: inline; }
+.cafe-back:not(.b-carry-hot) .b-cup-hot, .cafe-back:not(.b-carry-iced) .b-cup-iced { display: none; }
+/* Out from behind the counter (a walking copy clears a table). */
+.cafe-back.b-out .barista { opacity: 0; }
+/* The drink waiting on the pickup mat slides in from behind the turntable. */
+.pickup-cup { opacity: 0; transition: opacity .2s ease; }
+.cafe-counter.pick-hot .pickup-cup.hot, .cafe-counter.pick-iced .pickup-cup.iced { opacity: 1; animation: pickup-slide .5s ease-out; }
+@keyframes pickup-slide { from { transform: translateX(16px); } }
+.pickup-cup .st { opacity: 0; animation: steam-wisp 2.8s ease-in-out infinite; }
+.pickup-cup .st2 { animation-delay: -.9s; } .pickup-cup .st3 { animation-delay: -1.8s; }
 /* Steaming milk at the machine: the pitcher comes out beside the machine, under the wand,
    and jiggles while the wand steams. */
 .cafe-back.b-steam .barista-arm { transform: rotate(25deg); }
@@ -1237,7 +1254,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .cafe-back.b-look-l .barista-head { transform: rotate(-9deg); }
 .cafe-back.b-look-r .barista-head { transform: rotate(9deg); }
 /* Bending down to the ice well under the counter. */
-.cafe-back.b-dip .barista { transform: translateY(16px); }
+.cafe-back.b-dip .barista { --by: 16px; transition-duration: .5s; }
 /* Talking (taking an order). */
 .cafe-back.b-talk .b-mouth { display: none; }
 .cafe-back.b-talk .b-mouth-open { display: inline; animation: talk-open .3s steps(1) infinite; }
@@ -1269,7 +1286,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .phone-glow { animation: none; }
-  .drink.hot .st, .bar-cup .st { animation: none; opacity: .45; }
+  .drink.hot .st, .bar-cup .st, .pickup-cup .st { animation: none; opacity: .45; }
 }
 
 /* ---------- radio: reduced motion ---------- */
@@ -1310,6 +1327,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* ---------- living pets (js/life.js) ---------- */
 .dog-cushion { position: absolute; left: 60px; top: 712px; z-index: 5; display: none; overflow: visible; }
 .stage[data-pet="dog"] .dog-cushion { display: block; }
+/* In the café the front-left floor has a table, so the dog's bed is by the counter instead. */
+.stage[data-room="cafe"] :is(.pet-dog, .dog-cushion) { left: 1040px; }
 /* Standing and lying crossfade, with a small rise and settle, so getting up and lying down never snap. */
 .pet-stand, .pet-lying { transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .38s ease, transform .45s cubic-bezier(.3, .7, .4, 1); }
 .pet-stand { opacity: 0; transform: scale(1.04, .8); }
@@ -1556,6 +1575,16 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .table-things .put-down { opacity: 0; }
 .table-things.down .put-down { opacity: 1; }
 .table-front.lifted .table-drink { opacity: 0; }
+/* Customers who come and go (js/cafe.js): fade in and out, and an empty cup left behind. */
+#people :is(.table-things, .table-front) { transition: opacity .3s ease; }
+#people .cafe-fade { opacity: 0 !important; }
+#people .gone { display: none; }
+#people .empty-cup .wisps { display: none; }
+#people .empty-cup .drink :is(ellipse, path[fill="#9A6440"]) { opacity: .35; }
+/* Standing at the counter: reaching up onto it for the drink (the cup stays upright). */
+.person.reach-up .arm { transform: rotate(78deg); }
+.person.reach-up .forearm { transform: rotate(9deg); }
+.person.reach-up .wrist { transform: rotate(-87deg); }
 /* Typing: the near hand taps in little bursts; the screen flickers with what's typed. */
 .person.typing .forearm { animation: key-taps .9s ease-in-out infinite; }
 @keyframes key-taps { 0%, 26%, 52%, 100% { transform: rotate(0); } 12% { transform: rotate(-3deg); } 38% { transform: rotate(-2deg); } 70% { transform: rotate(-3.5deg); } 84% { transform: rotate(-1deg); } }

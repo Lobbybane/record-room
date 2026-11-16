@@ -91,6 +91,11 @@ function torso(style, color, extra = {}) {
     out += `<path d="M-2 -46 L-6 0" stroke="${shade}" stroke-width="2"/>
       <g fill="#E0C068"><circle cx="-8" cy="-34" r="1.6"/><circle cx="-9" cy="-24" r="1.6"/><circle cx="-10" cy="-14" r="1.6"/></g>`;
   }
+  // The barista's green apron, over the front of whatever they wear.
+  if ((extra.extras || []).includes('apron')) {
+    out += '<path d="M-14 -34 Q-18 -16 -14 2 L3 2 L3 -34 Z" fill="#2E6E66"/><path d="M-8 -34 L-4 -47" stroke="#2E6E66" stroke-width="2.4"/>'
+      + '<rect x="-12" y="-18" width="9" height="7" rx="1.5" fill="#285E57"/>';
+  }
   return out;
 }
 
