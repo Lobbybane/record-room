@@ -1511,7 +1511,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .person.act-read .forearm { transform: rotate(22deg); }
 .person.act-read .wrist { transform: rotate(-28deg); }
 .person.act-read .eye-open { transform: translate(-.4px, 1px); }
-.person .page { transform-box: view-box; transform-origin: -25.4px -17.5px; }
+/* The turning page swings round the spine; it only shows while turning (step 2). */
+.person .page { transform-box: view-box; transform-origin: -37.4px -27px; opacity: 0; }
 /* Wall art where the record ledge used to be (one per room; the café has its menu board). */
 .stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
 .stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
