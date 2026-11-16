@@ -94,7 +94,7 @@ function tick() {
 
 function headPoint(p) {
   const s = p.s || 1.5;
-  return { x: p.x - 2 * s, y: p.y - 84 * s };
+  return { x: p.x + (p.face === 'right' ? 2 : -2) * s, y: p.y - 84 * s };
 }
 
 function say(p, text, ms = 2400) {
@@ -145,9 +145,12 @@ async function chat() {
   if (!lines) return;
   const gen = generation;
   busy.add(a.dataset.pid); busy.add(b.dataset.pid);
-  // Everyone faces left (toward the TV), so the one on the left turns round to talk.
-  const leftOne = pa.x < pb.x ? a : b;
-  leftOne.classList.add('turned');
+  // Most people face left (toward the TV), so the one on the left turns round to talk.
+  // Café tablemates already face each other, so nobody needs to turn.
+  const [lp, rp] = pa.x < pb.x ? [pa, pb] : [pb, pa];
+  const facingEachOther = lp.face === 'right' && rp.face !== 'right';
+  const leftOne = facingEachOther ? null : (pa.x < pb.x ? a : b);
+  leftOne?.classList.add('turned');
   const speakers = [[a, pa], [b, pb]];
   try {
     for (let i = 0; i < lines.length; i++) {
@@ -158,20 +161,22 @@ async function chat() {
     }
     if (Math.random() < 0.4) await Promise.all([act(a, 'laugh'), act(b, 'laugh')]);
   } finally {
-    leftOne.classList.remove('turned');
+    leftOne?.classList.remove('turned');
     busy.delete(a.dataset.pid); busy.delete(b.dataset.pid);
   }
 }
 
 // What someone can do depends on what they're holding: a drink gets sipped, a laptop
 // typed on, popcorn eaten. Only empty hands stretch or wave.
-const SOLO_FOR = { mug: 'sip', latte: 'sip', cocoa: 'sip', lemonade: 'sip', togo: 'sip', phone: 'scroll', laptop: 'type', book: 'scroll', popcorn: 'munch' };
+const SOLO_FOR = { mug: 'sip', latte: 'sip', cocoa: 'sip', lemonade: 'sip', togo: 'sip', hot: 'sip', hotlatte: 'sip', iced: 'sip', phone: 'scroll', laptop: 'type', book: 'scroll', popcorn: 'munch' };
 async function solo() {
   const el = pick(present());
   if (!el) return;
   const p = dataOf(el);
-  const hold = el.dataset.hold;
-  const own = SOLO_FOR[hold];
+  const hold = el.dataset.hold.split(':')[0];
+  // Café customers busy with a laptop, phone or book keep their pose (their own moves come
+  // from js/cafe.js); they only laugh here.
+  const own = /\bact-(type|phone|read)\b/.test(el.getAttribute('class')) ? null : SOLO_FOR[hold];
   const action = own ? (Math.random() < 0.8 ? own : 'laugh') : hold ? 'laugh' : pick(['laugh', 'stretch', 'wave']);
   busy.add(el.dataset.pid);
   if (action === 'laugh') say(p, pick(['haha', 'lol', 'hehe']), 1600);

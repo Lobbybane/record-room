@@ -23,17 +23,23 @@ export const GROUPS = {
       { x: 700, y: 722, s: 1.4, pose: 'recline', skin: 2, hair: ['short', '#2A1E1E'], top: ['hoodie', '#5A6EB0'], legs: '#2C2E5E', hold: 'phone', dozer: true },
     ],
   },
+  // A real café: little bistro tables with bentwood chairs. People sit facing their table
+  // (and each other); the TV is just the café's radio. `act` is what they're doing
+  // (type, phone, read, or hold for just enjoying a drink) and `drink` what they ordered.
   cafe: {
     furniture: [
-      { type: 'cafetable', x: 470, y: 700, s: 1.4, items: [['latte', -10], ['latte', 8]], core: true, people: true },
-      { type: 'armchair', x: 400, y: 712, s: 1.4, color: '#8A5A4A' },
-      { type: 'armchair', x: 560, y: 704, s: 1.4, color: '#2E6E66', core: true, people: true },
-      { type: 'stool', x: 688, y: 726, s: 1.4, color: '#8A5A3C', people: true },
+      { type: 'cafechair', x: 404.75, y: 700, s: 1.15, face: 'right' },
+      { type: 'cafechair', x: 531.25, y: 700, s: 1.15 },
+      { type: 'bistro', x: 468, y: 700, s: 1.15 },
+      { type: 'cafechair', x: 604.75, y: 726, s: 1.15, face: 'right' },
+      { type: 'cafechair', x: 731.25, y: 726, s: 1.15 },
+      { type: 'bistro', x: 668, y: 726, s: 1.15 },
     ],
     people: [
-      { x: 560, y: 704, s: 1.45, core: true, skin: 4, hair: ['bun', '#15101A'], top: ['sweater', '#F2B33D'], legs: '#3E2E3E', hold: 'latte', dozer: true },
-      { x: 400, y: 712, s: 1.45, skin: 0, hair: ['long', '#B0603A'], top: ['tee', '#9FE0C8'], legs: '#3B3F78', hold: 'book', studier: true },
-      { x: 688, y: 726, s: 1.4, core: true, skin: 2, hair: ['short', '#2A1E1E'], top: ['flannel', '#4F6FA8'], legs: '#2C2E5E', hold: 'laptop', extras: ['glasses'] },
+      { x: 404.75, y: 700, s: 1.15, pose: 'chair', shoes: '#3A2A3A', face: 'right', core: true, act: 'type', drink: 'hotlatte:#F4ECFF', skin: 2, hair: ['short', '#2A1E1E'], top: ['flannel', '#4F6FA8'], legs: '#2C2E5E', extras: ['glasses'] },
+      { x: 531.25, y: 700, s: 1.15, pose: 'chair', shoes: '#6B4436', act: 'read', hold: 'bookopen:#6FA6C8', skin: 0, hair: ['long', '#B0603A'], top: ['tee', '#9FE0C8'], legs: '#3B3F78' },
+      { x: 604.75, y: 726, s: 1.15, pose: 'chair', shoes: '#E8DDF5', face: 'right', act: 'phone', hold: 'phone', drink: 'iced', skin: 4, hair: ['bun', '#15101A'], top: ['sweater', '#F2B33D'], legs: '#3E2E3E' },
+      { x: 731.25, y: 726, s: 1.15, pose: 'chair', shoes: '#2B2440', core: true, act: 'hold', hold: 'hot:#F7A9C8', plate: true, skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['hoodie', '#E8955A'], legs: '#3B3F78' },
     ],
   },
   cabin: {
@@ -117,8 +123,7 @@ const LIFE = {
   },
   cafe: {
     chats: [["how's the latte?", 'perfect'], ['love this place', 'same'], ['what are you reading?', 'a mystery'], ['deadline…', 'you got this']],
-    moments: ['type'],
-    wanders: { 2: { snacks: ['latte'], snackLines: ['need more coffee'] } },
+    moments: [],
     // Comes in from the street on the right, picks up a to-go cup at the counter, then says hi.
     visitor: { x: 893, y: 708, s: 1.3, order: { x: 965, item: 'togo' }, lines: [['cute place!', 'the best'], ['love this song', 'right?']],
       look: { skin: 1, hair: ['ponytail', '#2A1E1E'], top: ['puffer', '#9CBDA6'], legs: '#3B3F78', hold: 'togo' } },

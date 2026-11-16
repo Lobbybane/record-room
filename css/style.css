@@ -1209,8 +1209,9 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @keyframes sip { 0%, 64% { opacity: 0; } 65%, 82% { opacity: 1; } 83%, 100% { opacity: 0; } }
 @keyframes sip-down { 0%, 64% { opacity: 1; } 65%, 82% { opacity: 0; } 83%, 100% { opacity: 1; } }
 
-.orderer-body { transform-box: view-box; transform-origin: 896px 604px; animation: orderer-sway 6s ease-in-out infinite; }
-@keyframes orderer-sway { 50% { transform: rotate(1deg); } }
+/* The barista's arms bend at the elbow (pivots set in index.html). */
+.barista :is(.b-arm-l, .b-fore-l, .b-fore-r) { transform-box: view-box; transform-origin: 0 0; transition: transform .6s cubic-bezier(.45, .05, .55, .95); }
+.barista :is(.b-phone, .b-cup, .b-mouth-open) { display: none; }
 .phone-glow { animation: screen-flicker 3s ease-in-out infinite; }
 
 .pendant-cone { fill: url(#cone-light); }
@@ -1231,7 +1232,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .menu-board li span:first-child::after { content: ' ..............................'; opacity: .45; }
 
 @media (prefers-reduced-motion: reduce) {
-  .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .orderer-body, .phone-glow { animation: none; }
+  .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .phone-glow { animation: none; }
+  .drink.hot .st { animation: none; opacity: .45; }
 }
 
 /* ---------- radio: reduced motion ---------- */
@@ -1484,8 +1486,25 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   .stage.is-on .person .head, .phone-glow, .screen-glow { animation: none; }
 }
 /* The café's own regulars follow the People setting too (the barista always works). */
-.stage[data-crowd="cozy"] :is(.cafe-orderer, .cafe-bar .sipper),
-.stage[data-crowd="empty"] :is(.cafe-orderer, .cafe-bar .sipper, .cafe-bar .typist) { display: none; }
+.stage[data-crowd="cozy"] .cafe-bar .sipper,
+.stage[data-crowd="empty"] :is(.cafe-bar .sipper, .cafe-bar .typist) { display: none; }
+
+/* ---------- the café's customers (tables, drinks, what they're doing) ---------- */
+/* Steam curls up off a hot drink and fades. */
+.drink.hot .st { opacity: 0; animation: steam-wisp 2.8s ease-in-out infinite; }
+.drink.hot .st2 { animation-delay: -.9s; }
+.drink.hot .st3 { animation-delay: -1.8s; }
+@keyframes steam-wisp { 0% { opacity: 0; transform: translateY(2px); } 35% { opacity: .65; } 100% { opacity: 0; transform: translateY(-6px); } }
+/* In the café nobody bobs along at the TV: they're busy with their own things. */
+.stage[data-room="cafe"].is-on .person .head { animation: none; }
+/* Poses: laptop users look down at the screen; phone and book are held up to read. */
+.person.act-type .head { transform: rotate(-6deg); }
+.person:is(.act-phone, .act-read) .head { transform: rotate(-11deg); }
+.person:is(.act-phone, .act-read) .arm { transform: rotate(8deg); }
+.person:is(.act-phone, .act-read) .forearm { transform: rotate(38deg); }
+.person.act-phone .wrist { transform: rotate(-26deg); }
+.person.act-read .wrist { transform: rotate(-34deg); }
+.person .page { transform-box: view-box; transform-origin: -28px -32px; }
 /* Wall art where the record ledge used to be (one per room; the café has its menu board). */
 .stage[data-room="bedroom"] .art-bedroom, .stage[data-room="cabin"] .art-cabin, .stage[data-room="beach"] .art-beach,
 .stage[data-room="greenhouse"] .art-greenhouse, .stage[data-room="treehouse"] .art-treehouse, .stage[data-room="train"] .art-train { display: block; }
