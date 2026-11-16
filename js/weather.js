@@ -1,10 +1,10 @@
 // Weather through the window, drawn on two canvases each frame:
 // - outside: rain at three depths (with splashes), soft snow, and lightning bolts in a storm
 // - on the glass: beads of water and drops that run down, gathering beads and leaving trails
-// The glass is 512 x 322 stage pixels; the canvases match the screen size for sharp lines.
+// The glass is 592 x 354 stage pixels; the canvases match the screen size for sharp lines.
 
-const W = 512;
-const H = 322;
+const W = 592;
+const H = 354;
 const LIGHTNING_MS = 12000; // the .lightning CSS animation's length (thunder follows it too)
 
 const rand = (a, b) => a + Math.random() * (b - a);

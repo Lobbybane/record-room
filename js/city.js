@@ -1,4 +1,5 @@
-// The city through the window, drawn as one SVG (512 x 322, the glass's own pixels).
+// The city through the window, drawn as one SVG in the old window's pixels (0-512 x 0-322),
+// reaching out to fill the bigger glass (-30 to 562, -32 to 322).
 // Buildings have rooftop details and window grids; neon signs are mounted on buildings
 // with no windows behind them and nothing drawn over them. The window's middle bar
 // sits at x 251-261, so signs stay on one pane or the other.
@@ -18,6 +19,8 @@ const LIT = { sunrise: 0.2, golden: 0.12, dusk: 0.34, midnight: 0.46 };
 // x, width, top, tone (1-4), window style, roof detail, optional sign.
 // Sign boxes are in glass pixels; windows are left out wherever a sign sits.
 const BUILDINGS = [
+  // (the window is wider than this list's 0-512: a building at each edge fills it)
+  { x: -40, w: 46, top: 138, tone: 3, windows: 'grid', roof: 'antenna' },
   { x: 0, w: 58, top: 160, tone: 2, windows: 'grid', roof: 'tank' },
   { x: 52, w: 70, top: 112, tone: 3, windows: 'grid', roof: 'ac',
     sign: { type: 'box', text: 'CAFE', x: 64, y: 196, w: 46, h: 16, color: 'peach' } },
@@ -28,6 +31,8 @@ const BUILDINGS = [
   { x: 322, w: 78, top: 96, tone: 1, windows: 'bands', roof: 'spire',
     sign: { type: 'vertical', text: 'HOTEL', x: 354, y: 118, w: 14, h: 74, color: 'pink' } },
   { x: 396, w: 60, top: 170, tone: 3, windows: 'grid', roof: 'tank' },
+  { x: 506, w: 60, top: 100, tone: 2, windows: 'bands', roof: 'spire',
+    sign: { type: 'box', text: 'RAMEN', x: 510, y: 132, w: 40, h: 15, color: 'cyan' } },
   { x: 450, w: 62, top: 128, tone: 4, windows: 'grid', roof: 'ac',
     sign: { type: 'box', text: 'JAZZ', x: 460, y: 150, w: 42, h: 16, color: 'pink' } },
 ];
@@ -53,7 +58,7 @@ const overlaps = (a, b, pad = 3) =>
 export function buildCity(container, sky) {
   const rnd = seeded(11);
   const litChance = LIT[sky] ?? LIT.dusk;
-  const root = svg('svg', { viewBox: '0 0 512 322', class: 'city-svg', 'aria-hidden': 'true' });
+  const root = svg('svg', { viewBox: '-30 -32 592 354', class: 'city-svg', 'aria-hidden': 'true' });
 
   const defs = svg('defs');
   defs.innerHTML = `
@@ -68,7 +73,7 @@ export function buildCity(container, sky) {
   // Tiny lights in the far-off skyline, behind everything else.
   const far = svg('g', { class: 'far-lights' });
   for (let i = 0; i < 46; i++) {
-    far.append(svg('rect', { x: (rnd() * 510).toFixed(1), y: (168 + rnd() * 90).toFixed(1), width: 1.6, height: 2, class: 'far-light' }));
+    far.append(svg('rect', { x: (rnd() * 590 - 30).toFixed(1), y: (168 + rnd() * 90).toFixed(1), width: 1.6, height: 2, class: 'far-light' }));
   }
   root.append(far);
   const buildings = svg('g', { class: 'buildings' });
