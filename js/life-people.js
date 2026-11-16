@@ -294,18 +294,18 @@ const easeInOut = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
 function walkTo(el, { x, y, s }, toX, speed = 110) {
   const facing = toX > x ? -1 : 1; // everyone is drawn facing left
   const duration = (Math.abs(toX - x) / speed) * 1000 * 1.15;
-  el.classList.add('walking');
+  el.classList.add('walking', 'stepping');
   const start = performance.now();
   return new Promise((resolve) => {
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
       const cx = x + (toX - x) * easeInOut(t);
-      // A soft step bob that fades in and out with the walk.
-      const bob = Math.abs(Math.sin((now - start) / 260 * Math.PI)) * -1.4 * Math.min(1, t * 6, (1 - t) * 6);
-      el.setAttribute('transform', `translate(${cx.toFixed(1)} ${(y + bob).toFixed(1)}) scale(${facing * s} ${s})`);
+      // The stride and the body's dip come from CSS (.stepping, --stride in css/style.css).
+      el.setAttribute('transform', `translate(${cx.toFixed(1)} ${y}) scale(${facing * s} ${s})`);
       if (t < 1) requestAnimationFrame(step);
       else {
-        el.classList.remove('walking');
+        el.classList.remove('walking');           // the stride eases out…
+        setTimeout(() => { if (!el.classList.contains('walking')) el.classList.remove('stepping'); }, 450); // …then stops
         el.setAttribute('transform', `translate(${toX} ${y}) scale(${s} ${s})`);
         resolve();
       }

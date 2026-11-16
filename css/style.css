@@ -1655,15 +1655,44 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .person.groove .bodywrap { animation: p-groove .64s ease-in-out 6; }
 @keyframes p-groove { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
 /* Getting up and walking: the seated person and their standing copy crossfade. */
-.person { transition: opacity .3s ease; }
 .person.away { opacity: 0; }
 .person.walker { display: none; opacity: 0; }
 .person.walker.out { display: inline; }
 .person.walker.shown { opacity: 1; }
-.person .leg { transform-box: fill-box; transform-origin: 50% 0; }
-.person.walking .leg-near { animation: p-step .52s ease-in-out infinite; }
-.person.walking .leg-far { animation: p-step .52s ease-in-out infinite reverse; }
-@keyframes p-step { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+/* ---------- walking: a real stride ---------- */
+/* Legs turn at the hip (.thigh) and the knee (.shin). One cycle is two steps: heel strike
+   with the leg forward, weight on it, push off behind, then swing through with the knee
+   bent and the foot lifted; the far leg runs half a cycle behind. --stride eases from 0 to 1
+   when someone sets off and back to 0 as they stop, so legs grow into the stride and settle
+   straight instead of snapping. (Forward is a positive turn: people are drawn facing left.) */
+@property --stride { syntax: '<number>'; inherits: true; initial-value: 0; }
+.person { --stride: 0; transition: opacity .3s ease, --stride .4s ease; }
+.person.walking { --stride: 1; }
+.person :is(.thigh, .shin) { transform-box: view-box; transform-origin: 0 0; }
+.person.stepping .leg-near .thigh { animation: walk-thigh 1s linear infinite; }
+.person.stepping .leg-near .shin { animation: walk-shin 1s linear infinite; }
+.person.stepping .leg-far .thigh { animation: walk-thigh 1s linear -.5s infinite; }
+.person.stepping .leg-far .shin { animation: walk-shin 1s linear -.5s infinite; }
+@keyframes walk-thigh {
+  0%, 100% { transform: rotate(calc(var(--stride) * 24deg)); }
+  20% { transform: rotate(calc(var(--stride) * 11deg)); }
+  50% { transform: rotate(calc(var(--stride) * -22deg)); }
+  64% { transform: rotate(calc(var(--stride) * -12deg)); }
+  84% { transform: rotate(calc(var(--stride) * 16deg)); }
+}
+@keyframes walk-shin {
+  0%, 100% { transform: rotate(calc(var(--stride) * -2deg)); }
+  20% { transform: rotate(calc(var(--stride) * -9deg)); }
+  44% { transform: rotate(calc(var(--stride) * -5deg)); }
+  56% { transform: rotate(calc(var(--stride) * -30deg)); }
+  70% { transform: rotate(calc(var(--stride) * -58deg)); }
+  88% { transform: rotate(calc(var(--stride) * -16deg)); }
+}
+/* The body dips as each heel lands and rises as the other leg passes; empty hands swing. */
+.person.stepping .bodywrap { animation: walk-dip .5s ease-in-out infinite; }
+@keyframes walk-dip { 0%, 100% { transform: translateY(calc(var(--stride) * 1.3px)); } 50% { transform: translateY(calc(var(--stride) * -1.4px)); } }
+.person.stepping[data-hold=""] .arm { animation: walk-arm 1s ease-in-out infinite; }
+@keyframes walk-arm { 0%, 100% { transform: rotate(calc(var(--stride) * -11deg)); } 50% { transform: rotate(calc(var(--stride) * 11deg)); } }
 .person.walking .head { animation: none !important; }
 /* Speech bubbles. */
 .bubble { animation: bubble-in .25s cubic-bezier(.3, 1.6, .5, 1); transform-box: fill-box; transform-origin: 50% 100%; }
