@@ -17,6 +17,7 @@ let stage = null;
 let scene = null;             // { room, root, group }
 let generation = 0;           // bumps when the people are redrawn, so old events stop
 const busy = new Set();
+export { busy as lifeBusy }; // js/cafe.js leaves these people alone
 let lastVisitor = 0;
 let lastSnack = 0;
 
@@ -29,7 +30,7 @@ const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
  * Plays one CSS moment on a person: adds the class, waits until that person's animations
  * from it have really finished (so nothing snaps back early), then removes the class.
  */
-async function act(el, cls, fallback = 4000) {
+export async function act(el, cls, fallback = 4000) {
   el.classList.add(cls);
   await frame();
   const running = el.getAnimations({ subtree: true }).filter((a) => {
@@ -73,7 +74,7 @@ function allowed() {
 
 const dataOf = (el) => scene.group.people[Number(el.dataset.pid)];
 function present() {
-  return [...scene.root.querySelectorAll('.person:not(.walker):not(.visitor):not(.away):not(.lying)')]
+  return [...scene.root.querySelectorAll('.person:not(.walker):not(.visitor):not(.away):not(.lying):not(.cafe-busy)')]
     .filter((el) => !busy.has(el.dataset.pid));
 }
 
@@ -81,7 +82,8 @@ function tick() {
   if (!allowed()) return;
   const now = Date.now();
   const g = scene.group;
-  const options = [['chat', 4], ['solo', 3]];
+  // In the café, js/cafe.js gives each customer their own moves; here they only chat.
+  const options = [['chat', 4], ['solo', scene.room === 'cafe' ? 0 : 3]];
   if (g.moments?.length) options.push(['moment', 2.5]);
   if (now - lastSnack > 55_000 && present().some((el) => dataOf(el).wanders)) options.push(['snack', 1.4]);
   if (g.visitor && now - lastVisitor > rand(70_000, 130_000)) options.push(['visitor', 6]);
@@ -170,6 +172,7 @@ async function chat() {
 // typed on, popcorn eaten. Only empty hands stretch or wave.
 const SOLO_FOR = { mug: 'sip', latte: 'sip', cocoa: 'sip', lemonade: 'sip', togo: 'sip', hot: 'sip', hotlatte: 'sip', iced: 'sip', phone: 'scroll', laptop: 'type', book: 'scroll', popcorn: 'munch' };
 async function solo() {
+  if (scene.room === 'cafe') return; // café customers' own moves come from js/cafe.js
   const el = pick(present());
   if (!el) return;
   const p = dataOf(el);

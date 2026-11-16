@@ -347,23 +347,30 @@ const FURNITURE = {
 /* ---------- what a café customer has on the table ---------- */
 
 // Drawn in the customer's own coordinates (mirrored with them), on the table top at y -14.
-// A mug or glass on the table sits where the hand rests, nudged out of the way of a laptop.
-export function tableThings(p) {
+// 'back' is drawn before the person (laptop, plate, and a phone or closed book put down
+// while they sip); 'front' after them: the drink, nearer to us on the table, standing
+// exactly where the reaching hand picks it up (js/cafe.js swaps it into the hand).
+export const DRINK_SPOT = [-12, 0];
+export function tableThings(p, part = 'back') {
   const s = p.s || 1.5;
   const at = (dx, dy, svg) => `<g transform="translate(${dx} ${dy})">${svg}</g>`;
+  const wrap = (cls, inner) => `<g class="${cls}" data-for="${p.pid ?? p.index}" data-y="${p.z ?? p.y}" transform="translate(${p.x} ${p.y}) scale(${p.face === 'right' ? -s : s} ${s})">${inner}</g>`;
+  if (part === 'front') {
+    return p.drink && p.act !== 'hold' ? wrap('table-front', `<g class="table-drink">${at(...DRINK_SPOT, held(p.drink))}</g>`) : '';
+  }
   let out = '';
   if (p.act === 'type') {
     out += `<g class="laptop-on-table"><path d="M-52 -14 L-21 -14 L-22 -11.5 L-52 -11.5 Z" fill="#B9B1D6"/>
       <path d="M-52 -14 L-46 -41 L-43 -40.5 L-49 -14 Z" fill="#8A84A8"/>
       <path class="screen-glow" d="M-48.5 -16.5 L-43.6 -38.5" stroke="#9FD8FF" stroke-width="2" opacity=".75"/></g>`;
   }
-  if (p.drink && p.act !== 'hold') {
-    out += `<g class="table-drink">${at(p.act === 'type' ? -34 : -7, 1, held(p.drink))}</g>`;
-  }
+  // Put down for a moment while they drink (hidden until then).
+  if (p.act === 'phone') out += '<g class="put-down"><rect x="-38" y="-15.6" width="12" height="2" rx="1" fill="#15132B"/></g>';
+  if (p.act === 'read') out += `<g class="put-down"><rect x="-42" y="-17.4" width="18" height="3.6" rx="1" fill="${(p.hold || '').split(':')[1] || '#6FA6C8'}"/><rect x="-41" y="-17.9" width="16" height="1.2" fill="#F7F1E6"/></g>`;
   if (p.plate) {
     out += at(p.act === 'type' ? 0 : -14, 0, '<ellipse cx="-36" cy="-14.5" rx="7" ry="1.6" fill="#F4ECFF"/><path d="M-41 -15.5 q5 -6 10 0 q-2.4 -2 -5 -2 q-2.6 0 -5 2 Z" fill="#E8B060"/>');
   }
-  return `<g class="table-things" data-for="${p.pid ?? p.index}" data-y="${p.z ?? p.y}" transform="translate(${p.x} ${p.y}) scale(${p.face === 'right' ? -s : s} ${s})">${out}</g>`;
+  return wrap('table-things', out);
 }
 
 /* ---------- drawing a room's group ---------- */
@@ -379,10 +386,11 @@ export function drawPeople(container, { room, crowd, season }) {
     ...people,
     // What's on the table in front of each seated café customer (laptop, mug…).
     ...people.filter((p) => p.act).map((p) => ({ ...p, kind: 't' })),
+    ...people.filter((p) => p.act).map((p) => ({ ...p, kind: 'd' })),
   ];
   // Back to front (higher y is nearer). At the same depth: chairs, tables, the things on
   // the tables, then people (so hands rest on top of the table and its things).
-  const layer = (item) => (item.kind === 'p' ? 3 : item.kind === 't' ? 2 : item.type === 'cafechair' ? 0 : 1);
+  const layer = (item) => ({ p: 3, t: 2, d: 4 })[item.kind] ?? (item.type === 'cafechair' ? 0 : 1);
   items.sort((a, b) => (a.z ?? a.y) - (b.z ?? b.y) || layer(a) - layer(b));
   const cold = season === 'winter' && !['beach'].includes(room);
   const parts = items.map((item) => {
@@ -393,6 +401,7 @@ export function drawPeople(container, { room, crowd, season }) {
       return draw ? `<g class="furniture f-${item.type}" data-y="${item.z ?? item.y}" transform="translate(${item.x} ${item.y}) scale(${item.face === 'right' ? -s : s} ${s})">${draw(item)}</g>` : '';
     }
     if (item.kind === 't') return tableThings(item);
+    if (item.kind === 'd') return tableThings(item, 'front');
     const extras = [...(item.extras || [])];
     if (cold && !extras.some((e) => e.startsWith('scarf')) && item.top?.[0] !== 'puffer') extras.push('scarf:#E85A6A');
     const person = { ...item, extras };

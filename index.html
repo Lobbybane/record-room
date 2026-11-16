@@ -601,7 +601,8 @@
       <g transform="translate(1127 459)"><g class="b-arm-l"><g transform="translate(-1127 -459)">
         <path d="M1127 459 L1118 496" fill="none" stroke="#EFE3D0" stroke-width="9" stroke-linecap="round"/>
         <g transform="translate(1118 496)"><g class="b-fore-l"><g transform="translate(-1118 -496)">
-          <g class="b-phone"><rect x="1127" y="497" width="8" height="13" rx="1.5" fill="#15132B"/><rect class="phone-glow" x="1128" y="498.5" width="6" height="10" rx="1" fill="#9FD8FF"/></g>
+          <!-- turned the other way round so it's upright once the arm is raised to look at it -->
+          <g class="b-phone"><g transform="rotate(112 1132 511)"><rect x="1128" y="495" width="9" height="14" rx="1.6" fill="#15132B"/><rect class="b-phone-glow" x="1129.2" y="496.6" width="6.6" height="10.6" rx="1" fill="#9FD8FF"/></g></g>
           <path d="M1118 496 L1130 510" fill="none" stroke="#EFE3D0" stroke-width="9" stroke-linecap="round"/>
           <circle cx="1132" cy="511" r="4.5" fill="#C98E67"/>
           <g class="b-cup"><path d="M1126 500 H1138 L1136.5 514 H1127.5 Z" fill="#F4ECFF"/><rect x="1125" y="498" width="14" height="3" rx="1" fill="#2B2440"/></g>
@@ -616,6 +617,18 @@
           <g class="b-pitcher"><path d="M1186 470 H1200 L1198 486 H1188 Z" fill="#DDE3F0"/><path d="M1200 474 q5 0 4 6" fill="none" stroke="#DDE3F0" stroke-width="2"/></g>
         </g></g></g>
       </g>
+    </g>
+    <!-- the drink being made, on the counter in front of the barista -->
+    <g class="bar-cup hot">
+      <rect x="1146" y="512" width="12" height="14" rx="2" fill="#F4ECFF"/><path d="M1158 515 q4.5 0 4.5 3.5 t-4.5 3.5" fill="none" stroke="#F4ECFF" stroke-width="2"/>
+      <ellipse cx="1152" cy="512.6" rx="5" ry="1.3" fill="#E6C9A0"/>
+      <g class="bar-wisps" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round"><path class="st st1" d="M1149 509 q-2 -3 0 -6 q2 -3 0 -6"/><path class="st st2" d="M1152.5 508.5 q2 -3 0 -6 q-2 -3 0 -6"/><path class="st st3" d="M1155.5 509 q-2 -3 0 -6"/></g>
+    </g>
+    <g class="bar-cup iced">
+      <path d="M1145 505 L1159 505 L1157.4 526 L1146.6 526 Z" fill="#E8DDF5" fill-opacity=".3"/>
+      <path class="ice-fill" d="M1145.6 511 L1158.4 511 L1157.4 526 L1146.6 526 Z" fill="#9A6440" fill-opacity=".9"/>
+      <g fill="#F4F8FF" fill-opacity=".8"><rect x="1147" y="507" width="5" height="5" rx="1" transform="rotate(12 1149.5 509.5)"/><rect x="1152" y="509" width="4.5" height="4.5" rx="1" transform="rotate(-10 1154 511)"/></g>
+      <path d="M1144 505 H1160" stroke="#F4ECFF" stroke-width="1.6" stroke-linecap="round"/><path d="M1153 505 L1156.5 493" stroke="#F28DB2" stroke-width="2" stroke-linecap="round"/>
     </g>
     <g class="espresso">
       <rect x="1180" y="440" width="72" height="8" rx="2" fill="#9AA3BC"/>
