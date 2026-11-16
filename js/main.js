@@ -12,6 +12,7 @@ import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
 import { drawPeople } from './people.js';
 import { initPeopleLife, peopleRedrawn } from './life-people.js';
+import { initCafe, cafeRedrawn } from './cafe.js';
 import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
 import { STATIONS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
@@ -192,7 +193,9 @@ const decor = initDecor(stage, {
     const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
     if (peopleKey !== drawnPeople) {
       drawnPeople = peopleKey;
-      peopleRedrawn({ room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season }) });
+      const drawn = { room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season }) };
+      peopleRedrawn(drawn);
+      cafeRedrawn(drawn);
     }
   },
 });
@@ -201,6 +204,7 @@ initStudyTimer(stage);
 initThunder(stage);
 initParallax(stage);
 initPeopleLife(stage);
+initCafe(stage);
 initTheater(stage);
 // Candles and the fireplace: click to light or blow out.
 for (const [id, name, label] of [['candles', 'candles', 'candles'], ['fireplace', 'fire', 'fire']]) {

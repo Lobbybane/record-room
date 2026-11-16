@@ -38,6 +38,14 @@ function legs(pose, color, shoe = '#F4ECFF') {
     return `<path d="M6 -2 L-36 6 L-34 18 L8 12 Z" fill="${far}"/><path d="M2 -4 L-40 2 L-38 14 L4 10 Z" fill="${color}"/>
       <path d="M-40 2 L-66 22 L-58 30 L-34 12 Z" fill="${color}"/><path d="M-72 22 L-56 28 Q-56 36 -62 36 L-76 30 Q-78 25 -72 22 Z" fill="${shoe}"/>`;
   }
+  // On a café chair at a table: shorter thighs, so two people facing each other across a
+  // little table keep their knees apart underneath it.
+  if (pose === 'chair') {
+    return `<path d="M8 -9 L-28 -9 Q-36 -9 -36 -1 Q-36 7 -28 7 L8 7 Z" fill="${far}" transform="translate(4 -3)"/>
+      <path d="M6 -6 L-30 -6 Q-38 -6 -38 2 Q-38 10 -30 10 L6 10 Z" fill="${color}"/>
+      <path d="M-40 0 L-28 0 L-30 40 L-41 40 Z" fill="${color}"/>
+      <path d="M-45 38 L-30 38 Q-28 46 -34 47 L-47 47 Q-49 42 -45 38 Z" fill="${shoe}"/>`;
+  }
   // sitting on a seat, feet on the floor
   return `<path d="M8 -9 L-36 -9 Q-44 -9 -44 -1 Q-44 7 -36 7 L8 7 Z" fill="${far}" transform="translate(5 -3)"/>
     <path d="M6 -6 L-38 -6 Q-46 -6 -46 2 Q-46 10 -38 10 L6 10 Z" fill="${color}"/>
@@ -143,7 +151,7 @@ function head(p) {
 
 // Something held in the near hand (hand at about -24,-15).
 const LAP_ITEMS = new Set(['laptop', 'popcorn', 'book']);
-export const isLapItem = (item) => LAP_ITEMS.has(item);
+export const isLapItem = (item) => LAP_ITEMS.has(String(item || '').split(':')[0]);
 
 /** Puts an item in a drawn person's lap or hand (whichever suits it). */
 export function setHold(el, item) {
@@ -155,8 +163,46 @@ export function setHold(el, item) {
   el.dataset.hold = item || '';
 }
 
+// Little wisps of steam over a hot drink (they rise and fade in css/style.css).
+const STEAM = '<g class="wisps" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round">'
+  + '<path class="st st1" d="M-30.5 -30 q-2 -3 0 -6 q2 -3 0 -6"/><path class="st st2" d="M-27.5 -30.5 q2 -3 0 -6 q-2 -3 0 -6"/>'
+  + '<path class="st st3" d="M-24.5 -30 q-2 -3 0 -6"/></g>';
+
 export function held(item) {
-  switch (item) {
+  const [name, tone] = String(item || '').split(':');
+  switch (name) {
+    // A hot coffee in a mug (any colour), black or with a latte's foam, steaming.
+    case 'hot': case 'hotlatte': {
+      const c = tone || '#F7A9C8';
+      return `<g class="drink hot"><rect x="-33" y="-27" width="10" height="12" rx="2" fill="${c}"/>`
+        + `<path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="${c}" stroke-width="2"/>`
+        + `<ellipse cx="-28" cy="-26.6" rx="4.4" ry="1.1" fill="${name === 'hotlatte' ? '#E6C9A0' : '#5A3A2A'}"/>${STEAM}</g>`;
+    }
+    // An iced coffee: a clear cup, coffee, ice cubes, a straw and a little condensation.
+    case 'iced': return '<g class="drink iced">'
+      + '<path d="M-34 -31 L-22 -31 L-23.6 -14 L-32.4 -14 Z" fill="#E8DDF5" fill-opacity=".28"/>'
+      + '<path d="M-33.4 -25 L-22.6 -25 L-23.6 -14 L-32.4 -14 Z" fill="#9A6440" fill-opacity=".9"/>'
+      + '<path d="M-33.4 -25 L-22.6 -25" stroke="#C99A70" stroke-width="1.2"/>'
+      + '<g fill="#F4F8FF" fill-opacity=".75"><rect x="-32" y="-29" width="4.5" height="4.5" rx="1" transform="rotate(12 -29.7 -26.7)"/><rect x="-27.6" y="-27.5" width="4" height="4" rx="1" transform="rotate(-10 -25.6 -25.5)"/><rect x="-30.5" y="-22" width="4" height="4" rx="1" fill-opacity=".35"/></g>'
+      + '<path d="M-34.6 -31 H-21.4" stroke="#F4ECFF" stroke-width="1.4" stroke-linecap="round"/>'
+      + '<path d="M-26.5 -31 L-23.5 -41" stroke="#F28DB2" stroke-width="1.7" stroke-linecap="round"/>'
+      + '<g fill="#FFFFFF" fill-opacity=".7"><circle cx="-32.2" cy="-18" r=".6"/><circle cx="-24.4" cy="-20" r=".55"/><circle cx="-25" cy="-16" r=".5"/></g></g>';
+    // An open book held up to read, with a page that can turn (css/style.css).
+    // An open book held upright to read, seen from the side: we see the back cover (spine
+    // away from her, on the left) and the page edges, and the open pages face her eyes.
+    // The hidden `.page` is a page that sweeps across when she turns one (css/style.css).
+    case 'bookopen': {
+      const c = tone || '#6FA6C8';
+      // Leaned back from the hand, as a book is naturally held.
+      return '<g class="book-read" transform="rotate(-14 -23 -17) translate(3 0)">'
+        + `<path d="M-39.4 -37.5 L-26.4 -37.5 L-22.4 -16.5 L-35.4 -16.5 Z" fill="${c}"/>`
+        + '<path d="M-26.4 -37.5 L-24.6 -37.1 L-20.6 -16.9 L-22.4 -16.5 Z" fill="#F7F1E6"/>'
+        + '<path d="M-39.4 -37.5 L-26.4 -37.5 L-25.4 -39.3 L-38.2 -39.3 Z" fill="#F7F1E6"/>'
+        + '<path d="M-25.3 -36.6 l3.6 18.6" stroke="#D8CDB8" stroke-width=".5"/>'
+        + `<path d="M-38.6 -33.5 L-27.2 -33.5 L-26.6 -30.5 L-38 -30.5 Z" fill="${tint(c, 0.35)}"/>`
+        + `<path d="M-39.4 -37.5 L-35.4 -16.5" stroke="${tint(c, -0.3)}" stroke-width="1.8" stroke-linecap="round"/>`
+        + '<path class="page" d="M-39.4 -37.5 L-26.4 -37.5 L-22.4 -16.5 L-35.4 -16.5 Z" fill="#FFFBF2"/></g>';
+    }
     case 'mug': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F7A9C8"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F7A9C8" stroke-width="2"/>';
     case 'latte': return '<rect x="-33" y="-27" width="10" height="12" rx="2" fill="#F4ECFF"/><rect x="-33" y="-27" width="10" height="3" rx="1.5" fill="#C9956A"/><path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="#F4ECFF" stroke-width="2"/>';
     case 'cocoa': return '<rect x="-34" y="-27" width="11" height="12" rx="2" fill="#C8443C"/><ellipse cx="-28.5" cy="-27" rx="5" ry="1.8" fill="#6E3A2A"/><circle cx="-30" cy="-28" r="1.8" fill="#FFFFFF"/><circle cx="-27" cy="-28.5" r="1.6" fill="#FFFFFF"/><path class="mug-steam" d="M-30 -32 q-2 -4 0 -8 M-26 -32 q-2 -4 0 -8" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="1.4"/>';
@@ -218,7 +264,7 @@ export function personSvg(p, i, extraClass = '') {
   const extras = p.extras || [];
   const scarfColor = extras.find((e) => e.startsWith('scarf'))?.split(':')[1];
   const lean = pose === 'recline' ? 26 : pose === 'floor' ? -4 : 0;
-  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', extraClass].join(' ');
+  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', p.act ? `act-${p.act}` : '', extraClass].join(' ');
   // Lap items (laptop, popcorn bucket, book) rest on the lap and never move with the arm;
   // hand items (drinks, phone, can…) are in the hand and go wherever it goes.
   const onLap = isLapItem(p.hold);
@@ -236,7 +282,8 @@ export function personSvg(p, i, extraClass = '') {
     </g></g>`;
   const fx = `<g class="zz"><text x="10" y="-92">z</text><text x="20" y="-104">z</text></g>`
     + (p.core && i === 0 ? '<g class="huh"><circle cx="8" cy="-104" r="11" fill="#F4ECFF"/><text x="8" y="-99" text-anchor="middle">?</text></g>' : '');
-  return `<g class="${classes}" data-pid="${pid}" data-y="${p.z ?? p.y}" data-hold="${p.hold || ''}" transform="translate(${p.x} ${p.y}) scale(${p.s || 1.5})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
+  const s = p.s || 1.5;
+  return `<g class="${classes}" data-pid="${pid}" data-y="${p.z ?? p.y}" data-hold="${p.hold || ''}" data-face="${p.face || 'left'}" transform="translate(${p.x} ${p.y}) scale(${p.face === 'right' ? -s : s} ${s})" style="--d: ${((i * 0.23) % 0.8).toFixed(2)}s">
     ${legs(pose, p.legs || '#3B3F78', p.shoes)}${skirt(topStyle, topColor, pose)}${upper}${fx}</g>`;
 }
 
@@ -270,6 +317,23 @@ const FURNITURE = {
       <rect x="16" y="-90" width="20" height="16" rx="5" fill="#F4ECFF" opacity=".8"/>
       <path d="M-46 -4 Q-46 -10 -38 -10 L34 -10 L34 28 L-46 28 Z" fill="${tint(f.color || '#3E6E8E', 0.1)}"/>
       <path d="M-56 -22 L-40 -22 L-40 28 L-56 28 Z" fill="${tint(f.color || '#3E6E8E', -0.2)}"/>`,
+  // A café bistro table seen from the side: the top is at seated-hand height (y -14).
+  bistro: (f) => {
+    const c = f.color || '#C9956A';
+    return `<path d="M0 -10 V44" stroke="#2B2440" stroke-width="4"/><ellipse cx="0" cy="46" rx="14" ry="3" fill="#2B2440"/>
+      <path d="M-33 -12 v3 a33 4.6 0 0 0 66 0 v-3 Z" fill="${tint(c, -0.25)}"/><ellipse cx="0" cy="-12" rx="33" ry="4.6" fill="${c}"/>
+      <ellipse cx="-6" cy="-13" rx="20" ry="1.6" fill="${tint(c, 0.25)}" opacity=".6"/>`;
+  },
+  // A bentwood café chair, seat under the hips and the back behind (it faces left like people).
+  cafechair: (f) => {
+    const c = f.color || '#6B4436';
+    const d = tint(c, -0.3);
+    return `<path d="M-17 13 L-21 47 M13 13 L17 47" stroke="${d}" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-19 31 Q-2 35 15 31" fill="none" stroke="${d}" stroke-width="2"/>
+      <path d="M14 11 Q19 -10 16 -36 Q22 -42 26 -35 Q24 -12 19 11" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M17 -26 Q21 -27 23 -24 M18 -14 Q21 -15 22 -12" stroke="${c}" stroke-width="2" fill="none"/>
+      <path d="M-21 8 Q-21 6 -18 6 L18 6 Q21 6 21 8 L21 12 L-21 12 Z" fill="${c}"/><path d="M-20 6.5 H20" stroke="${tint(c, 0.3)}" stroke-width="1.4"/>`;
+  },
   cafetable: (f) => `<ellipse cx="0" cy="0" rx="28" ry="7" fill="${f.color || '#C9956A'}"/><path d="M0 4 V52 M-16 54 H16" stroke="#2B2440" stroke-width="4" stroke-linecap="round"/>
       ${(f.items || []).map(([item, dx]) => `<g transform="translate(${dx + 28} 13)">${held(item)}</g>`).join('')}`,
   skis: () => `<g transform="rotate(8)"><rect x="0" y="0" width="7" height="150" rx="3" fill="#D04858"/><rect x="11" y="4" width="7" height="150" rx="3" fill="#4F6FA8"/><path d="M-2 0 q5 -10 10 0 M9 4 q5 -10 10 0" fill="#D04858"/></g>
@@ -280,6 +344,35 @@ const FURNITURE = {
   luggage: (f) => `<rect x="-20" y="-40" width="40" height="40" rx="5" fill="${f.color || '#8A4A3C'}"/><rect x="-8" y="-48" width="16" height="8" rx="3" fill="none" stroke="${tint(f.color || '#8A4A3C', -0.3)}" stroke-width="3"/><path d="M-20 -20 H20" stroke="${tint(f.color || '#8A4A3C', -0.3)}" stroke-width="3"/>`,
 };
 
+/* ---------- what a café customer has on the table ---------- */
+
+// Drawn in the customer's own coordinates (mirrored with them), on the table top at y -14.
+// 'back' is drawn before the person (laptop, plate, and a phone or closed book put down
+// while they sip); 'front' after them: the drink, nearer to us on the table, standing
+// exactly where the reaching hand picks it up (js/cafe.js swaps it into the hand).
+export const DRINK_SPOT = [-12, 0];
+export function tableThings(p, part = 'back') {
+  const s = p.s || 1.5;
+  const at = (dx, dy, svg) => `<g transform="translate(${dx} ${dy})">${svg}</g>`;
+  const wrap = (cls, inner) => `<g class="${cls}" data-for="${p.pid ?? p.index}" data-y="${p.z ?? p.y}" transform="translate(${p.x} ${p.y}) scale(${p.face === 'right' ? -s : s} ${s})">${inner}</g>`;
+  if (part === 'front') {
+    return p.drink && p.act !== 'hold' ? wrap('table-front', `<g class="table-drink">${at(...DRINK_SPOT, held(p.drink))}</g>`) : '';
+  }
+  let out = '';
+  if (p.act === 'type') {
+    out += `<g class="laptop-on-table"><path d="M-52 -14 L-21 -14 L-22 -11.5 L-52 -11.5 Z" fill="#B9B1D6"/>
+      <path d="M-52 -14 L-46 -41 L-43 -40.5 L-49 -14 Z" fill="#8A84A8"/>
+      <path class="screen-glow" d="M-48.5 -16.5 L-43.6 -38.5" stroke="#9FD8FF" stroke-width="2" opacity=".75"/></g>`;
+  }
+  // Put down for a moment while they drink (hidden until then).
+  if (p.act === 'phone') out += '<g class="put-down"><rect x="-38" y="-15.6" width="12" height="2" rx="1" fill="#15132B"/></g>';
+  if (p.act === 'read') out += `<g class="put-down"><rect x="-42" y="-17.4" width="18" height="3.6" rx="1" fill="${(p.hold || '').split(':')[1] || '#6FA6C8'}"/><rect x="-41" y="-17.9" width="16" height="1.2" fill="#F7F1E6"/></g>`;
+  if (p.plate) {
+    out += at(p.act === 'type' ? 0 : -14, 0, '<ellipse cx="-36" cy="-14.5" rx="7" ry="1.6" fill="#F4ECFF"/><path d="M-41 -15.5 q5 -6 10 0 q-2.4 -2 -5 -2 q-2.6 0 -5 2 Z" fill="#E8B060"/>');
+  }
+  return wrap('table-things', out);
+}
+
 /* ---------- drawing a room's group ---------- */
 
 let svgRoot = null;
@@ -287,19 +380,28 @@ let svgRoot = null;
 export function drawPeople(container, { room, crowd, season }) {
   const group = GROUPS[room] || GROUPS.bedroom;
   const show = (item) => crowd !== 'empty' && (crowd !== 'cozy' || item.core || item.always);
+  const people = (group.people || []).map((p, i) => ({ ...p, kind: 'p', index: i })).filter(show);
   const items = [
     ...(group.furniture || []).map((f) => ({ ...f, kind: 'f' })),
-    ...(group.people || []).map((p, i) => ({ ...p, kind: 'p', index: i })).filter(show),
+    ...people,
+    // What's on the table in front of each seated café customer (laptop, mug…).
+    ...people.filter((p) => p.act).map((p) => ({ ...p, kind: 't' })),
+    ...people.filter((p) => p.act).map((p) => ({ ...p, kind: 'd' })),
   ];
-  // Back to front (higher y is nearer); furniture before people at the same depth.
-  items.sort((a, b) => (a.z ?? a.y) - (b.z ?? b.y) || (a.kind === 'f' ? -1 : 1));
+  // Back to front (higher y is nearer). At the same depth: chairs, tables, the things on
+  // the tables, then people (so hands rest on top of the table and its things).
+  const layer = (item) => ({ p: 3, t: 2, d: 4 })[item.kind] ?? (item.type === 'cafechair' ? 0 : 1);
+  items.sort((a, b) => (a.z ?? a.y) - (b.z ?? b.y) || layer(a) - layer(b));
   const cold = season === 'winter' && !['beach'].includes(room);
   const parts = items.map((item) => {
     if (item.kind === 'f') {
       if (item.people && !show({ core: item.core })) return '';
       const draw = FURNITURE[item.type];
-      return draw ? `<g class="furniture f-${item.type}" data-y="${item.z ?? item.y}" transform="translate(${item.x} ${item.y}) scale(${item.s || 1.5})">${draw(item)}</g>` : '';
+      const s = item.s || 1.5;
+      return draw ? `<g class="furniture f-${item.type}" data-y="${item.z ?? item.y}" transform="translate(${item.x} ${item.y}) scale(${item.face === 'right' ? -s : s} ${s})">${draw(item)}</g>` : '';
     }
+    if (item.kind === 't') return tableThings(item);
+    if (item.kind === 'd') return tableThings(item, 'front');
     const extras = [...(item.extras || [])];
     if (cold && !extras.some((e) => e.startsWith('scarf')) && item.top?.[0] !== 'puffer') extras.push('scarf:#E85A6A');
     const person = { ...item, extras };
@@ -323,7 +425,7 @@ export function drawPeople(container, { room, crowd, season }) {
 }
 
 // How far down a standing copy goes so its feet land where the seated person's feet are.
-const FEET = { sit: 47, floor: 12, recline: 36, stand: 64 };
+const FEET = { sit: 47, chair: 47, floor: 12, recline: 36, stand: 64 };
 export function walkerDrop(p) {
   const s = p.s || 1.5;
   return (FEET[p.pose || 'sit'] - FEET.stand) * s;
