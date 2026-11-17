@@ -1237,6 +1237,39 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* The neon sign hangs on the wall above the menu board (centred over it), clear of the window view. */
 .stage[data-room="cafe"] .neon-sign { left: 1076px; top: 164px; transform: translateX(-50%); }
 
+/* ---------- Christmas café: the café with Christmas decorations on (data-holiday~="winter") ---------- */
+/* A big tree with lights and presents by the window, treats and lights on the counter, Christmas
+   pastries, a holiday menu, paper snowflakes and mistletoe, a neon candy cane and star, Santa hats
+   on the barista and the window-bar regulars, and the Christmas video on the TV (js/main.js). */
+.stage:not([data-holiday~="winter"]) .xmas-cafe, .stage:not([data-room="cafe"]) .xmas-cafe, .menu-xmas, .b-santa { display: none; }
+.stage[data-room="cafe"][data-holiday~="winter"] .menu-xmas { display: block; }
+.stage[data-room="cafe"][data-holiday~="winter"] .b-santa { display: inline; }
+.stage[data-room="cafe"][data-holiday~="winter"] :is(.menu-regular, .pastries, .sill-plant, .b-bun, .bar-bun) { display: none; }
+.menu-xmas.menu-title { font-size: 19px; color: #FFD9DE; }
+.menu-xmas li span:first-child::before { content: '\2744\FE0E  '; color: #BFE3FF; font-size: 9px; }
+.xmas-cafe .tl { animation: xmas-twinkle 2.6s ease-in-out infinite; }
+.xmas-cafe .tl.t1 { animation-delay: -.65s; animation-duration: 3.1s; }
+.xmas-cafe .tl.t2 { animation-delay: -1.3s; animation-duration: 2.2s; }
+.xmas-cafe .tl.t3 { animation-delay: -1.95s; animation-duration: 3.4s; }
+@keyframes xmas-twinkle { 0%, 100% { opacity: 1; } 45% { opacity: .35; } 60% { opacity: .9; } }
+.xmas-cafe .ic { animation: icicle-glint 2.8s ease-in-out infinite; }
+.xmas-cafe .ic.i1 { animation-delay: -.9s; }
+.xmas-cafe .ic.i2 { animation-delay: -1.8s; }
+@keyframes icicle-glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.xmas-cafe .star-glow { animation: star-glow 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes star-glow { 0%, 100% { opacity: .75; scale: 1; } 50% { opacity: 1; scale: 1.12; } }
+.xmas-cafe .flake { transform-box: view-box; animation: flake-turn 36s linear infinite; }
+.xmas-cafe .flake.f2 { animation-duration: 48s; animation-direction: reverse; }
+.xmas-cafe .flake.f3 { animation-duration: 60s; }
+@keyframes flake-turn { to { rotate: 360deg; } }
+.xmas-neon { filter: drop-shadow(0 0 4px rgba(255, 107, 126, .9)) drop-shadow(0 0 10px rgba(255, 107, 126, .45)); }
+.xmas-neon .neon-star { filter: drop-shadow(0 0 4px rgba(255, 226, 122, .9)); animation: neon-star 5s steps(1) infinite; }
+@keyframes neon-star { 0%, 100% { opacity: 1; } 71% { opacity: .5; } 73% { opacity: 1; } 75% { opacity: .6; } 77% { opacity: 1; } }
+.xmas-cafe .gh-window { filter: drop-shadow(0 0 3px rgba(255, 211, 138, .8)); }
+@media (prefers-reduced-motion: reduce) {
+  .xmas-cafe :is(.tl, .ic, .star-glow, .flake, .neon-star) { animation: none; }
+}
+
 .barista-arm { transform-box: view-box; transform-origin: 1166px 458px; transition: transform .6s cubic-bezier(.45, .05, .55, .95); }
 @keyframes steam-pitcher { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg) translateY(-2px); } }
 .barista-head { transform-box: view-box; transform-origin: 1146px 440px; transition: transform .6s cubic-bezier(.45, .05, .55, .95); }

@@ -16,7 +16,7 @@ import { initCafe, cafeRedrawn } from './cafe.js';
 import { initOutside } from './outside.js';
 import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
-import { STATIONS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
+import { STATIONS, CHRISTMAS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
 const stage = $('#stage');
@@ -553,6 +553,11 @@ let radioPhase = 'off';      // off | tuning | playing | paused | error
 let soundOn = false;         // true once a tap has let the radio play out loud
 let radioFailures = 0;
 let settingKey = null;     // the station chosen in Decorate (a broken one may be skipped)
+// The Christmas café: while the café's Christmas decorations are up, the TV plays the
+// Christmas station, until the station knob is turned (then it follows the knob as usual).
+let xmasOn = false;
+let xmasFollow = false;
+let lastStationSetting = null;
 let stallTimer = 0;
 
 function musicSettingsChanged(d) {
@@ -568,9 +573,15 @@ function musicSettingsChanged(d) {
   if (current !== null && !busy && !recordsHere(d.room)) putBack();
   // In the movie theater the screen plays the "Now showing" list (always on).
   theater = d.room === 'theater';
+  const xmas = d.room === 'cafe' && (stage.dataset.holiday || '').split(' ').includes('winter');
+  if (xmas && !xmasOn) xmasFollow = true;                       // the decorations just went up
+  else if (!xmas) xmasFollow = false;
+  else if (d.station !== lastStationSetting) xmasFollow = false; // a station was picked
+  xmasOn = xmas;
+  lastStationSetting = d.station;
   const nextOn = theater || d.radio === 'on';
-  const next = theater ? showingFor(d.showing) : stationFor(d.station);
-  const wanted = theater ? `theater:${next.key}` : `${d.station}:${next.key}`; // "auto" can change station as the day goes on
+  const next = theater ? showingFor(d.showing) : xmasFollow ? CHRISTMAS : stationFor(d.station);
+  const wanted = theater ? `theater:${next.key}` : `${xmasFollow ? 'xmas' : d.station}:${next.key}`; // "auto" can change station as the day goes on
   const first = radioOn === null;
   if (!first && nextOn === radioOn && wanted === settingKey) return;
   const retune = nextOn && (wanted !== settingKey || !radioOn);
@@ -653,6 +664,8 @@ function radioState(state) {
   } else if (state === 2) {
     radioPhase = 'paused';
   } else if (state === 0) {
+    // A video station (the Christmas one) starts again from the top.
+    if (station.loop) { player.restart(); return; }
     // A live stream ended (it happens when a stream restarts): move along the dial.
     nextOnDial();
     return;
@@ -682,6 +695,15 @@ function nextOnDial() {
     return;
   }
   const next = nextStation(station.key);
+  if (xmasFollow) {
+    // Leaving the Christmas station in the café: follow the knob from now on.
+    xmasFollow = false;
+    if (decor.get('station') === next.key && decor.get('radio') === 'on') {
+      settingKey = null;
+      musicSettingsChanged(decor.snapshot());
+      return;
+    }
+  }
   if (decor.get('radio') !== 'on') decor.set('radio', 'on');
   decor.set('station', next.key); // retunes through musicSettingsChanged
 }

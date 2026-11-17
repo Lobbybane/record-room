@@ -14,7 +14,13 @@ export const STATIONS = [
   { key: 'sleep', id: 'rUxyKA_-grg', name: 'beats to sleep/chill to', by: 'Lofi Girl', label: 'Sleep & chill' },
   { key: 'synthwave', id: '4xDzrJKXOOY', name: 'synthwave radio', by: 'Lofi Girl', label: 'Synthwave' },
   { key: 'jazzy', id: '5yx6BWlEVcY', name: 'jazzy & lofi hip hop radio', by: 'Chillhop Music', label: 'Jazzy lofi' },
+  // Bobby's Christmas pick. It plays in the café while the Christmas decorations are up
+  // (js/main.js), and Auto plays it at Christmas. It starts again from the top when it ends.
+  { key: 'christmas', id: 'qsT3qusaKnM', name: 'Christmas café', by: 'Christmas', label: 'Christmas café', holiday: 'winter', loop: true },
 ];
+
+// The station the café plays while its Christmas decorations are up.
+export const CHRISTMAS = STATIONS.find((s) => s.key === 'christmas');
 
 const KEY = 'record-room:stations:v1';
 
@@ -41,7 +47,7 @@ export const allStations = () => [...STATIONS, ...custom];
 // "Auto": a station tagged for a holiday that's on today, otherwise one for the time of day.
 export function autoStation(date = new Date()) {
   const today = holidaysForDate(date, Object.keys(HOLIDAYS));
-  const holiday = custom.find((s) => s.holiday && today.includes(s.holiday));
+  const holiday = [...custom, ...STATIONS].find((s) => s.holiday && today.includes(s.holiday));
   if (holiday) return holiday;
   const hour = date.getHours();
   const key = hour >= 23 || hour < 6 ? 'sleep' : hour < 10 ? 'jazzy' : hour < 19 ? 'main' : 'synthwave';
