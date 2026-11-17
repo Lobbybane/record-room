@@ -1,7 +1,10 @@
 import { loadLibrary, saveCrate, parseYouTubeId } from './records.js';
 import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } from './covers.js';
 import { createPlayer, loadYouTubeApi } from './player.js';
-import { initDecor } from './decor.js';
+import { initDecor, OPTIONS } from './decor.js';
+import { initKeys, keysPage } from './keys.js';
+import { menuPage, renderMenu } from './cafemenu.js';
+import { youPage, youLook } from './you.js';
 import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
@@ -165,7 +168,7 @@ let fittedFor = '';
 let drawnAudience = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { ...lookPages(() => decor), sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
+  custom: { ...lookPages(() => decor), keys: keysPage, menu: menuPage, you: youPage(() => decor), sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
   onApply: (d) => {
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
@@ -192,10 +195,11 @@ const decor = initDecor(stage, {
       drawAudience($('#theater-audience'), { crowd: d.crowd, seat: d.seat });
     }
     // Redraw the room's group when the room, the crowd or the season changes.
-    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
+    const you = youLook(d);
+    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}|${JSON.stringify(you)}`;
     if (peopleKey !== drawnPeople) {
       drawnPeople = peopleKey;
-      const drawn = { room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season }) };
+      const drawn = { room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season, you }) };
       peopleRedrawn(drawn);
       cafeRedrawn(drawn);
     }
@@ -525,16 +529,20 @@ onSleepChange(() => {
 /* ---------------- volume knob ---------------- */
 
 let volumeTimer = 0;
+// The little volume bar on the TV.
+function showVolume(level, text = `${level}%`) {
+  const bar = $('#tv-vol');
+  bar.style.setProperty('--v', `${level}%`);
+  bar.querySelector('span').textContent = text;
+  bar.classList.add('show');
+  clearTimeout(volumeTimer);
+  volumeTimer = setTimeout(() => bar.classList.remove('show'), 1500);
+}
 $('#tv-volume').addEventListener('click', () => {
   sfx.click();
   const next = VOLUME_STEPS.find((step) => step < vol() - 2) ?? VOLUME_STEPS[0];
   decor.set('volume', next);
-  const bar = $('#tv-vol');
-  bar.style.setProperty('--v', `${next}%`);
-  bar.querySelector('span').textContent = `${next}%`;
-  bar.classList.add('show');
-  clearTimeout(volumeTimer);
-  volumeTimer = setTimeout(() => bar.classList.remove('show'), 1500);
+  showVolume(next);
 });
 
 /* ---------------- the radio ---------------- */
@@ -1067,10 +1075,69 @@ form.addEventListener('submit', async (event) => {
   }
 }
 
+/* ---------------- keyboard shortcuts ---------------- */
+
+initKeys({
+  pause() {
+    if (current !== null) {
+      if (phase === 'playing') player.pause();
+      else if (['paused', 'ended'].includes(phase)) player.play();
+      return;
+    }
+    if (!radioOn) { decor.set('radio', 'on'); return; }
+    if (radioPhase === 'playing') player.pause();
+    else if (radioPhase === 'paused') player.play();
+  },
+  next() {
+    if (theater) $('#th-next').click();
+    else $('#tv-knob').click();
+  },
+  volume(step) {
+    const next = Math.max(0, Math.min(100, Math.round((vol() + step) / 5) * 5));
+    decor.set('volume', next);
+    if (player.isMuted() && soundOn && next > 0) player.unMute();
+    showVolume(next);
+  },
+  mute() {
+    if (player.isMuted()) {
+      player.unMute();
+      player.setVolume(vol());
+      showVolume(vol());
+    } else {
+      player.mute();
+      showVolume(0, 'Muted');
+    }
+  },
+  room(n) {
+    const key = Object.keys(OPTIONS.room.choices)[n];
+    if (key) decor.set('room', key);
+  },
+  toggle(name) {
+    if (name === 'rain') {
+      if (theater) return;
+      decor.set('weather', ['rain', 'storm'].includes(decor.get('weather')) ? 'clear' : 'rain');
+    } else if (name === 'lamp') {
+      $('#lamp-switch').click();
+    } else if (name === 'candles' && !theater) {
+      $('#candles').click();
+    }
+  },
+  crate() {
+    if (recordsHere() && !theater) $('#crate').click();
+  },
+  decorate: () => decor.toggle(),
+  fullscreen() {
+    const button = $('#fullscreen-toggle');
+    if (!button.hidden) button.click();
+  },
+  help: () => decor.openPage('keys'),
+});
+
 /* ---------------- start ---------------- */
 
 buildStars();
 buildLights();
+renderMenu();
 
 renderCrate();
 updateCard();

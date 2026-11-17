@@ -77,6 +77,7 @@ export function stationsPage(getDecor) {
   return {
     label: 'Station',
     value(settings) {
+      if (settings.radio === 'off') return 'Off';
       const key = settings.station;
       return key === 'auto' ? `Auto · ${autoStation().label}` : stationFor(key).label;
     },
@@ -98,6 +99,15 @@ export function stationsPage(getDecor) {
         return row;
       };
 
+      // Radio on or off, at the top of the page.
+      const power = el('input', { type: 'checkbox', className: 'ios-switch', name: 'radio', checked: decor.get('radio') === 'on' });
+      power.setAttribute('role', 'switch');
+      power.addEventListener('change', () => decor.set('radio', power.checked ? 'on' : 'off'));
+      scroll.append(el('div', { className: 'ios-group' },
+        el('label', { className: 'ios-row' }, el('span', { className: 'ios-label', textContent: 'Radio on the TV' }), power)),
+      el('p', { className: 'ios-footer', textContent: 'Plays whenever no record is on. Pick a record and it takes over; put it back and the radio returns.' }));
+
+      scroll.append(el('h3', { className: 'ios-header', textContent: 'Choose' }));
       const auto = el('div', { className: 'ios-group', role: 'radiogroup' });
       auto.append(choice('auto', 'Auto', `Now: ${autoStation().label}`));
       scroll.append(auto, el('p', {

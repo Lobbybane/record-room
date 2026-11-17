@@ -29,6 +29,13 @@ const atSeat = (id, look) => {
   return { ...look, seat: id, x: seat.x, y: seat.y, s: seat.s, face: seat.face === 'right' ? 'right' : undefined, pose: 'chair' };
 };
 
+// Where "you" sit on a floor cushion in each room, in stage pixels (feet on the floor),
+// in a free spot near the front. No "you" in the café (customers come and go) or the theater.
+export const YOU_SPOTS = {
+  bedroom: [530, 794], cabin: [610, 796], beach: [505, 796], greenhouse: [640, 794],
+  treehouse: [765, 796], train: [700, 794],
+};
+
 export const GROUPS = {
   bedroom: {
     furniture: [

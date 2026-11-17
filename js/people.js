@@ -4,7 +4,7 @@
 // CSS reacts to the stage: heads bob while music plays, dozers nod off when it stops,
 // the studier swaps to a book or tea with the study timer, and holiday hats show by data-hat.
 
-import { GROUPS } from './groups.js';
+import { GROUPS, YOU_SPOTS } from './groups.js';
 
 const SKIN = ['#F6D6C2', '#E8B896', '#C98E67', '#9C6646', '#6E4430'];
 
@@ -338,7 +338,7 @@ export function personSvg(p, i, extraClass = '') {
   const extras = p.extras || [];
   const scarfColor = extras.find((e) => e.startsWith('scarf'))?.split(':')[1];
   const lean = pose === 'recline' ? 26 : pose === 'floor' ? -4 : 0;
-  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', p.act ? `act-${p.act}` : '', extraClass].join(' ');
+  const classes = ['person', p.core ? 'core' : 'extra', p.dozer ? 'dozer' : '', p.studier ? 'studier' : '', p.act ? `act-${p.act}` : '', p.you ? 'is-you' : '', extraClass].join(' ');
   // Lap items (laptop, popcorn bucket, book) rest on the lap and never move with the arm;
   // hand items (drinks, phone, can…) are in the hand and go wherever it goes.
   const onLap = isLapItem(p.hold);
@@ -465,11 +465,25 @@ export function offscreenX(margin = 70) {
   return Math.max(1330, ax + (right - ax) / scale + margin);
 }
 
-export function drawPeople(container, { room, crowd, season }) {
-  const group = GROUPS[room] || GROUPS.bedroom;
-  const show = (item) => crowd !== 'empty' && (crowd !== 'cozy' || item.core || item.always);
+export function drawPeople(container, { room, crowd, season, you = null }) {
+  const base = GROUPS[room] || GROUPS.bedroom;
+  // "You" join the group on a floor cushion (even when nobody else is there). They're added
+  // to the end of the group's list, so js/life-people.js lets them chat and sip like anyone.
+  const spot = you && YOU_SPOTS[room];
+  let group = base;
+  let youFurniture = [];
+  if (spot) {
+    const { scale = 1.2, ax = 560, ay = 800 } = base;
+    const x = Math.round(ax + (spot[0] - ax) / scale);
+    const y = Math.round(ay + (spot[1] - ay) / scale) - 12;
+    const me = { ...you, x, y, s: 1.4, pose: 'floor', core: true, you: true };
+    group = { ...base, people: [...(base.people || []), me] };
+    youFurniture = [{ type: 'cushion', x, y, s: 1.3, color: you.cushion || '#F28DB2', kind: 'f' }];
+  }
+  const show = (item) => item.you || (crowd !== 'empty' && (crowd !== 'cozy' || item.core || item.always));
   const people = (group.people || []).map((p, i) => ({ ...p, kind: 'p', index: i })).filter(show);
   const items = [
+    ...youFurniture,
     ...(group.furniture || []).map((f) => ({ ...f, kind: 'f' })),
     ...people,
     // What's on the table in front of each seated café customer (laptop, mug…).

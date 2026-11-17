@@ -795,6 +795,35 @@ html, body {
 .tv-led { width: 8px; height: 8px; border-radius: 50%; background: #6B5E52; transition: background .3s ease, box-shadow .3s ease; }
 .stage.is-on .tv-led { background: var(--pink); box-shadow: 0 0 8px var(--pink); }
 
+/* TV styles (Decorate > Furniture & colours > TV). The screen keeps its place and size in every style. */
+.stage[data-tv="pastel"] :is(.tv, .tv-ghost) { background: #9FD8C4; box-shadow: inset -10px -12px 0 rgba(40, 90, 80, .2), 0 14px 26px rgba(10, 8, 25, .45); }
+.stage[data-tv="pastel"] .knob-dial { background: radial-gradient(circle at 40% 35%, #FFE3EF 0 30%, #F2A9C4 70%); box-shadow: 0 2px 0 #C47896, inset 0 -2px 0 rgba(0, 0, 0, .12); }
+.stage[data-tv="pastel"] .grille { background: repeating-linear-gradient(90deg, #F4FFFB 0 3px, transparent 3px 7px); }
+.stage[data-tv="pastel"] .tv-antenna :is(line, circle) { stroke: #E88AAE; fill: #E88AAE; }
+
+.stage[data-tv="wooden"] :is(.tv, .tv-ghost) {
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .07) 0 2px, transparent 2px 9px, rgba(255, 255, 255, .04) 9px 11px, transparent 11px 17px),
+    linear-gradient(180deg, #8A5634, #6A3E24);
+  box-shadow: inset 0 0 0 4px #5A321C, inset -8px -10px 0 rgba(30, 14, 6, .25), 0 14px 26px rgba(10, 8, 25, .45);
+}
+.stage[data-tv="wooden"] .tv-bezel { background: linear-gradient(180deg, #2A2230, #1A1520); box-shadow: 0 0 0 3px #C9B48E; border-radius: 12px; }
+.stage[data-tv="wooden"] .knob-dial { background: radial-gradient(circle at 40% 35%, #FFE6A0 0 25%, #C9A050 60%, #8A6A2A); box-shadow: 0 2px 0 #4A3016, inset 0 -2px 0 rgba(0, 0, 0, .2); }
+.stage[data-tv="wooden"] .knob-mark { background: #4A3016; }
+.stage[data-tv="wooden"] .grille { height: 16px; border-radius: 3px; background: repeating-linear-gradient(45deg, #D8C4A0 0 2px, #B8A27C 2px 4px); box-shadow: inset 0 0 0 1.5px #4A2A16; }
+.stage[data-tv="wooden"] .tv-antenna :is(line, circle) { stroke: #C8C4D8; fill: #C8C4D8; }
+
+.stage[data-tv="flat"] :is(.tv, .tv-ghost) { border-radius: 8px; background: linear-gradient(180deg, #24212E, #15131D); box-shadow: inset 0 0 0 1px #3A3648, 0 14px 26px rgba(10, 8, 25, .45); }
+.stage[data-tv="flat"] .tv-bezel { left: 20px; top: 198px; width: 304px; height: 216px; border-radius: 4px; background: #08070C; }
+.stage[data-tv="flat"] .tv-screen { border-radius: 2px; }
+.stage[data-tv="flat"] .tv-ghost span { border-radius: 2px; }
+.stage[data-tv="flat"] .tv-antenna { display: none; }
+.stage[data-tv="flat"] .knob-dial { width: 16px; height: 16px; margin: 1px; background: radial-gradient(circle at 40% 35%, #4A4658, #2A2734); box-shadow: inset 0 0 0 1px #5A5670; }
+.stage[data-tv="flat"] .knob-mark { top: 2px; height: 5px; background: #B9A8FF; }
+.stage[data-tv="flat"] .grille { height: 3px; border-radius: 2px; background: #2E2B3A; }
+.stage[data-tv="flat"] .tv-led { width: 5px; height: 5px; }
+
 /* ---------- in-room controls (there's no now-playing card) ---------- */
 /* The record on the turntable: tap it to put it back, skip or remove it. */
 .deck-btn {
@@ -946,6 +975,27 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-holiday~="hanukkah"] .fairy:nth-child(2n+1) { --b: #6FB8FF; }
 .stage[data-holiday~="hanukkah"] .fairy:nth-child(2n) { --b: #F4ECFF; }
 
+/* String light colours (Decorate > Furniture & colours). "Classic" keeps the holiday colours;
+   a chosen colour wins over them (same specificity, later in the file). */
+.stage[data-lights="warm"] .fairy:nth-child(n) { --b: #FFD38A; }
+.stage[data-lights="warm"] .fairy:nth-child(2n) { --b: #FFBE76; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+1) { --b: #FF5A6E; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+2) { --b: #FFB347; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+3) { --b: #FFE66D; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+4) { --b: #7EF2B8; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+5) { --b: #6FB8FF; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n) { --b: #C29CFF; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+1) { --b: #F7A9C8; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+2) { --b: #C9B3FF; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+3) { --b: #9FE8D0; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n) { --b: #FFF1A8; }
+.stage[data-lights="icy"] .fairy:nth-child(3n+1) { --b: #E3FBFF; }
+.stage[data-lights="icy"] .fairy:nth-child(3n+2) { --b: #9FD8FF; }
+.stage[data-lights="icy"] .fairy:nth-child(3n) { --b: #F4ECFF; }
+.stage[data-lights="candy"] .fairy:nth-child(2n+1) { --b: #FF7AA8; }
+.stage[data-lights="candy"] .fairy:nth-child(2n) { --b: #FFF0F5; }
+.stage[data-lights="off"] :is(#lights, .lights-wire) { display: none; }
+
 /* Garlands, bunting and lanterns along the curtain rod. */
 .stage:is([data-holiday~="july4"], [data-holiday~="newyear"], [data-holiday~="easter"], [data-holiday~="thanksgiving"], [data-holiday~="stpatricks"]) .bunting-string,
 .stage[data-holiday~="july4"] .bunting-july4,
@@ -1079,6 +1129,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   font: 400 17px var(--ios-font); cursor: pointer;
 }
 .ios-nav-btn.strong { font-weight: 600; }
+.ios-back { display: inline-flex; align-items: center; gap: 4px; max-width: 130px; }
+.ios-back span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ios-nav-btn:disabled { opacity: .45; cursor: default; }
 .ios-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 28px; }
 .ios-large-title { margin: 0 4px 6px; font: 700 32px/1.15 var(--ios-font); letter-spacing: -.02em; }
@@ -1097,7 +1149,81 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   font: 400 17px var(--ios-font); letter-spacing: -.01em; text-align: left;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.ios-row + .ios-row::before { content: ''; position: absolute; left: 16px; right: 0; top: 0; height: .5px; background: var(--ios-sep); }
+.ios-row:not([hidden]) ~ .ios-row::before { content: ''; position: absolute; left: 16px; right: 0; top: 0; height: .5px; background: var(--ios-sep); }
+.ios-row:not([hidden]) ~ .ios-row:has(> .ios-icon)::before { left: 57px; }
+.ios-row[hidden], .ios-section[hidden], .quick-tile[hidden] { display: none; }
+/* Coloured icon squares, like iPhone Settings. */
+.ios-icon {
+  flex: 0 0 auto; display: grid; place-items: center; width: 29px; height: 29px; margin-left: -2px;
+  border-radius: 7px; background: var(--c); color: #FFFFFF;
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .18);
+}
+.ico .f { fill: currentColor; stroke: none; }
+.ios-slider-row.with-icon .ios-label { flex: 0 0 64px; }
+
+/* Rooms as little pictures, swiped sideways. */
+.room-tiles {
+  display: flex; gap: 9px; margin: 0 -16px; padding: 2px 16px 4px;
+  overflow-x: auto; scroll-snap-type: x proximity; scroll-padding: 0 16px; scrollbar-width: none;
+}
+.room-tiles::-webkit-scrollbar { display: none; }
+.room-tile {
+  position: relative; flex: 0 0 86px; height: 96px; padding: 0; scroll-snap-align: start;
+  border: 0; border-radius: 14px; overflow: hidden; cursor: pointer; color: #FFFFFF;
+  background: linear-gradient(165deg, var(--a), var(--b));
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .16);
+  -webkit-tap-highlight-color: transparent;
+}
+.room-tile::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2.5px var(--ios-tint); opacity: 0; transition: opacity .2s; }
+.room-tile[aria-pressed="true"]::after { opacity: 1; }
+.room-tile-art { position: absolute; left: 50%; top: 14px; display: grid; place-items: center; width: 44px; height: 44px; margin-left: -22px; border-radius: 50%; background: rgba(255, 255, 255, .14); }
+.room-tile-art .ico { width: 24px; height: 24px; }
+.room-tile[aria-pressed="true"] .room-tile-art { background: rgba(255, 220, 235, .28); }
+.room-tile-label { position: absolute; left: 0; right: 0; bottom: 9px; font: 600 12.5px var(--ios-font); text-align: center; }
+.room-tile:hover { filter: brightness(1.08); }
+.room-tile:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+
+/* Quick tiles: round switches for what you change most. */
+.quick-tiles { display: flex; gap: 8px; }
+.quick-tile {
+  flex: 1 1 0; min-width: 0; max-width: calc(25% - 6px); display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 11px 2px 9px; border: 0; border-radius: 16px; background: var(--ios-group);
+  color: var(--ios-secondary); font: 500 11.5px var(--ios-font); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.quick-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #FFFFFF; transition: background .2s, color .2s; }
+.quick-ico .ico { width: 20px; height: 20px; }
+.quick-tile[aria-pressed="true"] { color: #FFFFFF; }
+.quick-tile[aria-pressed="true"] .quick-ico { background: #FFD38A; color: #2A1E2E; box-shadow: 0 0 14px rgba(255, 211, 138, .35); }
+.quick-label { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.quick-tile:hover { background: rgba(255, 255, 255, .12); }
+.quick-tile:focus-visible { outline: 2px solid var(--ios-tint); outline-offset: 2px; }
+.key-row { cursor: default; gap: 14px; }
+.menu-item-row { gap: 10px; }
+/* The "You" page: a preview, swatches and chips. */
+.you-stage { display: grid; place-items: center; height: 150px; margin: 4px 0 14px; border-radius: 16px; background: radial-gradient(ellipse at 50% 85%, rgba(247, 169, 200, .22), transparent 70%), var(--ios-group); }
+.you-preview { width: 150px; height: 150px; }
+.you-swatches, .you-chips { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--ios-group); }
+.you-chips { gap: 8px; }
+.you-swatch {
+  width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--c); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .35);
+}
+.you-swatch[aria-checked="true"] { box-shadow: 0 0 0 2.5px #1E1A30, 0 0 0 4.5px var(--ios-tint); }
+.you-chip {
+  padding: 7px 13px; border: 0; border-radius: 999px; cursor: pointer;
+  background: rgba(255, 255, 255, .1); color: #FFFFFF; font: 500 14px var(--ios-font);
+}
+.you-chip[aria-checked="true"] { background: var(--ios-tint); color: #2A1E2E; font-weight: 600; }
+.you-swatch:focus-visible, .you-chip:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.ios-field .menu-name { flex: 1 1 auto; min-width: 0; text-align: left; }
+.ios-field .menu-price { flex: 0 0 64px; min-width: 0; text-align: right; color: var(--ios-secondary); }
+.key-row .ios-label { white-space: normal; font-size: 15px; }
+.key-cap {
+  flex: 0 0 74px; padding: 4px 6px; border-radius: 7px; text-align: center;
+  background: rgba(255, 255, 255, .12); box-shadow: inset 0 -1.5px 0 rgba(0, 0, 0, .35);
+  font: 600 13px var(--ios-font); color: #FFFFFF;
+}
 .ios-link:hover, .ios-option:hover, .ios-action:hover:not(:disabled) { background: rgba(255, 255, 255, .05); }
 .ios-row:active { background: rgba(255, 255, 255, .1); }
 .ios-row:focus-visible, .ios-option:has(:focus-visible) { outline: 2px solid var(--ios-tint); outline-offset: -2px; border-radius: 12px; }

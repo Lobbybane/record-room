@@ -3,6 +3,8 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
+import { confirmDialog } from './ui.js';
+import { YOU_OPTIONS, YOU_DEFAULTS } from './you.js';
 import { STATIONS, isStation, isShowing } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
@@ -104,6 +106,28 @@ export const OPTIONS = {
       cream: ['Cream', '#E6D8C2', '#C2B39C', '#F4EAD9'],
     },
   },
+  lights: {
+    label: 'String lights',
+    swatches: {
+      auto: ['Classic', 'linear-gradient(135deg, #FFD38A 50%, #F7A9C8 50%)'],
+      warm: ['Warm white', '#FFD38A'],
+      rainbow: ['Rainbow', 'conic-gradient(#FF5A6E, #FFB347, #FFE66D, #7EF2B8, #6FB8FF, #C29CFF, #FF5A6E)'],
+      pastel: ['Pastel', 'conic-gradient(#F7A9C8, #C9B3FF, #9FE8D0, #FFF1A8, #F7A9C8)'],
+      icy: ['Icy blue', 'linear-gradient(135deg, #E3FBFF 50%, #9FD8FF 50%)'],
+      candy: ['Candy pink', 'linear-gradient(135deg, #FF7AA8 50%, #FFF0F5 50%)'],
+      off: ['Off', 'rgba(120, 120, 128, .4)'],
+    },
+    footer: 'Classic lights change colour on holidays. A colour you pick stays all year.',
+  },
+  tv: {
+    label: 'TV',
+    swatches: {
+      retro: ['Retro cream', '#D8C7B0'],
+      pastel: ['Mint & pink', 'linear-gradient(135deg, #9FD8C4 55%, #F2A9C4 55%)'],
+      wooden: ['Wooden', 'linear-gradient(135deg, #8A5634 55%, #C9A050 55%)'],
+      flat: ['Flat-screen', '#1C1A26'],
+    },
+  },
   parallax: {
     label: 'Moving city',
     choices: { on: 'On', off: 'Off' },
@@ -111,7 +135,7 @@ export const OPTIONS = {
   candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
   fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
   radio: {
-    label: 'Lofi radio',
+    label: 'Radio on the TV',
     choices: { on: 'On', off: 'Off' },
   },
   volume: {
@@ -138,6 +162,8 @@ export const OPTIONS = {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
   },
+  // "You" (js/you.js draws its own page for these).
+  ...YOU_OPTIONS,
   // Not in the panel: switched by clicking the lamp.
   lamp: {
     label: 'Lamp',
@@ -164,6 +190,8 @@ export const DEFAULTS = {
   rug: 'round',
   wallpaper: 'plain',
   curtain: 'room',
+  lights: 'auto',
+  tv: 'retro',
   holiday: 'auto',
   sound: 'on',
   mixMatch: 'off',
@@ -178,6 +206,7 @@ export const DEFAULTS = {
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',
+  ...YOU_DEFAULTS,
 };
 
 const NEON_MAX = 16;
@@ -277,6 +306,8 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.rug = decor.rug;
     stage.dataset.wallpaper = decor.wallpaper;
     stage.dataset.curtain = decor.curtain;
+    stage.dataset.lights = decor.lights;
+    stage.dataset.tv = decor.tv;
     const [, , curtainA, curtainB] = OPTIONS.curtain.swatches[decor.curtain];
     for (const [name, value] of [['--curtain-a', curtainA], ['--curtain-b', curtainB]]) {
       if (value) stage.style.setProperty(name, value);
@@ -311,6 +342,18 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     decor,
     maxText: NEON_MAX,
     custom,
+    actions: {
+      // Back to how the room first looked; music, records, stations and saved looks stay.
+      async reset() {
+        const ok = await confirmDialog({ title: 'Reset the room?', message: 'The room, outside, people, pets and sounds go back to how they first looked. Your records, stations and saved looks stay.', confirm: 'Reset' });
+        if (!ok) return;
+        const keep = new Set(['radio', 'station', 'volume', 'showing', 'celebrate']);
+        for (const [name, value] of Object.entries(DEFAULTS)) {
+          if (!keep.has(name)) decor[name] = Array.isArray(value) ? [...value] : value;
+        }
+        apply();
+      },
+    },
     onChange(name, value) {
       if (name === 'neonText') decor.neonText = String(value).slice(0, NEON_MAX);
       else if (isValid(name, value)) decor[name] = value;
@@ -366,6 +409,13 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     snapshot: () => JSON.parse(JSON.stringify(decor)),
     refresh: () => ui.refresh(),
     close: () => setOpen(false),
+    toggle: () => toggle.click(),
+    isOpen: () => panel.open,
+    openPage(name) {
+      if (!panel.open) toggle.click();
+      ui.reset();
+      ui.open(name);
+    },
   };
 }
 

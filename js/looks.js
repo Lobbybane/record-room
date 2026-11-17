@@ -9,7 +9,8 @@ const SLOTS = 3;
 // Settings a look remembers (not the radio, timers or which holidays you celebrate).
 const LOOK_KEYS = [
   'room', 'time', 'weather', 'season', 'lamp', 'neonText', 'neonColor',
-  'pet', 'coat', 'tank', 'crowd', 'rug', 'wallpaper', 'curtain', 'candles', 'fire',
+  'pet', 'coat', 'tank', 'crowd', 'rug', 'wallpaper', 'curtain', 'lights', 'tv', 'candles', 'fire',
+  'you', 'youSkin', 'youHair', 'youHairColor', 'youTop', 'youTopColor', 'youExtra', 'youHold',
 ];
 
 // Everything a preset doesn't mention goes back to these, so presets don't mix.
