@@ -17,7 +17,7 @@
 // Moves are CSS classes (css/style.css: "café customers' moves", "the barista's day").
 // Every step checks `generation`; tidy() puts the room back as it was drawn.
 
-import { setHold, holdIn, holdOut, personSvg, tableThings } from './people.js';
+import { setHold, holdIn, holdOut, personSvg, tableThings, offscreenX, held } from './people.js';
 import { act, lifeBusy, say, talk, settle, endLoop } from './life-people.js';
 import { CAFE_SEATS } from './groups.js';
 
@@ -35,7 +35,6 @@ function choose(options) {
 /* ---------- where things are (people-group units) ---------- */
 const LINE_Y = 635;          // standing customers walk here: feet at the counter's base
 const STAND_S = 1.15;        // size of a standing customer
-const DOOR_X = 1330;         // off to the right, the café's door
 const REGISTER_X = 843;      // in front of the counter's left end (stage x ≈ 900)
 const QUEUE_GAP = 50;        // the queue grows to the right, along the counter
 const BARISTA_REGISTER = -156; // the barista's slide (stage px) from the machine to the register
@@ -58,6 +57,9 @@ let seats = new Map();       // seat id → { seat, el, reserved, cup }
 const extra = new Map();     // element → data for customers who came in (not in js/groups.js)
 let queue = [];              // customers waiting to order, in order
 let jobs = [];               // orders for the barista: { c, done }
+let serving = false;         // the barista is taking or making an order
+let busboyOut = false;       // the bus boy is out clearing tables
+let busboyRest = 0;          // he's back in the kitchen until then
 
 const STATES = ['b-pocket', 'b-steam', 'b-shot', 'b-phone', 'b-look-l', 'b-look-r', 'b-dip', 'b-talk', 'b-hot', 'b-iced', 'b-filled', 'b-sliding', 'b-carry', 'b-carry-hot', 'b-carry-iced', 'b-out'];
 const MOVES = ['typing', 'scrolling', 'page-turn', 'reach', 'reach-up', 'sip', 'sip-iced', 'turned', 'laugh', 'cafe-busy', 'talking', 'cafe-leaving'];
@@ -122,6 +124,9 @@ function tidy() {
   queue = [];
   jobs = [];
   pairSeat = null;
+  serving = false;
+  busboyOut = false;
+  busboyRest = 0;
 }
 
 function restart() {
@@ -135,6 +140,7 @@ function restart() {
     if (spot) spot.el = el;
   }
   baristaDay(gen);
+  busboyWatch(gen);
   for (const el of seated()) {
     customer(el, gen);
     stay(el, gen, rand(60_000, 180_000)); // the ones already here leave in time too
@@ -265,6 +271,8 @@ function pace() {
   return stage.dataset.crowd === 'cozy' ? { gap: [50_000, 100_000], max: 3 } : { gap: [20_000, 40_000], max: 7 };
 }
 const freeSeats = () => [...seats.values()].filter((spot) => !spot.el && !spot.reserved && !spot.cup);
+// Tables with an empty cup left on them that nobody is already on their way to clear.
+const dirtySpots = () => [...seats.values()].filter((spot) => spot.cup && !spot.el && !spot.reserved && !spot.claimed);
 const busySeats = () => [...seats.values()].filter((spot) => spot.el || spot.reserved).length;
 
 async function arrivals(gen) {
@@ -312,13 +320,10 @@ async function arrive(gen, kind = 'one', wish = {}) {
   if (c.act === 'hold' && !c.drink) { c.act = 'phone'; c.hold = 'phone'; }
   const spot = wish.toGo ? null : reserveSeat(kind);
   if (!c.drink && !spot) return; // nothing to order and nowhere to sit: they don't come in
-  const st = { x: DOOR_X, y: LINE_Y, s: STAND_S, face: 1 };
+  const st = { x: offscreenX(), y: LINE_Y, s: STAND_S, face: 1 };
   const el = build(personSvg({ ...c, hold: '', pose: 'stand', carries: true, x: st.x, y: st.y, s: st.s }, 7, 'cafe-rt cafe-walker'));
-  el.classList.add('cafe-fade');
-  slot(el, standKey(st.y, st.s));
+  slot(el, standKey(st.y, st.s)); // off screen: they simply walk in
   place(el, st);
-  await frame();
-  el.classList.remove('cafe-fade');
   c.el = el;
   c.st = st;
   try {
@@ -338,7 +343,7 @@ async function arrive(gen, kind = 'one', wish = {}) {
       if (gen !== generation) return;
     }
     if (spot) await sitDown(c, spot, gen);
-    else await walk(el, st, [[DOOR_X, LINE_Y]]);
+    else await walk(el, st, [[offscreenX(), LINE_Y]]);
   } finally {
     if (!spot || gen !== generation) el.remove();
   }
@@ -420,7 +425,7 @@ async function leave(el, gen) {
   spot.el = null;
   spot.cup = cup || null;
   if (gen !== generation) { walker.remove(); return; }
-  await walk(walker, st, [[seat.x, LINE_Y, STAND_S], [DOOR_X, LINE_Y]]);
+  await walk(walker, st, [[seat.x, LINE_Y, STAND_S], [offscreenX(), LINE_Y]]);
   walker.remove();
 }
 
@@ -551,8 +556,9 @@ async function baristaDay(gen) {
   await wait(rand(600, 1500));
   while (await still(gen)) {
     if (jobs.length) { await serve(b, jobs.shift(), gen); continue; }
-    const dirty = [...seats.values()].find((spot) => spot.cup && !spot.el && !spot.reserved);
-    if (dirty && !queue.length && Math.random() < 0.6) { await clearTable(b, dirty, gen); continue; }
+    // A cup or two the barista clears when it's quiet; a pile is the bus boy's job.
+    const dirty = dirtySpots();
+    if (dirty.length && dirty.length < 3 && !busboyOut && !queue.length && Math.random() < 0.6) { await clearTable(b, dirty[0], gen); continue; }
     const what = choose([['phone', 3], ['look', 3], ['steam', 1.5], ['rest', 2]]);
     await idle(b, what, gen);
   }
@@ -575,6 +581,7 @@ async function idle(b, what, gen) {
 // Takes an order at the register, makes it, and hands it over on the pickup mat.
 async function serve(b, job, gen) {
   const { c } = job;
+  serving = true;
   const ok = () => gen === generation && c.el.isConnected;
   for (const cls of ['b-phone', 'b-look-l', 'b-look-r', 'b-steam']) if (b.classList.contains(cls)) await stopPose(b, cls);
   try {
@@ -619,6 +626,7 @@ async function serve(b, job, gen) {
   } finally {
     b.classList.remove('b-carry', 'b-carry-hot', 'b-carry-iced', 'b-talk');
     counterTop()?.classList.remove('pick-hot', 'pick-iced');
+    serving = false;
     job.done();
   }
 }
@@ -627,6 +635,7 @@ async function serve(b, job, gen) {
 async function clearTable(b, spot, gen) {
   const { seat } = spot;
   const cup = spot.cup;
+  spot.claimed = true;
   await slideTo(b, 'register');
   if (gen !== generation) return;
   const st = { x: REGISTER_X + 22, y: LINE_Y, s: STAND_S, face: 1 };
@@ -652,6 +661,7 @@ async function clearTable(b, spot, gen) {
     await holdIn(walker, drink);
     if (cup) { if (cup.classList.contains('cafe-rt')) cup.remove(); else { cup.classList.remove('cafe-fade'); cup.classList.add('gone'); } }
     spot.cup = null;
+    spot.claimed = false;
     walker.classList.remove('reach');
     await wait(650);
     if (gen !== generation) return;
@@ -663,6 +673,89 @@ async function clearTable(b, spot, gen) {
   } finally {
     walker.remove();
     b.classList.remove('b-out');
+    spot.claimed = false;
+  }
+}
+
+/* ---------- the bus boy ---------- */
+
+const heldTub = (n) => held(`tub:${n}`);
+const heldCloth = held('cloth');
+
+// Comes in from the kitchen (off screen to the right) when cups pile up on the tables.
+async function busboyWatch(gen) {
+  while (await still(gen)) {
+    await wait(3000);
+    if (gen !== generation) return;
+    if (busboyOut || Date.now() < busboyRest || stage.dataset.crowd === 'empty') continue;
+    const dirty = dirtySpots().length;
+    const baristaBusy = serving || queue.length > 0;
+    const need = stage.dataset.crowd === 'cozy' ? baristaBusy && dirty >= 2 : dirty >= 3 || (dirty >= 2 && baristaBusy);
+    if (need) await busboyTrip(gen);
+  }
+}
+
+const BUSBOY = { skin: 3, hair: ['short', '#15101A'], top: ['tee', '#F4ECFF'], legs: '#2A2440', shoes: '#15132B', extras: ['apron:#1F4F49', 'cap:#2E6E66'] };
+
+async function busboyTrip(gen) {
+  const route = dirtySpots().sort((a, c) => c.seat.x - a.seat.x).slice(0, 5); // nearest the kitchen first
+  if (!route.length) return;
+  busboyOut = true;
+  route.forEach((spot) => { spot.claimed = true; });
+  let cleared = 0;
+  const st = { x: offscreenX(), y: LINE_Y, s: STAND_S, face: 1 };
+  const el = build(personSvg({ ...BUSBOY, pose: 'stand', hold: 'tub:0', x: st.x, y: st.y, s: st.s, pid: 'busboy' }, 7, 'cafe-rt cafe-walker busboy'));
+  slot(el, standKey(st.y, st.s));
+  place(el, st);
+  const tub = () => el.querySelector('.lap-hold');
+  const hand = () => el.querySelector('.own-hold');
+  try {
+    for (const spot of route) {
+      if (gen !== generation) return;
+      if (!spot.cup || spot.el) { spot.claimed = false; continue; }
+      const { seat } = spot;
+      const standY = seat.y - 17 * seat.s;
+      await walk(el, st, [[st.x, LINE_Y, STAND_S], [seat.x, LINE_Y, STAND_S], [seat.x, standY, seat.s]]);
+      if (gen !== generation) return;
+      await turn(el, st, seat.face === 'right' ? -1 : 1);
+      // Reach for the cup; it fades off the table and into the tub.
+      el.classList.add('reach');
+      await wait(700);
+      const cup = spot.cup;
+      cup.classList.add('cafe-fade');
+      await wait(160);
+      cleared++;
+      tub().innerHTML = '';
+      tub().insertAdjacentHTML('beforeend', heldTub(cleared));
+      await wait(200);
+      if (cup.classList.contains('cafe-rt')) cup.remove(); else { cup.classList.remove('cafe-fade'); cup.classList.add('gone'); }
+      spot.cup = null;
+      spot.claimed = false;
+      // A quick wipe with the cloth, then back to standing.
+      hand().style.opacity = '0';
+      hand().innerHTML = heldCloth;
+      await settle();
+      hand().style.opacity = '';
+      await act(el, 'wipe');
+      hand().style.opacity = '0';
+      await wait(170);
+      hand().innerHTML = '';
+      hand().style.opacity = '';
+      el.classList.remove('reach');
+      await wait(650);
+    }
+    if (gen !== generation) return;
+    // Back to the kitchen, past the register; the barista says thanks now and then.
+    await walk(el, st, [[st.x, LINE_Y, STAND_S], [REGISTER_X + 40, LINE_Y]]);
+    if (gen !== generation) return;
+    if (!serving && Math.random() < 0.5) baristaSays(barista(), pick(['thanks!', 'you’re a star', 'thank you!']), 1600);
+    else if (Math.random() < 0.5) talk(el, st, pick(['got it!', 'all clean', 'tables are done']), 1500);
+    await walk(el, st, [[offscreenX(), LINE_Y]]);
+  } finally {
+    el.remove();
+    route.forEach((spot) => { spot.claimed = false; });
+    busboyOut = false;
+    busboyRest = Date.now() + 40_000 / speed;
   }
 }
 
@@ -718,6 +811,7 @@ export async function makeIced(b = barista(), gen = generation, keep = false) {
  * - cafeNow('arrive', { drink: 'iced' | 'hot' | 'hotlatte' | '', act, toGo }) sends one customer in now
  *   (cafeNow('pair') sends two);
  * - cafeNow('leave', seatId) sends someone home; cafeNow('clear') sends the barista to a dirty table;
+ * - cafeNow('busboy') sends the bus boy out now to clear the cups left on tables;
  * - cafeNow('type' | 'scroll' | 'read' | 'page' | 'glance' | 'sip' | 'laugh', pid) plays one customer move;
  * - cafeNow('phone' | 'look' | 'steam' | 'hot' | 'iced') plays one barista move.
  */
@@ -736,6 +830,7 @@ export async function cafeNow(kind, arg) {
   }
   if (kind === 'pair') { arrive(gen, 'pair'); await wait(1800); return arrive(gen, 'second'); }
   if (kind === 'leave') { const spot = seats.get(arg); return spot?.el && leave(spot.el, gen); }
+  if (kind === 'busboy') { busboyRest = 0; return busboyOut ? null : busboyTrip(gen); }
   if (kind === 'clear') { const spot = [...seats.values()].find((s) => s.cup && !s.el); return spot && clearTable(barista(), spot, gen); }
   if (['phone', 'look', 'steam'].includes(kind)) return idle(barista(), kind, gen);
   if (kind === 'hot') return makeHot(barista(), gen);
