@@ -1640,6 +1640,9 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 #people .gone { display: none; }
 #people .empty-cup .wisps { display: none; }
 #people .empty-cup .drink :is(ellipse, path[fill="#9A6440"]) { opacity: .35; }
+/* The bus boy wipes a table: the cloth goes back and forth (on translate, so it adds to his reach). */
+.person.wipe .forearm { animation: wipe-table 1.4s ease-in-out both; }
+@keyframes wipe-table { 0%, 100% { translate: 0 0; } 20%, 60% { translate: -4px .5px; } 40%, 80% { translate: 3px 0; } }
 /* Standing at the counter: reaching up onto it for the drink (the cup stays upright). */
 .person.reach-up .arm { transform: rotate(78deg); }
 .person.reach-up .forearm { transform: rotate(9deg); }

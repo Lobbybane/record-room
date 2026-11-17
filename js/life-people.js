@@ -5,11 +5,10 @@
 // `visitor` and `wanders` in js/groups.js). Nothing happens when the room is dozing,
 // with "Nobody" there, with Lively people off, or with reduced motion.
 
-import { personSvg, setHold, walkerDrop } from './people.js';
+import { personSvg, setHold, walkerDrop, offscreenX } from './people.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const NS = 'http://www.w3.org/2000/svg';
-const OFFSTAGE = 1330;        // where people walk off to (behind the card, on the right)
 const TV_EDGE = 380;          // bubbles stay right of the TV (people-group units)
 const CARD_EDGE = 1000;       // ...and clear of the right edge of the room
 
@@ -373,14 +372,14 @@ async function snack() {
     await talk(el, p, pick(p.snackLines || ['snack run!', 'anyone want anything?']), 2000);
     if (gen !== generation) return;
     await standUp(el, walker);
-    await walkTo(walker, at, OFFSTAGE);
+    await walkTo(walker, at, offscreenX());
     walker.classList.remove('out', 'shown');
     await wait(rand(12_000, 22_000));
     if (gen !== generation) return;
     const treat = pick(p.snacks || ['snacks']);
     setHold(walker, treat);
     walker.classList.add('out', 'shown');
-    await walkTo(walker, { ...at, x: OFFSTAGE }, p.x);
+    await walkTo(walker, { ...at, x: offscreenX() }, p.x);
     if (gen !== generation) return;
     setHold(el, treat);
     await sitDown(el, walker);
@@ -404,19 +403,17 @@ async function visitor() {
   lastVisitor = Date.now();
   const gen = generation;
   const look = typeof v.look === 'function' ? v.look(stage) : v.look;
-  const p = { ...look, pose: 'stand', x: OFFSTAGE, y: v.y, s: v.s || 1.4, pid: 'v' };
+  const p = { ...look, pose: 'stand', x: offscreenX(), y: v.y, s: v.s || 1.4, pid: 'v' };
   if (v.order) { p.hold = ''; p.carries = true; } // picks up their order on the way in
   const holder = document.createElementNS(NS, 'g');
   holder.innerHTML = personSvg(p, 7, 'visitor');
-  const el = holder.firstElementChild;
-  el.style.opacity = '0';
-  requestAnimationFrame(() => { el.style.opacity = ''; });
+  const el = holder.firstElementChild; // (starts off screen, so it simply walks in)
   // Slot the visitor in at the right depth among the group.
   const before = [...scene.root.children].find((c) => Number(c.dataset.y) > v.y);
   scene.root.insertBefore(el, before || null);
   try {
     if (v.order) {
-      await walkTo(el, { x: OFFSTAGE, y: v.y, s: p.s }, v.order.x);
+      await walkTo(el, { x: offscreenX(), y: v.y, s: p.s }, v.order.x);
       if (gen !== generation) return;
       await wait(1600);
       setHold(el, v.order.item);
@@ -424,7 +421,7 @@ async function visitor() {
       if (gen !== generation) return;
       await walkTo(el, { x: v.order.x, y: v.y, s: p.s }, v.x);
     } else {
-      await walkTo(el, { x: OFFSTAGE, y: v.y, s: p.s }, v.x);
+      await walkTo(el, { x: offscreenX(), y: v.y, s: p.s }, v.x);
     }
     if (gen !== generation) return;
     if (v.effect) effect(v.effect, { ...p, x: v.x });
@@ -443,7 +440,7 @@ async function visitor() {
     // Only an empty hand waves (a full one would fling its drink).
     if (!el.dataset.hold) await act(el, 'wave');
     if (gen !== generation) return;
-    await walkTo(el, { x: v.x, y: v.y, s: p.s }, OFFSTAGE);
+    await walkTo(el, { x: v.x, y: v.y, s: p.s }, offscreenX());
   } finally {
     el.remove();
   }

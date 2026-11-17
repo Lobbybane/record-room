@@ -91,10 +91,12 @@ function torso(style, color, extra = {}) {
     out += `<path d="M-2 -46 L-6 0" stroke="${shade}" stroke-width="2"/>
       <g fill="#E0C068"><circle cx="-8" cy="-34" r="1.6"/><circle cx="-9" cy="-24" r="1.6"/><circle cx="-10" cy="-14" r="1.6"/></g>`;
   }
-  // The barista's green apron, over the front of whatever they wear.
-  if ((extra.extras || []).includes('apron')) {
-    out += '<path d="M-14 -34 Q-18 -16 -14 2 L3 2 L3 -34 Z" fill="#2E6E66"/><path d="M-8 -34 L-4 -47" stroke="#2E6E66" stroke-width="2.4"/>'
-      + '<rect x="-12" y="-18" width="9" height="7" rx="1.5" fill="#285E57"/>';
+  // An apron over the front of whatever they wear (green for the barista; 'apron:<colour>').
+  const apron = (extra.extras || []).find((e) => e.startsWith('apron'));
+  if (apron) {
+    const c = apron.split(':')[1] || '#2E6E66';
+    out += `<path d="M-14 -34 Q-18 -16 -14 2 L3 2 L3 -34 Z" fill="${c}"/><path d="M-8 -34 L-4 -47" stroke="${c}" stroke-width="2.4"/>`
+      + `<rect x="-12" y="-18" width="9" height="7" rx="1.5" fill="${tint(c, -0.12)}"/>`;
   }
   return out;
 }
@@ -162,7 +164,7 @@ function head(p) {
 }
 
 // Something held in the near hand (hand at about -24,-15).
-const LAP_ITEMS = new Set(['laptop', 'popcorn', 'book']);
+const LAP_ITEMS = new Set(['laptop', 'popcorn', 'book', 'tub']);
 export const isLapItem = (item) => LAP_ITEMS.has(String(item || '').split(':')[0]);
 
 /** Puts an item in a drawn person's lap or hand (whichever suits it). */
@@ -247,6 +249,21 @@ export function held(item) {
     case 'marshmallow': return '<path d="M-22 -16 L-70 8" stroke="#8A5A3C" stroke-width="2"/><rect x="-76" y="5" width="8" height="7" rx="2" fill="#FFF3E6" transform="rotate(-26 -72 8)"/>';
     case 'lantern': return '<path d="M-28 -16 V-22" stroke="#2B2440" stroke-width="1.4"/><rect x="-34" y="-14" width="12" height="15" rx="3" fill="#2B2440"/><rect x="-32" y="-12" width="8" height="11" rx="2" fill="#FFD38A" class="lantern-light"/>';
     case 'pizza': return '<path d="M-48 -26 L-14 -26 L-14 -18 L-48 -18 Z" fill="#E6C88A"/><path d="M-48 -26 L-14 -26" stroke="#C9A86A" stroke-width="2"/><text x="-31" y="-19.5" text-anchor="middle" font-size="6" font-weight="800" fill="#C8443C">PIZZA</text>';
+    // The bus boy's grey tub, held against the hip, with the cups and mugs he's cleared
+    // peeking out (tub:<how many>, up to 5).
+    case 'tub': {
+      const n = Math.min(5, Number(tone) || 0);
+      const cups = Array.from({ length: n }, (_, i) => {
+        const x = -32 + i * 5.2;
+        return i % 2
+          ? `<path d="M${x} -25 L${x + 5} -25 L${x + 4.4} -15 L${x + 0.6} -15 Z" fill="#E8DDF5" opacity=".8"/><path d="M${x + 3} -25 L${x + 4.6} -30" stroke="#F28DB2" stroke-width="1"/>`
+          : `<rect x="${x}" y="${-23 - (i % 3)}" width="5.4" height="7" rx="1" fill="${['#F4ECFF', '#F7A9C8', '#7FA08A'][i % 3]}"/>`;
+      }).join('');
+      return `<g class="tub">${cups}<path d="M-35 -19 L-5 -19 L-7 -6 L-33 -6 Z" fill="#8A8CA8"/><path d="M-35 -19 L-5 -19" stroke="#A9ABC4" stroke-width="1.6"/>`
+        + '<path d="M-31 -15 H-9" stroke="#6E7090" stroke-width="1"/></g>';
+    }
+    // A cloth for wiping tables.
+    case 'cloth': return '<path d="M-30 -18 Q-26 -21 -21 -18 L-22 -12 Q-26 -14 -30 -12 Z" fill="#6FA6C8"/><path d="M-28 -16 L-23 -15" stroke="#9FC8E0" stroke-width=".8"/>';
     case 'togo': return '<path d="M-33 -30 L-23 -30 L-24.5 -14 L-31.5 -14 Z" fill="#F4ECFF"/><rect x="-34" y="-32" width="12" height="3" rx="1" fill="#2B2440"/><rect x="-33" y="-24" width="10" height="5" fill="#C9956A"/>';
     case 'firewood': return '<g transform="rotate(-8 -30 -18)"><rect x="-48" y="-24" width="36" height="7" rx="3.5" fill="#8A5A3C"/><rect x="-46" y="-17" width="34" height="7" rx="3.5" fill="#6E4430"/><circle cx="-12" cy="-20.5" r="3" fill="#C9956A"/><circle cx="-12" cy="-13.5" r="3" fill="#C9956A"/></g>';
     case 'surfboard': return '<g transform="rotate(-70 -24 -15)"><path d="M-24 -15 Q-12 -60 -24 -110 Q-36 -60 -24 -15 Z" fill="#FFB38A"/><path d="M-24 -20 L-24 -104" stroke="#FFFFFF" stroke-width="2" opacity=".7"/></g>';
@@ -407,6 +424,20 @@ export function tableThings(p, part = 'back') {
 /* ---------- drawing a room's group ---------- */
 
 let svgRoot = null;
+let groupFit = { scale: 1.2, ax: 560 }; // how the current room's group is scaled (see drawPeople)
+
+/**
+ * A spot just past the right edge of the screen, in people-group units (where walkers come
+ * in and go out, so they never appear or vanish in view). The screen can be wider than
+ * the stage: its right edge is --fx + --fw in stage pixels (set in js/main.js).
+ */
+export function offscreenX(margin = 70) {
+  const stage = document.getElementById('stage');
+  const px = (name, fallback) => parseFloat(stage?.style.getPropertyValue(name)) || fallback;
+  const right = px('--fx', 0) + px('--fw', 1280);
+  const { scale, ax } = groupFit;
+  return Math.max(1330, ax + (right - ax) / scale + margin);
+}
 
 export function drawPeople(container, { room, crowd, season }) {
   const group = GROUPS[room] || GROUPS.bedroom;
@@ -451,6 +482,7 @@ export function drawPeople(container, { room, crowd, season }) {
   }
   // The whole group grows from a point on the floor, so the room's numbers stay simple.
   const { scale = 1.2, ax = 560, ay = 800 } = group;
+  groupFit = { scale, ax };
   svgRoot.innerHTML = `<g class="people-group" transform="translate(${ax} ${ay}) scale(${scale}) translate(${-ax} ${-ay})">${parts.join('')}</g>`;
   return { group, root: svgRoot.firstElementChild, cold };
 }
