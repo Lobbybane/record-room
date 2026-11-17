@@ -3,6 +3,7 @@ import { findCover, youtubeThumb, guessFromVideo, fetchVideoInfo, isThumbnail } 
 import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor, OPTIONS } from './decor.js';
 import { initKeys, keysPage } from './keys.js';
+import { menuPage, renderMenu } from './cafemenu.js';
 import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
@@ -166,7 +167,7 @@ let fittedFor = '';
 let drawnAudience = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { ...lookPages(() => decor), keys: keysPage, sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
+  custom: { ...lookPages(() => decor), keys: keysPage, menu: menuPage, sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
   onApply: (d) => {
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
@@ -1134,6 +1135,7 @@ initKeys({
 
 buildStars();
 buildLights();
+renderMenu();
 
 renderCrate();
 updateCard();

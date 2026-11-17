@@ -1199,6 +1199,9 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .quick-tile:hover { background: rgba(255, 255, 255, .12); }
 .quick-tile:focus-visible { outline: 2px solid var(--ios-tint); outline-offset: 2px; }
 .key-row { cursor: default; gap: 14px; }
+.menu-item-row { gap: 10px; }
+.ios-field .menu-name { flex: 1 1 auto; min-width: 0; text-align: left; }
+.ios-field .menu-price { flex: 0 0 64px; min-width: 0; text-align: right; color: var(--ios-secondary); }
 .key-row .ios-label { white-space: normal; font-size: 15px; }
 .key-cap {
   flex: 0 0 74px; padding: 4px 6px; border-radius: 7px; text-align: center;

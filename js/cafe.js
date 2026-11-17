@@ -18,6 +18,7 @@
 // Every step checks `generation`; tidy() puts the room back as it was drawn.
 
 import { setHold, holdIn, holdOut, personSvg, tableThings, offscreenX, held } from './people.js';
+import { menuOrder } from './cafemenu.js';
 import { act, lifeBusy, say, talk, settle, endLoop } from './life-people.js';
 import { CAFE_SEATS } from './groups.js';
 
@@ -600,7 +601,7 @@ async function serve(b, job, gen) {
     if (!ok()) return;
     await baristaSays(b, pick(['hi! what can I get you?', 'hey there! what can I get you?', 'welcome in! what would you like?']));
     if (!ok()) return;
-    await talk(c.el, c.st, pick(ORDERS[c.drink.split(':')[0]] || ORDERS.hot), 2000);
+    await talk(c.el, c.st, (!christmas() && Math.random() < 0.6 && menuOrder(c.drink)) || pick(ORDERS[c.drink.split(':')[0]] || ORDERS.hot), 2000);
     if (!ok()) return;
     await baristaSays(b, pick(['coming right up!', 'you got it!', 'great choice!']), 1800);
     if (!ok()) return;
