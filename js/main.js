@@ -421,6 +421,8 @@ async function playRecord(ref) {
   }
   busy = false;
   updateCard();
+  // Moved to the café while the record was on its way: it goes straight back.
+  if (!recordsHere()) putBack();
 }
 
 // advance: play the next queued record (when a record ends or is skipped).
@@ -562,6 +564,8 @@ function musicSettingsChanged(d) {
     knob.setAttribute('aria-label', `Volume ${d.volume}%: turn down`);
     knob.title = `Volume ${d.volume}%`;
   }
+  // The café has no records: a record that's on goes back and the radio returns.
+  if (current !== null && !busy && !recordsHere(d.room)) putBack();
   // In the movie theater the screen plays the "Now showing" list (always on).
   theater = d.room === 'theater';
   const nextOn = theater || d.radio === 'on';
@@ -587,8 +591,13 @@ setInterval(() => {
   if (decor.get('station') === 'auto') musicSettingsChanged(decor.snapshot());
 }, 60_000);
 
+// Rooms with a record player and a crate (the café has neither).
+function recordsHere(room = decor.get('room')) {
+  return room !== 'cafe';
+}
+
 function showRadioOff() {
-  showTv('Radio’s off', 'Turn the knob, or pick a record');
+  showTv('Radio’s off', recordsHere() ? 'Turn the knob, or pick a record' : 'Turn the knob to switch it on');
 }
 
 async function tuneRadio({ flash = false } = {}) {
@@ -662,7 +671,7 @@ function radioError() {
     return;
   }
   radioPhase = 'error';
-  showTv('No signal', 'The radio can’t play here right now. Pick a record instead.');
+  showTv('No signal', recordsHere() ? 'The radio can’t play here right now. Pick a record instead.' : 'The radio can’t play here right now.');
   updateCard();
   updateTvTag();
 }

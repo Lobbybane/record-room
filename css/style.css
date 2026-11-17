@@ -1231,6 +1231,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .cafe-only { display: none; }
 .stage[data-room="cafe"] .cafe-only { display: block; }
 .stage[data-room="cafe"] :is(.curtain, .lamp-shade, .lamp-bulb, .lamp-pole, .mug, .steam, .lamp-glow, .chalkboard) { display: none; }
+/* The café has no records: no record player on the counter, no crate (js/main.js hands a playing record back to the radio). */
+.stage[data-room="cafe"] :is(.turntable, .crate, .vinyl-wrap, .tonearm-layer, .deck-btn) { display: none; }
 .stage[data-room="cafe"] .lamp-switch { left: 622px; top: -12px; width: 60px; height: 46px; }
 /* The neon sign hangs on the wall above the menu board (centred over it), clear of the window view. */
 .stage[data-room="cafe"] .neon-sign { left: 1076px; top: 164px; transform: translateX(-50%); }
