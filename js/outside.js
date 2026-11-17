@@ -18,12 +18,14 @@ const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const rand = (a, b) => a + Math.random() * (b - a);
 const LEFT = -60;   // off the glass on the left (the glass shows -30 to 562)
 const RIGHT = 590;  // off the glass on the right
+const GIFTS = ['#D63A4A', '#2E8A5E', '#F2C14E', '#4F7FD9', '#F28DB2', '#B79CFF'];
+const christmas = () => (stage?.dataset.holiday || '').split(' ').includes('winter');
 const FEET = 298;   // the pavement
 
 let stage = null;
 
 /** One passer-by, drawn facing right with feet at (0, 0). */
-export function passerbySvg({ coat = pick(COATS), umbrella = pick(UMBRELLAS), skin = pick(SKINS), hair = pick(HAIR), dog = false, bag = false } = {}) {
+export function passerbySvg({ coat = pick(COATS), umbrella = pick(UMBRELLAS), skin = pick(SKINS), hair = pick(HAIR), dog = false, bag = false, gift = '' } = {}) {
   const legs = '#1E1A3A';
   return `<g class="bob"><g class="legs"><path class="leg-a" d="M-0.8 -5.5 L-1.6 0" stroke="${legs}" stroke-width="1.7" stroke-linecap="round"/>`
     + `<path class="leg-b" d="M0.8 -5.5 L1.6 0" stroke="${legs}" stroke-width="1.7" stroke-linecap="round"/></g>`
@@ -31,6 +33,9 @@ export function passerbySvg({ coat = pick(COATS), umbrella = pick(UMBRELLAS), sk
     + `<circle cx="0.2" cy="-14.6" r="2.1" fill="${skin}"/>`
     + `<path d="M-1.9 -15.6 Q0.2 -18.4 2.3 -15.8 Q0.2 -16.6 -1.9 -15.6 Z" fill="${hair}"/>`
     + (bag ? '<rect x="2" y="-9" width="3" height="3.6" rx=".8" fill="#2A2440"/>' : '')
+    // At Christmas: a wrapped present under the arm, or a gift bag with tissue paper.
+    + (gift === 'box' ? `<g class="gift"><rect x="1.6" y="-10.4" width="4.6" height="4" rx=".5" fill="${pick(GIFTS)}"/><path d="M3.9 -10.4 V-6.4 M1.6 -8.4 H6.2" stroke="#F2C14E" stroke-width=".7"/><path d="M3.9 -10.4 q-1.4 -1.4 -1.8 0 M3.9 -10.4 q1.4 -1.4 1.8 0" fill="none" stroke="#F2C14E" stroke-width=".6"/></g>` : '')
+    + (gift === 'bag' ? `<g class="gift"><path d="M1.8 -9.6 H6 L5.6 -5 H2.2 Z" fill="${pick(GIFTS)}"/><path d="M2.8 -9.6 q1.1 -1.8 2.2 0" fill="none" stroke="#2A2440" stroke-width=".4"/><path d="M2.6 -9.6 l.6 -1.2 l.6 1 l.7 -1.3 l.6 1.4" fill="#F4ECFF"/></g>` : '')
     + `<g class="umbrella"><path d="M0.3 -13 V-19.5" stroke="#2A2440" stroke-width=".7"/><path d="M-6.6 -19 Q0.3 -26.6 7.2 -19 Q0.3 -20.6 -6.6 -19 Z" fill="${umbrella}"/></g></g>`
     + (dog ? '<g class="dog"><path d="M6 -4.6 H12 Q13.6 -4.6 13.6 -3.2 V-2.6 H6 Z" fill="#8A5A3C"/><circle cx="13.4" cy="-5.4" r="1.6" fill="#8A5A3C"/>'
       + '<path class="dog-a" d="M7 -2.6 V0" stroke="#8A5A3C" stroke-width="1.1"/><path class="dog-b" d="M12 -2.6 V0" stroke="#8A5A3C" stroke-width="1.1"/>'
@@ -80,6 +85,8 @@ function walker(container) {
   const right = Math.random() < 0.5;
   const storm = weather() === 'storm';
   const look = { bag: Math.random() < 0.3, dog: !storm && Math.random() < 0.12 };
+  // At Christmas about half of them are carrying presents home.
+  if (christmas() && !look.bag && Math.random() < 0.5) look.gift = Math.random() < 0.55 ? 'box' : 'bag';
   const near = Math.random() < 0.55; // two lanes: nearer people are a touch bigger and lower
   const size = near ? 1 : 0.86;
   const feet = near ? FEET + 1 : FEET - 1.5;

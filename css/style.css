@@ -583,7 +583,20 @@ html, body {
 @keyframes vent-puff { 0% { opacity: 0; transform: translateY(0) scale(.5); } 20% { opacity: .35; } 100% { opacity: 0; transform: translateY(-22px) scale(1.8); } }
 .stage:is([data-weather="rain"], [data-weather="snow"], [data-season="winter"]) .vent-steam .puff { animation-duration: 3.4s; }
 /* Umbrellas come out in the rain. */
+/* Christmas drinks: cocoa with marshmallows or a red holiday cup, on the barista's cups (js/cafe.js sets data-drink). */
+:is(.xm-cocoa, .xm-redcup) { display: none; }
+:is(.cafe-back, .cafe-counter)[data-drink="cocoa"] .xm-cocoa,
+:is(.cafe-back, .cafe-counter)[data-drink="red"] .xm-redcup { display: inline; }
+/* (the white mug under a red cup hides, steam and all but the wisps) */
+:is(.cafe-back, .cafe-counter)[data-drink="red"] :is(.bar-cup.hot, .b-cup-hot, .pickup-cup.hot) > :is(rect, path, ellipse) { display: none; }
+/* Christmas sweaters: every sweater gets a knit band at Christmas; the elf hat replaces a Santa hat. */
+.xknit { display: none; }
+.stage[data-holiday~="winter"] .xknit { display: inline; }
+.person:has(.elf-hat) .holiday-hats { display: none; }
 .passerby .umbrella { display: none; }
+/* Christmas on the street: wreaths on the lamp posts and a snowman (any city view). */
+.street :is(.lamp-wreaths, .snowman) { display: none; }
+.stage[data-holiday~="winter"] .street :is(.lamp-wreaths, .snowman) { display: inline; }
 .stage:is([data-weather="rain"], [data-weather="storm"]) .passerby .umbrella { display: inline; }
 .bld.t1 { fill: var(--bld-1); } .bld.t2 { fill: var(--bld-2); } .bld.t3 { fill: var(--bld-3); } .bld.t4 { fill: var(--bld-4); }
 .cornice { fill: rgba(255, 255, 255, .09); }

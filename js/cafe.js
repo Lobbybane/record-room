@@ -241,16 +241,23 @@ const LEGS = ['#2C2E5E', '#3B3F78', '#3E2E3E', '#4F6FA8', '#2B2440'];
 const SHOES = ['#F4ECFF', '#3A2A3A', '#6B4436', '#2B2440', '#E8DDF5'];
 const BOOKS = ['#6FA6C8', '#C8443C', '#7FA08A', '#F2B33D'];
 
+const christmas = () => (stage?.dataset.holiday || '').split(' ').includes('winter');
+// At Christmas, sweaters with a knit band (the band shows by css at Christmas).
+const XMAS_TOPS = [['sweater', '#C8443C'], ['sweater', '#2E8A5E'], ['sweater', '#E8E4F4'], ['sweater', '#4F6FA8']];
+
 function newCustomer(partner) {
-  const drink = choose([['hot', 4], ['hotlatte', 3], ['iced', 4], ['', 1.5]]);
+  // At Christmas many order hot cocoa or a gingerbread latte in a red holiday cup.
+  const drink = christmas()
+    ? choose([['hot', 2], ['hotlatte', 1.5], ['iced', 1.5], ['hotcocoa', 3.5], ['redcup', 3.5], ['', 0.5]])
+    : choose([['hot', 4], ['hotlatte', 3], ['iced', 4], ['', 1.5]]);
   const act = choose([['type', 3], ['phone', 3], ['read', 2.5], ['hold', drink ? 2.5 : 0]]);
   const extras = [];
   if (Math.random() < 0.2) extras.push('glasses');
   if (Math.random() < 0.15) extras.push(`headphones:${pick(['#6FE3F2', '#F28DB2', '#F2B33D'])}`);
-  const cup = drink === 'iced' ? 'iced' : drink ? `${drink}:#F4ECFF` : '';
+  const cup = drink === 'iced' ? 'iced' : drink === 'redcup' ? 'redcup' : drink ? `${drink}:#F4ECFF` : '';
   return {
     pid: `c${++counter}`,
-    skin: pick(SKINS), hair: pick(HAIR), top: pick(TOPS), legs: pick(LEGS), shoes: pick(SHOES), extras,
+    skin: pick(SKINS), hair: pick(HAIR), top: christmas() && Math.random() < 0.55 ? pick(XMAS_TOPS) : pick(TOPS), legs: pick(LEGS), shoes: pick(SHOES), extras,
     act, drink: cup,
     hold: act === 'phone' ? 'phone' : act === 'read' ? `bookopen:${pick(BOOKS)}` : act === 'hold' ? cup : '',
     partner,
@@ -261,7 +268,11 @@ const ORDERS = {
   hot: ['a cappuccino please', 'a flat white please', 'just a black coffee', 'a mocha please'],
   hotlatte: ['a latte please', 'oat latte please!', 'a vanilla latte?'],
   iced: ['an iced latte please', 'iced coffee, please!', 'a cold brew please', 'iced oat latte?'],
+  hotcocoa: ['a hot cocoa please!', 'hot chocolate with marshmallows?', 'one hot cocoa, extra marshmallows!'],
+  redcup: ['a gingerbread latte please!', 'one peppermint mocha?', 'gingerbread latte, to warm up!'],
 };
+// Which cup the barista makes: cocoa with marshmallows, or a red holiday cup (css: "Christmas drinks").
+const cupStyle = (drink) => (String(drink).startsWith('hotcocoa') ? 'cocoa' : String(drink).startsWith('redcup') ? 'red' : '');
 const iced = (drink) => String(drink).startsWith('iced');
 
 /* ---------- arrivals and pace ---------- */
@@ -594,6 +605,7 @@ async function serve(b, job, gen) {
     await baristaSays(b, pick(['coming right up!', 'you got it!', 'great choice!']), 1800);
     if (!ok()) return;
     // Make it at the machine; the customer waits (and glances round now and then).
+    b.dataset.drink = counterTop().dataset.drink = cupStyle(c.drink);
     await slideTo(b, 'machine');
     const glance = (async () => { await wait(rand(2500, 4500)); if (ok()) { c.el.classList.add('turned'); await wait(1600); c.el.classList.remove('turned'); } })();
     await (iced(c.drink) ? makeIced(b, gen, true) : makeHot(b, gen, true));
@@ -626,6 +638,8 @@ async function serve(b, job, gen) {
   } finally {
     b.classList.remove('b-carry', 'b-carry-hot', 'b-carry-iced', 'b-talk');
     counterTop()?.classList.remove('pick-hot', 'pick-iced');
+    delete b.dataset.drink;
+    if (counterTop()) delete counterTop().dataset.drink;
     serving = false;
     job.done();
   }
@@ -655,7 +669,7 @@ async function clearTable(b, spot, gen) {
     await turn(walker, st, seat.face === 'right' ? -1 : 1);
     walker.classList.add('reach');
     await wait(600);
-    const drink = cup?.querySelector('.drink.iced') ? 'iced' : 'hot:#F4ECFF';
+    const drink = cup?.querySelector('.drink.iced') ? 'iced' : cup?.querySelector('.drink.redcup') ? 'redcup' : 'hot:#F4ECFF';
     cup?.classList.add('cafe-fade');
     walker.querySelector('.own-hold')?.classList.add('empty-cup');
     await holdIn(walker, drink);
@@ -704,7 +718,9 @@ async function busboyTrip(gen) {
   route.forEach((spot) => { spot.claimed = true; });
   let cleared = 0;
   const st = { x: offscreenX(), y: LINE_Y, s: STAND_S, face: 1 };
-  const el = build(personSvg({ ...BUSBOY, pose: 'stand', hold: 'tub:0', x: st.x, y: st.y, s: st.s, pid: 'busboy' }, 7, 'cafe-rt cafe-walker busboy'));
+  // At Christmas he wears an elf's hat.
+  const look = christmas() ? { ...BUSBOY, extras: [...BUSBOY.extras, 'elf'] } : BUSBOY;
+  const el = build(personSvg({ ...look, pose: 'stand', hold: 'tub:0', x: st.x, y: st.y, s: st.s, pid: 'busboy' }, 7, 'cafe-rt cafe-walker busboy'));
   slot(el, standKey(st.y, st.s));
   place(el, st);
   const tub = () => el.querySelector('.lap-hold');
