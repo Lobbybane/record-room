@@ -10,6 +10,7 @@ const SLOTS = 3;
 const LOOK_KEYS = [
   'room', 'time', 'weather', 'season', 'lamp', 'neonText', 'neonColor',
   'pet', 'coat', 'tank', 'crowd', 'rug', 'wallpaper', 'curtain', 'lights', 'tv', 'candles', 'fire',
+  'you', 'youSkin', 'youHair', 'youHairColor', 'youTop', 'youTopColor', 'youExtra', 'youHold',
 ];
 
 // Everything a preset doesn't mention goes back to these, so presets don't mix.

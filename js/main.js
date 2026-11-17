@@ -4,6 +4,7 @@ import { createPlayer, loadYouTubeApi } from './player.js';
 import { initDecor, OPTIONS } from './decor.js';
 import { initKeys, keysPage } from './keys.js';
 import { menuPage, renderMenu } from './cafemenu.js';
+import { youPage, youLook } from './you.js';
 import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
@@ -167,7 +168,7 @@ let fittedFor = '';
 let drawnAudience = '';
 const decor = initDecor(stage, {
   onSky: buildCity,
-  custom: { ...lookPages(() => decor), keys: keysPage, menu: menuPage, sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
+  custom: { ...lookPages(() => decor), keys: keysPage, menu: menuPage, you: youPage(() => decor), sleep: sleepPage, stations: stationsPage(() => decor), showings: showingsPage(() => decor) },
   onApply: (d) => {
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
@@ -194,10 +195,11 @@ const decor = initDecor(stage, {
       drawAudience($('#theater-audience'), { crowd: d.crowd, seat: d.seat });
     }
     // Redraw the room's group when the room, the crowd or the season changes.
-    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}`;
+    const you = youLook(d);
+    const peopleKey = `${d.room}|${d.crowd}|${stage.dataset.season}|${JSON.stringify(you)}`;
     if (peopleKey !== drawnPeople) {
       drawnPeople = peopleKey;
-      const drawn = { room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season }) };
+      const drawn = { room: d.room, ...drawPeople($('#people'), { room: d.room, crowd: d.crowd, season: stage.dataset.season, you }) };
       peopleRedrawn(drawn);
       cafeRedrawn(drawn);
     }

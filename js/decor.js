@@ -4,6 +4,7 @@
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
 import { confirmDialog } from './ui.js';
+import { YOU_OPTIONS, YOU_DEFAULTS } from './you.js';
 import { STATIONS, isStation, isShowing } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
@@ -161,6 +162,8 @@ export const OPTIONS = {
     label: 'Sound effects',
     choices: { on: 'On', off: 'Off' },
   },
+  // "You" (js/you.js draws its own page for these).
+  ...YOU_OPTIONS,
   // Not in the panel: switched by clicking the lamp.
   lamp: {
     label: 'Lamp',
@@ -203,6 +206,7 @@ export const DEFAULTS = {
   season: 'auto',
   celebrate: Object.keys(HOLIDAYS),
   hats: 'on',
+  ...YOU_DEFAULTS,
 };
 
 const NEON_MAX = 16;
