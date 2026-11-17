@@ -1097,7 +1097,55 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   font: 400 17px var(--ios-font); letter-spacing: -.01em; text-align: left;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.ios-row + .ios-row::before { content: ''; position: absolute; left: 16px; right: 0; top: 0; height: .5px; background: var(--ios-sep); }
+.ios-row:not([hidden]) ~ .ios-row::before { content: ''; position: absolute; left: 16px; right: 0; top: 0; height: .5px; background: var(--ios-sep); }
+.ios-row:not([hidden]) ~ .ios-row:has(> .ios-icon)::before { left: 57px; }
+.ios-row[hidden], .ios-section[hidden], .quick-tile[hidden] { display: none; }
+/* Coloured icon squares, like iPhone Settings. */
+.ios-icon {
+  flex: 0 0 auto; display: grid; place-items: center; width: 29px; height: 29px; margin-left: -2px;
+  border-radius: 7px; background: var(--c); color: #FFFFFF;
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .18);
+}
+.ico .f { fill: currentColor; stroke: none; }
+.ios-slider-row.with-icon .ios-label { flex: 0 0 64px; }
+
+/* Rooms as little pictures, swiped sideways. */
+.room-tiles {
+  display: flex; gap: 9px; margin: 0 -16px; padding: 2px 16px 4px;
+  overflow-x: auto; scroll-snap-type: x proximity; scroll-padding: 0 16px; scrollbar-width: none;
+}
+.room-tiles::-webkit-scrollbar { display: none; }
+.room-tile {
+  position: relative; flex: 0 0 86px; height: 96px; padding: 0; scroll-snap-align: start;
+  border: 0; border-radius: 14px; overflow: hidden; cursor: pointer; color: #FFFFFF;
+  background: linear-gradient(165deg, var(--a), var(--b));
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .16);
+  -webkit-tap-highlight-color: transparent;
+}
+.room-tile::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2.5px var(--ios-tint); opacity: 0; transition: opacity .2s; }
+.room-tile[aria-pressed="true"]::after { opacity: 1; }
+.room-tile-art { position: absolute; left: 50%; top: 14px; display: grid; place-items: center; width: 44px; height: 44px; margin-left: -22px; border-radius: 50%; background: rgba(255, 255, 255, .14); }
+.room-tile-art .ico { width: 24px; height: 24px; }
+.room-tile[aria-pressed="true"] .room-tile-art { background: rgba(255, 220, 235, .28); }
+.room-tile-label { position: absolute; left: 0; right: 0; bottom: 9px; font: 600 12.5px var(--ios-font); text-align: center; }
+.room-tile:hover { filter: brightness(1.08); }
+.room-tile:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+
+/* Quick tiles: round switches for what you change most. */
+.quick-tiles { display: flex; gap: 8px; }
+.quick-tile {
+  flex: 1 1 0; min-width: 0; max-width: calc(25% - 6px); display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 11px 2px 9px; border: 0; border-radius: 16px; background: var(--ios-group);
+  color: var(--ios-secondary); font: 500 11.5px var(--ios-font); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.quick-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #FFFFFF; transition: background .2s, color .2s; }
+.quick-ico .ico { width: 20px; height: 20px; }
+.quick-tile[aria-pressed="true"] { color: #FFFFFF; }
+.quick-tile[aria-pressed="true"] .quick-ico { background: #FFD38A; color: #2A1E2E; box-shadow: 0 0 14px rgba(255, 211, 138, .35); }
+.quick-label { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.quick-tile:hover { background: rgba(255, 255, 255, .12); }
+.quick-tile:focus-visible { outline: 2px solid var(--ios-tint); outline-offset: 2px; }
 .ios-link:hover, .ios-option:hover, .ios-action:hover:not(:disabled) { background: rgba(255, 255, 255, .05); }
 .ios-row:active { background: rgba(255, 255, 255, .1); }
 .ios-row:focus-visible, .ios-option:has(:focus-visible) { outline: 2px solid var(--ios-tint); outline-offset: -2px; border-radius: 12px; }

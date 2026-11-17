@@ -3,6 +3,7 @@
 
 import { HOLIDAYS, HAT_FOR, holidaysForDate, hanukkahNight, nextHoliday } from './holidays.js';
 import { createPanel } from './panel.js';
+import { confirmDialog } from './ui.js';
 import { STATIONS, isStation, isShowing } from './radio.js';
 
 const KEY = 'record-room:settings:v1';
@@ -111,7 +112,7 @@ export const OPTIONS = {
   candles: { label: 'Candles', choices: { on: 'On', off: 'Off' } },
   fire: { label: 'Fireplace', choices: { on: 'On', off: 'Off' }, footer: '' },
   radio: {
-    label: 'Lofi radio',
+    label: 'Radio on the TV',
     choices: { on: 'On', off: 'Off' },
   },
   volume: {
@@ -311,6 +312,18 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     decor,
     maxText: NEON_MAX,
     custom,
+    actions: {
+      // Back to how the room first looked; music, records, stations and saved looks stay.
+      async reset() {
+        const ok = await confirmDialog({ title: 'Reset the room?', message: 'The room, outside, people, pets and sounds go back to how they first looked. Your records, stations and saved looks stay.', confirm: 'Reset' });
+        if (!ok) return;
+        const keep = new Set(['radio', 'station', 'volume', 'showing', 'celebrate']);
+        for (const [name, value] of Object.entries(DEFAULTS)) {
+          if (!keep.has(name)) decor[name] = Array.isArray(value) ? [...value] : value;
+        }
+        apply();
+      },
+    },
     onChange(name, value) {
       if (name === 'neonText') decor.neonText = String(value).slice(0, NEON_MAX);
       else if (isValid(name, value)) decor[name] = value;
