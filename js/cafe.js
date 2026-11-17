@@ -17,8 +17,8 @@
 // Moves are CSS classes (css/style.css: "café customers' moves", "the barista's day").
 // Every step checks `generation`; tidy() puts the room back as it was drawn.
 
-import { setHold, personSvg, tableThings } from './people.js';
-import { act, lifeBusy, say, talk } from './life-people.js';
+import { setHold, holdIn, holdOut, personSvg, tableThings } from './people.js';
+import { act, lifeBusy, say, talk, settle, endLoop } from './life-people.js';
 import { CAFE_SEATS } from './groups.js';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -59,7 +59,7 @@ const extra = new Map();     // element → data for customers who came in (not 
 let queue = [];              // customers waiting to order, in order
 let jobs = [];               // orders for the barista: { c, done }
 
-const STATES = ['b-steam', 'b-shot', 'b-phone', 'b-look-l', 'b-look-r', 'b-dip', 'b-talk', 'b-hot', 'b-iced', 'b-filled', 'b-sliding', 'b-carry', 'b-carry-hot', 'b-carry-iced', 'b-out'];
+const STATES = ['b-pocket', 'b-steam', 'b-shot', 'b-phone', 'b-look-l', 'b-look-r', 'b-dip', 'b-talk', 'b-hot', 'b-iced', 'b-filled', 'b-sliding', 'b-carry', 'b-carry-hot', 'b-carry-iced', 'b-out'];
 const MOVES = ['typing', 'scrolling', 'page-turn', 'reach', 'reach-up', 'sip', 'sip-iced', 'turned', 'laugh', 'cafe-busy', 'talking', 'cafe-leaving'];
 
 export function initCafe(theStage) {
@@ -476,11 +476,10 @@ const sipFor = (drink) => (iced(drink) ? 'sip-iced' : 'sip');
 
 // A move that loops while its class is on (typing, scrolling), for a while.
 async function burst(el, cls, ms, gen, onTable = false) {
-  el.classList.add(cls);
-  if (onTable) tableBack(el)?.classList.add(cls);
+  const targets = onTable ? [el, tableBack(el)] : [el];
+  targets.forEach((t) => t?.classList.add(cls));
   await wait(ms);
-  el.classList.remove(cls);
-  if (onTable) tableBack(el)?.classList.remove(cls);
+  await endLoop(el, cls, targets); // finish the tap or flick that's under way
 }
 
 // Put down the phone or book, reach for the drink, sip, put it back, pick the phone up again.
@@ -494,30 +493,30 @@ async function sipFromTable(el, p, gen) {
   // (tidy() has already put this person back as they were).
   const step = async (ms) => { await wait(ms); return gen === generation; };
   if (inHand) {
-    el.classList.remove(pose);          // lower the phone or book to the table
-    if (!await step(650)) return;
-    setHold(el, '');
-    back?.classList.add('down');
+    el.classList.remove(pose);          // lower the phone or book to the table…
+    if (!await step(700)) return;
+    back?.classList.add('down');        // …and let go (it fades onto the table)
+    await holdOut(el);
   }
   el.classList.add('reach');            // reach for the cup…
-  if (!await step(650)) return;
-  front.classList.add('lifted');        // …and take it
-  setHold(el, p.drink);
-  el.classList.remove('reach');
-  if (!await step(650)) return;
+  if (!await step(700)) return;
+  front.classList.add('lifted');        // …and take it (table cup and hand cup crossfade)
+  await holdIn(el, p.drink);
+  el.classList.remove('reach');         // bring it in, then sip
+  if (!await step(700)) return;
   await act(el, sipFor(p.drink));
   if (gen !== generation) return;
   el.classList.add('reach');            // put it back down
-  if (!await step(650)) return;
-  setHold(el, '');
+  if (!await step(700)) return;
   front.classList.remove('lifted');
+  await holdOut(el);
   el.classList.remove('reach');
-  if (!await step(650)) return;
+  if (!await step(700)) return;
   if (inHand) {
     back?.classList.remove('down');     // pick the phone or book back up
-    setHold(el, inHand);
+    await holdIn(el, inHand);
     el.classList.add(pose);
-    await step(650);
+    await step(700);
   }
 }
 
@@ -543,7 +542,7 @@ async function slideTo(b, where) {
   b.classList.add('b-sliding');
   b.style.setProperty('--bx', `${to}px`);
   await wait(1250);
-  b.classList.remove('b-sliding');
+  await endLoop(b, 'b-sliding', [b]);
 }
 
 async function baristaDay(gen) {
@@ -569,7 +568,7 @@ async function idle(b, what, gen) {
   const cls = { phone: 'b-phone', look: pick(['b-look-l', 'b-look-r']), steam: 'b-steam' }[what];
   if (cls) b.classList.add(cls);
   await until(what === 'phone' ? rand(5000, 9000) : rand(1800, 3500));
-  if (cls) b.classList.remove(cls);
+  if (cls) await stopPose(b, cls);
   await until(rand(800, 2500));
 }
 
@@ -577,7 +576,7 @@ async function idle(b, what, gen) {
 async function serve(b, job, gen) {
   const { c } = job;
   const ok = () => gen === generation && c.el.isConnected;
-  b.classList.remove('b-phone', 'b-look-l', 'b-look-r', 'b-steam');
+  for (const cls of ['b-phone', 'b-look-l', 'b-look-r', 'b-steam']) if (b.classList.contains(cls)) await stopPose(b, cls);
   try {
     await slideTo(b, 'register');
     if (!ok()) return;
@@ -595,23 +594,26 @@ async function serve(b, job, gen) {
     if (!ok()) return;
     // Pick the cup up, carry it to the register end, set it down on the pickup mat.
     const kind = iced(c.drink) ? 'iced' : 'hot';
-    b.classList.remove('b-hot', 'b-iced', 'b-filled');
-    b.classList.add('b-carry', `b-carry-${kind}`);
-    await wait(650);
-    await slideTo(b, 'register');
-    b.classList.remove('b-carry');
+    b.classList.add('b-carry');                           // reach for the cup…
     await wait(450);
-    b.classList.remove(`b-carry-${kind}`);
+    b.classList.remove('b-hot', 'b-iced', 'b-filled');    // …it leaves the counter as it fades into the hand
+    b.classList.add(`b-carry-${kind}`);
+    await wait(500);
+    await slideTo(b, 'register');
+    b.classList.remove('b-carry');                        // lower it to the mat
+    await wait(550);
+    b.classList.remove(`b-carry-${kind}`);                // and let go: it fades onto the mat
     counterTop().classList.add(`pick-${kind}`);
+    await wait(350);
     await baristaSays(b, pick(['here you go!', 'enjoy!', 'here you are!']), 1800);
     if (!ok()) return;
     // The customer reaches up onto the counter and takes it.
     c.el.classList.add('reach-up');
-    await wait(650);
+    await wait(700);
     counterTop().classList.remove('pick-hot', 'pick-iced');
-    setHold(c.el, c.drink);
+    await holdIn(c.el, c.drink);
     c.el.classList.remove('reach-up');
-    await wait(500);
+    await wait(650);
     if (!ok()) return;
     await talk(c.el, c.st, pick(['thanks!', 'thank you!', 'thanks so much!']), 1500);
   } finally {
@@ -645,12 +647,13 @@ async function clearTable(b, spot, gen) {
     walker.classList.add('reach');
     await wait(600);
     const drink = cup?.querySelector('.drink.iced') ? 'iced' : 'hot:#F4ECFF';
-    if (cup) { if (cup.classList.contains('cafe-rt')) cup.remove(); else cup.classList.add('gone'); }
-    spot.cup = null;
-    setHold(walker, drink);
+    cup?.classList.add('cafe-fade');
     walker.querySelector('.own-hold')?.classList.add('empty-cup');
+    await holdIn(walker, drink);
+    if (cup) { if (cup.classList.contains('cafe-rt')) cup.remove(); else { cup.classList.remove('cafe-fade'); cup.classList.add('gone'); } }
+    spot.cup = null;
     walker.classList.remove('reach');
-    await wait(400);
+    await wait(650);
     if (gen !== generation) return;
     await walk(walker, st, [[seat.x, LINE_Y, STAND_S], [REGISTER_X + 22, LINE_Y]]);
     if (gen !== generation) return;
@@ -663,6 +666,21 @@ async function clearTable(b, spot, gen) {
   }
 }
 
+// Ends a barista pose smoothly: any loop on top of it (the pitcher's jiggle) finishes its
+// cycle first, then the pose eases back.
+async function stopPose(b, cls) {
+  const loops = b.getAnimations({ subtree: true }).filter((a) => a.effect?.getTiming?.().iterations === Infinity
+    && a.playState === 'running' && /pitcher-jiggle/.test(a.animationName || ''));
+  await Promise.race([Promise.all(loops.map((a) => {
+    const t = a.effect.getComputedTiming();
+    a.effect.updateTiming({ iterations: (t.currentIteration ?? 0) + 1 });
+    return a.finished.catch(() => {});
+  })), wait(2000)]);
+  if (cls === 'b-phone') { b.classList.add('b-pocket'); await wait(240); } // the phone goes away first
+  await settle();
+  b.classList.remove(cls, 'b-pocket');
+}
+
 // A hot drink: pull a shot, steam the milk, and it's ready on the counter.
 export async function makeHot(b = barista(), gen = generation, keep = false) {
   b.classList.add('b-shot');
@@ -671,7 +689,7 @@ export async function makeHot(b = barista(), gen = generation, keep = false) {
   if (gen !== generation) return;
   b.classList.add('b-steam');
   await wait(3000);
-  b.classList.remove('b-steam');
+  await stopPose(b, 'b-steam');
   if (gen !== generation) return;
   b.classList.add('b-hot');
   await wait(keep ? 1200 : 3500);

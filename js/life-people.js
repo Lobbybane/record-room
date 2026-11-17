@@ -39,6 +39,31 @@ export async function act(el, cls, fallback = 4000) {
   });
   await Promise.race([Promise.all(running.map((a) => a.finished.catch(() => {}))), wait(fallback)]);
   el.classList.remove(cls);
+  await settle();
+}
+
+/**
+ * Lets the page catch up after an animation ends, before the next pose starts. (If a move's
+ * animation is removed and a new pose is set in the same instant, the browser skips the
+ * pose's transition and jumps straight to it.)
+ */
+export const settle = async () => { await frame(); await frame(); };
+
+/**
+ * Stops a looping move at the end of its current cycle (where it's back at the pose), then
+ * takes the class off: typing, scrolling, steaming… `targets` are the elements whose
+ * looping animations belong to the move (default: el and everything inside it).
+ */
+export async function endLoop(el, cls, targets = [el]) {
+  const loops = targets.filter(Boolean).flatMap((t) => t.getAnimations({ subtree: true }))
+    .filter((a) => a.effect?.getTiming?.().iterations === Infinity && a.playState === 'running');
+  await Promise.race([Promise.all(loops.map((a) => {
+    const t = a.effect.getComputedTiming();
+    a.effect.updateTiming({ iterations: (t.currentIteration ?? 0) + 1 });
+    return a.finished.catch(() => {});
+  })), wait(3000)]);
+  for (const t of targets.filter(Boolean)) t.classList.remove(cls);
+  await settle();
 }
 
 export function initPeopleLife(theStage) {

@@ -166,6 +166,25 @@ const LAP_ITEMS = new Set(['laptop', 'popcorn', 'book']);
 export const isLapItem = (item) => LAP_ITEMS.has(String(item || '').split(':')[0]);
 
 /** Puts an item in a drawn person's lap or hand (whichever suits it). */
+/** Fades what's in the hand in (after putting `item` there) — for picking something up. */
+export async function holdIn(el, item) {
+  const slots = el.querySelectorAll('.own-hold, .lap-hold');
+  slots.forEach((s) => { s.style.transition = 'none'; s.style.opacity = '0'; });
+  setHold(el, item);
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  slots.forEach((s) => { s.style.transition = ''; s.style.opacity = ''; });
+  await new Promise((r) => setTimeout(r, 170));
+}
+
+/** Fades what's in the hand out, then empties it (or puts `next` there, faded) — for putting something down. */
+export async function holdOut(el, next = '') {
+  const slots = el.querySelectorAll('.own-hold, .lap-hold');
+  slots.forEach((s) => { s.style.opacity = '0'; });
+  await new Promise((r) => setTimeout(r, 170));
+  setHold(el, next);
+  slots.forEach((s) => { s.style.opacity = ''; });
+}
+
 export function setHold(el, item) {
   const lap = isLapItem(item);
   const lapSlot = el.querySelector('.lap-hold');
