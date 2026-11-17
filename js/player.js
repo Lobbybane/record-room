@@ -61,6 +61,7 @@ export function createPlayer(elementId, { onState, onError } = {}) {
       }
     },
     play() { if (ready) player.playVideo(); },
+    restart() { if (ready) { player.seekTo(0, true); player.playVideo(); } },
     pause() { if (ready) player.pauseVideo(); },
     stop() { fadeToken++; if (ready) player.stopVideo(); },
     state() { return ready ? player.getPlayerState() : -1; },

@@ -557,10 +557,46 @@ html, body {
 /* Wet pavement: puddles shine with the lamps and neon. */
 .street .puddles { fill: #9C8CD8; opacity: 0; transition: opacity 2s ease; }
 .stage:is([data-weather="rain"], [data-weather="storm"]) .street .puddles { opacity: .45; }
-.passersby { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
-.passerby { position: absolute; top: 0; left: 0; overflow: visible; }
+.passersby, .road-life, .birds { position: absolute; left: 0; top: 0; width: 512px; height: 322px; pointer-events: none; }
+.passerby, .bus, .cyclist, .bird { position: absolute; top: 0; left: 0; overflow: visible; }
+/* Walking: legs scissor from the hip and the body bobs, at the walker's own pace (--step). */
+.passerby.walking :is(.leg-a, .leg-b, .dog-a, .dog-b) { transform-box: fill-box; transform-origin: 50% 0; animation: tiny-step var(--step, .6s) ease-in-out infinite alternate; }
+.passerby.walking :is(.leg-b, .dog-b) { animation-direction: alternate-reverse; }
+@keyframes tiny-step { from { transform: rotate(-24deg); } to { transform: rotate(24deg); } }
+.passerby.walking .bob { animation: tiny-bob calc(var(--step, .6s) / 1) ease-in-out infinite; }
+@keyframes tiny-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-.5px); } }
+/* In a storm people hurry along, leaning into the wind under their umbrellas. */
+.passerby.hurry .bob { transform: rotate(5deg); }
+.passerby.hurry .umbrella { transform: rotate(-12deg); transform-box: fill-box; transform-origin: 50% 100%; }
+/* Cyclists' wheels spin; the bus and bikes have little headlights at night. */
+.cyclist .wheels { transform-box: fill-box; }
+.cyclist, .bus { filter: brightness(.85); }
+.headlight { filter: drop-shadow(0 0 2px #FFF4D6); }
+.stage:is([data-sky="golden"], [data-sky="sunrise"]) .headlight { filter: none; }
+/* Birds flap as they fly. */
+.bird .wings { animation: wing-flap var(--flap, .34s) ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes wing-flap { from { transform: scaleY(1); } to { transform: scaleY(-.55) translateY(-1px); } }
+.bird.gull .wings { animation-duration: .5s; }
+/* A manhole steams on the road, more on cold and wet nights. */
+.vent-steam .puff { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: vent-puff 4.5s ease-out infinite; }
+.vent-steam .p2 { animation-delay: -1.5s; } .vent-steam .p3 { animation-delay: -3s; }
+@keyframes vent-puff { 0% { opacity: 0; transform: translateY(0) scale(.5); } 20% { opacity: .35; } 100% { opacity: 0; transform: translateY(-22px) scale(1.8); } }
+.stage:is([data-weather="rain"], [data-weather="snow"], [data-season="winter"]) .vent-steam .puff { animation-duration: 3.4s; }
 /* Umbrellas come out in the rain. */
+/* Christmas drinks: cocoa with marshmallows or a red holiday cup, on the barista's cups (js/cafe.js sets data-drink). */
+:is(.xm-cocoa, .xm-redcup) { display: none; }
+:is(.cafe-back, .cafe-counter)[data-drink="cocoa"] .xm-cocoa,
+:is(.cafe-back, .cafe-counter)[data-drink="red"] .xm-redcup { display: inline; }
+/* (the white mug under a red cup hides, steam and all but the wisps) */
+:is(.cafe-back, .cafe-counter)[data-drink="red"] :is(.bar-cup.hot, .b-cup-hot, .pickup-cup.hot) > :is(rect, path, ellipse) { display: none; }
+/* Christmas sweaters: every sweater gets a knit band at Christmas; the elf hat replaces a Santa hat. */
+.xknit { display: none; }
+.stage[data-holiday~="winter"] .xknit { display: inline; }
+.person:has(.elf-hat) .holiday-hats { display: none; }
 .passerby .umbrella { display: none; }
+/* Christmas on the street: wreaths on the lamp posts and a snowman (any city view). */
+.street :is(.lamp-wreaths, .snowman) { display: none; }
+.stage[data-holiday~="winter"] .street :is(.lamp-wreaths, .snowman) { display: inline; }
 .stage:is([data-weather="rain"], [data-weather="storm"]) .passerby .umbrella { display: inline; }
 .bld.t1 { fill: var(--bld-1); } .bld.t2 { fill: var(--bld-2); } .bld.t3 { fill: var(--bld-3); } .bld.t4 { fill: var(--bld-4); }
 .cornice { fill: rgba(255, 255, 255, .09); }
@@ -1237,6 +1273,39 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* The neon sign hangs on the wall above the menu board (centred over it), clear of the window view. */
 .stage[data-room="cafe"] .neon-sign { left: 1076px; top: 164px; transform: translateX(-50%); }
 
+/* ---------- Christmas café: the café with Christmas decorations on (data-holiday~="winter") ---------- */
+/* A big tree with lights and presents by the window, treats and lights on the counter, Christmas
+   pastries, a holiday menu, paper snowflakes and mistletoe, a neon candy cane and star, Santa hats
+   on the barista and the window-bar regulars, and the Christmas video on the TV (js/main.js). */
+.stage:not([data-holiday~="winter"]) .xmas-cafe, .stage:not([data-room="cafe"]) .xmas-cafe, .menu-xmas, .b-santa { display: none; }
+.stage[data-room="cafe"][data-holiday~="winter"] .menu-xmas { display: block; }
+.stage[data-room="cafe"][data-holiday~="winter"] .b-santa { display: inline; }
+.stage[data-room="cafe"][data-holiday~="winter"] :is(.menu-regular, .pastries, .sill-plant, .b-bun, .bar-bun) { display: none; }
+.menu-xmas.menu-title { font-size: 19px; color: #FFD9DE; }
+.menu-xmas li span:first-child::before { content: '\2744\FE0E  '; color: #BFE3FF; font-size: 9px; }
+.xmas-cafe .tl { animation: xmas-twinkle 2.6s ease-in-out infinite; }
+.xmas-cafe .tl.t1 { animation-delay: -.65s; animation-duration: 3.1s; }
+.xmas-cafe .tl.t2 { animation-delay: -1.3s; animation-duration: 2.2s; }
+.xmas-cafe .tl.t3 { animation-delay: -1.95s; animation-duration: 3.4s; }
+@keyframes xmas-twinkle { 0%, 100% { opacity: 1; } 45% { opacity: .35; } 60% { opacity: .9; } }
+.xmas-cafe .ic { animation: icicle-glint 2.8s ease-in-out infinite; }
+.xmas-cafe .ic.i1 { animation-delay: -.9s; }
+.xmas-cafe .ic.i2 { animation-delay: -1.8s; }
+@keyframes icicle-glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.xmas-cafe .star-glow { animation: star-glow 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes star-glow { 0%, 100% { opacity: .75; scale: 1; } 50% { opacity: 1; scale: 1.12; } }
+.xmas-cafe .flake { transform-box: view-box; animation: flake-turn 36s linear infinite; }
+.xmas-cafe .flake.f2 { animation-duration: 48s; animation-direction: reverse; }
+.xmas-cafe .flake.f3 { animation-duration: 60s; }
+@keyframes flake-turn { to { rotate: 360deg; } }
+.xmas-neon { filter: drop-shadow(0 0 4px rgba(255, 107, 126, .9)) drop-shadow(0 0 10px rgba(255, 107, 126, .45)); }
+.xmas-neon .neon-star { filter: drop-shadow(0 0 4px rgba(255, 226, 122, .9)); animation: neon-star 5s steps(1) infinite; }
+@keyframes neon-star { 0%, 100% { opacity: 1; } 71% { opacity: .5; } 73% { opacity: 1; } 75% { opacity: .6; } 77% { opacity: 1; } }
+.xmas-cafe .gh-window { filter: drop-shadow(0 0 3px rgba(255, 211, 138, .8)); }
+@media (prefers-reduced-motion: reduce) {
+  .xmas-cafe :is(.tl, .ic, .star-glow, .flake, .neon-star) { animation: none; }
+}
+
 .barista-arm { transform-box: view-box; transform-origin: 1166px 458px; transition: transform .6s cubic-bezier(.45, .05, .55, .95); }
 @keyframes steam-pitcher { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg) translateY(-2px); } }
 .barista-head { transform-box: view-box; transform-origin: 1146px 440px; transition: transform .6s cubic-bezier(.45, .05, .55, .95); }
@@ -1344,6 +1413,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .barista-arm, .barista-head, .machine-steam, .cup-steam, .pour, .laptop-light, .typist, .typist-head, .sipper .arm-up, .sipper .arm-down, .phone-glow { animation: none; }
   .drink.hot .st, .bar-cup .st, .pickup-cup .st { animation: none; opacity: .45; }
+  .vent-steam .puff { animation: none; opacity: .2; }
+  .clouds g { animation: none !important; }
 }
 
 /* ---------- radio: reduced motion ---------- */

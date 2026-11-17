@@ -73,7 +73,12 @@ function torso(style, color, extra = {}) {
       <path d="M-6 -44 L-7 -30 M-1 -45 L-1 -32" stroke="${shade}" stroke-width="1.6" stroke-linecap="round"/>`;
   } else if (style === 'sweater') {
     out += `<rect x="-8" y="-50" width="16" height="9" rx="4" fill="${shade}"/>
-      <path d="M-10 -24 l5 5 5 -5 5 5 5 -5" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="1.6"/>`;
+      <path d="M-10 -24 l5 5 5 -5 5 5 5 -5" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="1.6"/>
+      <g class="xknit"><path d="M-15 -33 Q0 -31 15.6 -33 L15.8 -25 Q0 -23 -15.4 -25 Z" fill="#F4ECFF"/>
+        <path d="M-14 -27.4 l3 -3.6 3 3.6 3 -3.6 3 3.6 3 -3.6 3 3.6 3 -3.6 3 3.6" fill="none" stroke="#D63A4A" stroke-width="1.4"/>
+        <g fill="#2E8A5E"><circle cx="-11" cy="-31.4" r="1"/><circle cx="-5" cy="-31.4" r="1"/><circle cx="1" cy="-31.4" r="1"/><circle cx="7" cy="-31.4" r="1"/><circle cx="13" cy="-31.4" r="1"/></g>
+        <path d="M1 -17 v8 M-3 -13 h8 M-1.8 -15.8 l5.6 5.6 M-1.8 -10.2 l5.6 -5.6" stroke="#F4ECFF" stroke-width="1.1" stroke-linecap="round"/>
+        <path d="M-13.6 -4 Q0 -2 15 -4" fill="none" stroke="#F4ECFF" stroke-width="2.2" stroke-dasharray="2 1.6"/></g>`;
   } else if (style === 'flannel') {
     out += `<g stroke="${shade}" stroke-width="2.4" opacity=".8"><path d="M-12 -12 H16 M-14 -28 H15 M-4 -46 V0 M7 -46 V0"/></g>
       <path d="M-8 -46 L-2 -38 L3 -46" fill="none" stroke="${tint(color, 0.4)}" stroke-width="2"/>`;
@@ -130,6 +135,11 @@ const HEADWEAR = {
   beanie: (c) => `<g class="own-hat"><path d="M-16 -66 Q-16 -86 -1 -86 Q14 -86 14 -66 Z" fill="${c}"/><path d="M-17 -68 H15 V-62 H-17 Z" fill="${tint(c, -0.2)}"/><circle cx="-1" cy="-88" r="4.5" fill="${tint(c, 0.4)}"/></g>`,
   sunhat: (c) => `<g class="own-hat"><ellipse cx="-2" cy="-72" rx="25" ry="5" fill="${c}"/><path d="M-13 -72 Q-12 -86 -1 -86 Q10 -86 10 -72 Z" fill="${c}"/><path d="M-13 -74 H10" stroke="${tint(c, -0.3)}" stroke-width="2.4"/></g>`,
   scout: (c) => `<g class="own-hat"><ellipse cx="-2" cy="-73" rx="22" ry="4" fill="${c}"/><path d="M-12 -73 L-6 -88 L4 -88 L9 -73 Z" fill="${c}"/><path d="M-6 -86 L-1 -80 L4 -86" fill="none" stroke="${tint(c, -0.3)}" stroke-width="1.5"/></g>`,
+  // A Christmas elf's hat, flopping back with a bell (it replaces the holiday Santa hat).
+  elf: (c) => `<g class="elf-hat"><path d="M-15 -70 Q-12 -90 4 -92 Q17 -94 25 -101 Q19 -86 14 -70 Z" fill="${c === '#F28DB2' ? '#2E8A5E' : c}"/>`
+    + '<path d="M2 -90 Q14 -92 22 -98" fill="none" stroke="#1F5E46" stroke-width="1.4"/>'
+    + '<rect x="-16.5" y="-75" width="32" height="7" rx="3.5" fill="#D63A4A"/><g fill="#F2C14E"><circle cx="-10" cy="-71.5" r="1.2"/><circle cx="-2" cy="-71.5" r="1.2"/><circle cx="6" cy="-71.5" r="1.2"/></g>'
+    + '<circle cx="25.5" cy="-101" r="3.2" fill="#F2C14E"/><path d="M24.4 -100 h2.2" stroke="#B88A2E" stroke-width=".7"/></g>',
   cap: (c) => `<g class="own-hat"><path d="M-14 -70 Q-13 -84 0 -84 Q12 -84 12 -70 Z" fill="${c}"/><path d="M-14 -71 L-26 -69 L-24 -66 L-12 -67 Z" fill="${tint(c, -0.3)}"/><rect x="-5" y="-80" width="7" height="5" rx="1" fill="#E0C068"/></g>`,
   earmuffs: (c) => `<path d="M-12 -72 Q-2 -86 10 -72" fill="none" stroke="#2B2440" stroke-width="2.4"/><circle cx="4" cy="-63" r="6" fill="${c}"/>`,
   goggles: (c) => `<path d="M-15 -74 Q-2 -80 13 -74" fill="none" stroke="#2B2440" stroke-width="3"/><rect x="-17" y="-80" width="16" height="8" rx="4" fill="${c}"/><rect x="-15" y="-78" width="5" height="3" rx="1.5" fill="#FFFFFF" opacity=".6"/>`,
@@ -211,6 +221,22 @@ export function held(item) {
         + `<path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="${c}" stroke-width="2"/>`
         + `<ellipse cx="-28" cy="-26.6" rx="4.4" ry="1.1" fill="${name === 'hotlatte' ? '#E6C9A0' : '#5A3A2A'}"/>${STEAM}</g>`;
     }
+    // Christmas: hot cocoa with marshmallows in a mug (any colour), steaming.
+    case 'hotcocoa': {
+      const c = tone || '#F4ECFF';
+      return `<g class="drink hot cocoa"><rect x="-33" y="-27" width="10" height="12" rx="2" fill="${c}"/>`
+        + `<path d="M-23 -24 q4 0 4 3 t-4 3" fill="none" stroke="${c}" stroke-width="2"/>`
+        + '<ellipse cx="-28" cy="-26.6" rx="4.4" ry="1.2" fill="#6E3A2A"/>'
+        + '<rect x="-32" y="-29.4" width="2.8" height="2.4" rx=".8" fill="#FFFFFF"/><rect x="-28.8" y="-30" width="2.8" height="2.4" rx=".8" fill="#FFF3F6"/><rect x="-26" y="-29" width="2.4" height="2.2" rx=".8" fill="#FFFFFF"/>'
+        + `${STEAM}</g>`;
+    }
+    // Christmas: a gingerbread latte or peppermint mocha in a red holiday cup with a white lid.
+    case 'redcup': return '<g class="drink hot redcup">'
+      + '<path d="M-34 -30 L-22 -30 L-23.4 -14 L-32.6 -14 Z" fill="#D63A4A"/>'
+      + '<rect x="-33.6" y="-24.4" width="11.2" height="4.4" fill="#B88A5E"/>'
+      + '<rect x="-35" y="-32.6" width="14" height="3" rx="1.1" fill="#F4ECFF"/>'
+      + '<path d="M-28 -18.4 v2.6 M-29.3 -17.1 h2.6" stroke="#FFFFFF" stroke-width=".7"/>'
+      + `${STEAM.replace('class="wisps"', 'class="wisps" transform="translate(0 -3)"')}</g>`;
     // An iced coffee: a clear cup, coffee, ice cubes, a straw and a little condensation.
     case 'iced': return '<g class="drink iced">'
       + '<path d="M-34 -31 L-22 -31 L-23.6 -14 L-32.4 -14 Z" fill="#E8DDF5" fill-opacity=".28"/>'
