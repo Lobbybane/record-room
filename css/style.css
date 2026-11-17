@@ -1146,6 +1146,13 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .quick-label { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .quick-tile:hover { background: rgba(255, 255, 255, .12); }
 .quick-tile:focus-visible { outline: 2px solid var(--ios-tint); outline-offset: 2px; }
+.key-row { cursor: default; gap: 14px; }
+.key-row .ios-label { white-space: normal; font-size: 15px; }
+.key-cap {
+  flex: 0 0 74px; padding: 4px 6px; border-radius: 7px; text-align: center;
+  background: rgba(255, 255, 255, .12); box-shadow: inset 0 -1.5px 0 rgba(0, 0, 0, .35);
+  font: 600 13px var(--ios-font); color: #FFFFFF;
+}
 .ios-link:hover, .ios-option:hover, .ios-action:hover:not(:disabled) { background: rgba(255, 255, 255, .05); }
 .ios-row:active { background: rgba(255, 255, 255, .1); }
 .ios-row:focus-visible, .ios-option:has(:focus-visible) { outline: 2px solid var(--ios-tint); outline-offset: -2px; border-radius: 12px; }

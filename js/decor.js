@@ -379,6 +379,13 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     snapshot: () => JSON.parse(JSON.stringify(decor)),
     refresh: () => ui.refresh(),
     close: () => setOpen(false),
+    toggle: () => toggle.click(),
+    isOpen: () => panel.open,
+    openPage(name) {
+      if (!panel.open) toggle.click();
+      ui.reset();
+      ui.open(name);
+    },
   };
 }
 

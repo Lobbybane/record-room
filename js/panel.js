@@ -500,6 +500,12 @@ export function createPanel(panel, { options, decor, onChange, maxText = 16, cus
       }
       root.classList.add('is-active');
     },
+    // Open a page straight from the main page (the ? key opens the shortcuts).
+    open(name) {
+      if (!custom[name] && !subPages.has(name) && !options[name]) return;
+      if (custom[name]) titles.set(name, custom[name].label);
+      push(name, null);
+    },
     focusFirst() {
       const tile = root.querySelector('.room-tile[aria-pressed="true"]') || root.querySelector('.ios-row');
       tile?.scrollIntoView({ block: 'nearest', inline: 'center' });
