@@ -105,6 +105,19 @@ export const OPTIONS = {
       cream: ['Cream', '#E6D8C2', '#C2B39C', '#F4EAD9'],
     },
   },
+  lights: {
+    label: 'String lights',
+    swatches: {
+      auto: ['Classic', 'linear-gradient(135deg, #FFD38A 50%, #F7A9C8 50%)'],
+      warm: ['Warm white', '#FFD38A'],
+      rainbow: ['Rainbow', 'conic-gradient(#FF5A6E, #FFB347, #FFE66D, #7EF2B8, #6FB8FF, #C29CFF, #FF5A6E)'],
+      pastel: ['Pastel', 'conic-gradient(#F7A9C8, #C9B3FF, #9FE8D0, #FFF1A8, #F7A9C8)'],
+      icy: ['Icy blue', 'linear-gradient(135deg, #E3FBFF 50%, #9FD8FF 50%)'],
+      candy: ['Candy pink', 'linear-gradient(135deg, #FF7AA8 50%, #FFF0F5 50%)'],
+      off: ['Off', 'rgba(120, 120, 128, .4)'],
+    },
+    footer: 'Classic lights change colour on holidays. A colour you pick stays all year.',
+  },
   parallax: {
     label: 'Moving city',
     choices: { on: 'On', off: 'Off' },
@@ -165,6 +178,7 @@ export const DEFAULTS = {
   rug: 'round',
   wallpaper: 'plain',
   curtain: 'room',
+  lights: 'auto',
   holiday: 'auto',
   sound: 'on',
   mixMatch: 'off',
@@ -278,6 +292,7 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.rug = decor.rug;
     stage.dataset.wallpaper = decor.wallpaper;
     stage.dataset.curtain = decor.curtain;
+    stage.dataset.lights = decor.lights;
     const [, , curtainA, curtainB] = OPTIONS.curtain.swatches[decor.curtain];
     for (const [name, value] of [['--curtain-a', curtainA], ['--curtain-b', curtainB]]) {
       if (value) stage.style.setProperty(name, value);

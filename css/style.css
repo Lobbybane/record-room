@@ -946,6 +946,27 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .stage[data-holiday~="hanukkah"] .fairy:nth-child(2n+1) { --b: #6FB8FF; }
 .stage[data-holiday~="hanukkah"] .fairy:nth-child(2n) { --b: #F4ECFF; }
 
+/* String light colours (Decorate > Furniture & colours). "Classic" keeps the holiday colours;
+   a chosen colour wins over them (same specificity, later in the file). */
+.stage[data-lights="warm"] .fairy:nth-child(n) { --b: #FFD38A; }
+.stage[data-lights="warm"] .fairy:nth-child(2n) { --b: #FFBE76; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+1) { --b: #FF5A6E; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+2) { --b: #FFB347; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+3) { --b: #FFE66D; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+4) { --b: #7EF2B8; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n+5) { --b: #6FB8FF; }
+.stage[data-lights="rainbow"] .fairy:nth-child(6n) { --b: #C29CFF; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+1) { --b: #F7A9C8; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+2) { --b: #C9B3FF; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n+3) { --b: #9FE8D0; }
+.stage[data-lights="pastel"] .fairy:nth-child(4n) { --b: #FFF1A8; }
+.stage[data-lights="icy"] .fairy:nth-child(3n+1) { --b: #E3FBFF; }
+.stage[data-lights="icy"] .fairy:nth-child(3n+2) { --b: #9FD8FF; }
+.stage[data-lights="icy"] .fairy:nth-child(3n) { --b: #F4ECFF; }
+.stage[data-lights="candy"] .fairy:nth-child(2n+1) { --b: #FF7AA8; }
+.stage[data-lights="candy"] .fairy:nth-child(2n) { --b: #FFF0F5; }
+.stage[data-lights="off"] :is(#lights, .lights-wire) { display: none; }
+
 /* Garlands, bunting and lanterns along the curtain rod. */
 .stage:is([data-holiday~="july4"], [data-holiday~="newyear"], [data-holiday~="easter"], [data-holiday~="thanksgiving"], [data-holiday~="stpatricks"]) .bunting-string,
 .stage[data-holiday~="july4"] .bunting-july4,
@@ -1079,6 +1100,8 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
   font: 400 17px var(--ios-font); cursor: pointer;
 }
 .ios-nav-btn.strong { font-weight: 600; }
+.ios-back { display: inline-flex; align-items: center; gap: 4px; max-width: 130px; }
+.ios-back span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ios-nav-btn:disabled { opacity: .45; cursor: default; }
 .ios-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 28px; }
 .ios-large-title { margin: 0 4px 6px; font: 700 32px/1.15 var(--ios-font); letter-spacing: -.02em; }
