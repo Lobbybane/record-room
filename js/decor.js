@@ -118,6 +118,15 @@ export const OPTIONS = {
     },
     footer: 'Classic lights change colour on holidays. A colour you pick stays all year.',
   },
+  tv: {
+    label: 'TV',
+    swatches: {
+      retro: ['Retro cream', '#D8C7B0'],
+      pastel: ['Mint & pink', 'linear-gradient(135deg, #9FD8C4 55%, #F2A9C4 55%)'],
+      wooden: ['Wooden', 'linear-gradient(135deg, #8A5634 55%, #C9A050 55%)'],
+      flat: ['Flat-screen', '#1C1A26'],
+    },
+  },
   parallax: {
     label: 'Moving city',
     choices: { on: 'On', off: 'Off' },
@@ -179,6 +188,7 @@ export const DEFAULTS = {
   wallpaper: 'plain',
   curtain: 'room',
   lights: 'auto',
+  tv: 'retro',
   holiday: 'auto',
   sound: 'on',
   mixMatch: 'off',
@@ -293,6 +303,7 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     stage.dataset.wallpaper = decor.wallpaper;
     stage.dataset.curtain = decor.curtain;
     stage.dataset.lights = decor.lights;
+    stage.dataset.tv = decor.tv;
     const [, , curtainA, curtainB] = OPTIONS.curtain.swatches[decor.curtain];
     for (const [name, value] of [['--curtain-a', curtainA], ['--curtain-b', curtainB]]) {
       if (value) stage.style.setProperty(name, value);
