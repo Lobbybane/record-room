@@ -1418,7 +1418,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .candles, .fireplace { position: absolute; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .candles svg, .fireplace svg { display: block; overflow: visible; }
 .candles { left: 520px; top: 374px; z-index: 6; }
-.stage[data-room="cafe"] .candles { left: 1210px; top: 490px; }
+.stage[data-room="cafe"] .candles { left: 1194px; top: 490px; scale: .85; transform-origin: 50% 100%; } /* on the counter front, in front of the espresso machine */
 .fireplace { left: 414px; top: 472px; display: none; }
 .stage:is([data-room="cabin"], [data-room="treehouse"]) .fireplace { display: block; }
 .candles:focus-visible, .fireplace:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; border-radius: 8px; }
@@ -1439,7 +1439,7 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 /* Warm light on the walls and floor, strongest at night and with the lamp off. */
 .flame-glow { position: absolute; z-index: 21; pointer-events: none; opacity: 0; transition: opacity 1s ease; mix-blend-mode: screen; }
 .candle-glow { left: 380px; top: 250px; width: 340px; height: 300px; background: radial-gradient(closest-side, rgba(255, 170, 80, .28), transparent); }
-.stage[data-room="cafe"] .candle-glow { left: 1070px; top: 370px; }
+.stage[data-room="cafe"] .candle-glow { left: 1056px; top: 370px; }
 .fire-glow { left: 194px; top: 330px; width: 600px; height: 480px; background: radial-gradient(closest-side, rgba(255, 140, 60, .32), transparent); }
 .stage[data-candles="on"] .candle-glow { opacity: .55; animation: glow-flicker 3s ease-in-out infinite; }
 .stage[data-fire="on"]:is([data-room="cabin"], [data-room="treehouse"]) .fire-glow { opacity: .6; animation: glow-flicker 2.2s ease-in-out infinite; }
