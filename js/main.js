@@ -119,6 +119,7 @@ if ('ResizeObserver' in window) {
 window.addEventListener('resize', fitStage);
 decorPanel.addEventListener('close', fitStage);
 fitStage();
+window.roomFitted?.(); // the room fits the screen now: lift the loading screen (index.html)
 
 /* ---------------- the city outside ---------------- */
 
@@ -1154,5 +1155,5 @@ renderMenu();
 
 renderCrate();
 updateCard();
-window.roomReady?.(); // lifts the loading screen (index.html)
+window.roomReady?.(); // start finished (index.html's watchdog stands down)
 loadYouTubeApi().catch(() => { /* reported when a record is played */ });

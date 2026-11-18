@@ -90,7 +90,41 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
   padding: 11px 26px;
   cursor: pointer;
 }
-.boot-retry[hidden] { display: none; }
+.boot-buttons { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.boot-buttons[hidden], .boot-detail[hidden] { display: none; }
+.boot-show {
+  font: 600 14px -apple-system, system-ui, sans-serif;
+  color: #F4E9FF;
+  background: none;
+  border: 0;
+  padding: 8px 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.boot-note {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 101;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(20, 16, 40, .92);
+  color: #FFD9E6;
+  font: 12px ui-monospace, Menlo, monospace;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.boot-note[hidden] { display: none; }
+/* What went wrong, small, so a screenshot shows it */
+.boot-detail {
+  margin: -6px 0 0;
+  max-width: 300px;
+  font: 12px ui-monospace, Menlo, monospace;
+  color: rgba(244, 233, 255, .6);
+  overflow-wrap: anywhere;
+}
 @media (prefers-reduced-motion: reduce) {
   .boot-record { animation: none; }
   .boot { transition: none; }

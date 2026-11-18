@@ -1095,12 +1095,17 @@
 <div class="scroll-spacer" id="scroll-spacer"></div>
 </main>
 
+<button class="boot-note" id="boot-note" type="button" hidden aria-label="Dismiss"><span></span> ✕</button>
 <!-- Shown while the room loads, so a slow phone never sees a half-built room.
      The watchdog below offers a fresh reload if the room can't start. -->
 <div class="boot" id="boot" role="status" aria-live="polite">
   <div class="boot-record" aria-hidden="true"><span></span></div>
   <p class="boot-text" id="boot-text">Tuning in…</p>
-  <button class="boot-retry" id="boot-retry" type="button" hidden>Try again</button>
+  <p class="boot-detail" id="boot-detail" hidden></p>
+  <div class="boot-buttons" id="boot-buttons" hidden>
+    <button class="boot-retry" id="boot-retry" type="button">Try again</button>
+    <button class="boot-show" id="boot-show" type="button">Show the room anyway</button>
+  </div>
 </div>
 
 <!-- Add a record -->
@@ -1178,50 +1183,68 @@
 </dialog>
 
 <script>
-/* Startup watchdog. js/main.js calls roomReady() once the room is drawn.
-   If a file didn't arrive, or the phone mixed old and new files after an update,
-   reload once with every file fetched fresh; after that, offer a button. */
+/* Startup watchdog. js/main.js calls roomFitted() as soon as the room is fitted to
+   the screen (the loading screen lifts then) and roomReady() at the end of start.
+   Before the room is fitted, a failed file or a script error reloads once with every
+   file fetched fresh (fixes a phone mixing old and new files after an update); after
+   that it says what went wrong and offers "Try again" or "Show the room anyway".
+   Once the room is fitted the loading screen never comes back, whatever happens. */
 (function () {
-  var root = document.documentElement, ready = false, KEY = 'record-room:boot-retry';
+  var root = document.documentElement, KEY = 'record-room:boot-retry';
+  var fitted = false, ready = false, failed = false;
   function $(id) { return document.getElementById(id); }
+  function show() {
+    fitted = true;
+    root.classList.remove('booting');
+  }
   function fresh() {
     $('boot-text').textContent = 'Fetching a fresh copy…';
-    $('boot-retry').hidden = true;
+    $('boot-buttons').hidden = true;
     var urls = [location.href.split('#')[0]];
     try {
       performance.getEntriesByType('resource').forEach(function (r) {
         if (r.name.indexOf(location.origin) === 0 && /\.(js|css)(\?|$)/.test(r.name)) urls.push(r.name);
       });
     } catch (e) {}
-    var jobs = urls.map(function (u) { return fetch(u, { cache: 'reload' }).catch(function () {}); });
-    Promise.all(jobs).then(function () { location.reload(); });
+    var reload = function () { location.reload(); };
+    setTimeout(reload, 8000); // don't wait forever on a slow fetch
+    Promise.all(urls.map(function (u) {
+      try { return fetch(u, { cache: 'reload' }).catch(function () {}); } catch (e) { return null; }
+    })).then(reload, reload);
   }
-  function offer(text) {
-    if (ready) return;
+  function offer(text, why) {
+    if (fitted) return;
     $('boot-text').textContent = text;
-    $('boot-retry').hidden = false;
+    $('boot-buttons').hidden = false;
+    if (why) { $('boot-detail').textContent = why; $('boot-detail').hidden = false; }
   }
-  var failed = false;
-  window.roomFailed = function () {
-    if (ready || failed) return;
+  window.roomFitted = show;
+  window.roomReady = function () { ready = true; show(); };
+  window.roomFailed = function (why) {
+    if (fitted || failed) return;
     failed = true;
     var last = 0;
     try { last = Number(sessionStorage.getItem(KEY)) || 0; sessionStorage.setItem(KEY, String(Date.now())); } catch (e) {}
     if (Date.now() - last > 60000) fresh();
-    else offer('The room didn’t finish loading.');
-  };
-  window.roomReady = function () {
-    ready = true;
-    root.classList.remove('booting');
+    else offer('The room didn’t finish loading.', why || 'A file didn’t arrive.');
   };
   window.addEventListener('error', function (e) {
-    // Only errors from this site's own scripts before the room is up.
-    if (!ready && e instanceof ErrorEvent && (e.filename || '').indexOf(location.origin) === 0) roomFailed();
+    if (ready || !(e instanceof ErrorEvent)) return;
+    var file = e.filename || '';
+    if (file && file.indexOf(location.origin) !== 0) return; // someone else's script
+    var why = (e.message || 'Error') + (file ? ' (' + file.split('/').pop() + ':' + e.lineno + ')' : '');
+    if (!fitted) { roomFailed(why); return; }
+    // The room is showing but its start was cut short: say so, small, so it can be reported.
+    var note = $('boot-note');
+    note.querySelector('span').textContent = 'Something didn’t start: ' + why;
+    note.hidden = false;
   });
   setTimeout(function () { offer('Still tuning in… the connection is slow.'); }, 12000);
   $('boot-retry').addEventListener('click', fresh);
+  $('boot-show').addEventListener('click', show);
+  $('boot-note').addEventListener('click', function () { this.hidden = true; });
 })();
 </script>
-<script type="module" src="js/main.js" onerror="roomFailed()"></script>
+<script type="module" src="js/main.js" onerror="roomFailed('A file didn’t arrive.')"></script>
 </body>
 </html>
