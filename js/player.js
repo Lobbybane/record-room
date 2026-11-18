@@ -3,40 +3,59 @@
 
 let apiPromise = null;
 
+// Loads YouTube's player script. A failure isn't remembered, so the next try
+// (turning the knob, picking a record) asks again: phone connections drop out.
+// A script that hasn't arrived after 20 s counts as a failure too, so the TV
+// says so instead of tuning in forever; if it turns up later, it still works.
 export function loadYouTubeApi() {
+  if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
   if (apiPromise) return apiPromise;
   apiPromise = new Promise((resolve, reject) => {
-    if (window.YT && window.YT.Player) {
-      resolve(window.YT);
-      return;
-    }
+    const fail = () => {
+      apiPromise = null;
+      reject(new Error('Could not reach YouTube'));
+    };
     const previous = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
       if (typeof previous === 'function') previous();
+      clearTimeout(timer);
       resolve(window.YT);
     };
+    const old = document.querySelector('script[data-yt-api]');
+    if (old) old.remove();
     const script = document.createElement('script');
     script.src = 'https://www.youtube.com/iframe_api';
-    script.onerror = () => reject(new Error('Could not reach YouTube'));
+    script.dataset.ytApi = '';
+    script.onerror = () => { clearTimeout(timer); fail(); };
+    const timer = setTimeout(fail, 20000);
     document.head.appendChild(script);
   });
   return apiPromise;
 }
 
 // YouTube player states: -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buffering, 5 cued.
+// Waits for `promise`, but gives up after `ms` (it may still finish later).
+function within(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('YouTube is taking too long')), ms);
+    promise.then(() => { clearTimeout(timer); resolve(); });
+  });
+}
+
 export function createPlayer(elementId, { onState, onError } = {}) {
   let player = null;
   let ready = false;
-  let creating = null;
+  let whenReady = null; // resolves once YouTube's player is ready; never rejects
   let fadeToken = 0;
 
   return {
     // muted: start without sound (browsers allow muted autoplay before the first tap).
+    // If the player isn't ready within 20 s this throws (the TV says "No signal"),
+    // but the player keeps starting, so the next try (or YouTube itself) can still play.
     async load(videoId, { muted = false } = {}) {
       const YT = await loadYouTubeApi();
-      if (creating) await creating;
       if (!player) {
-        creating = new Promise((resolve) => {
+        whenReady = new Promise((resolve) => {
           player = new YT.Player(elementId, {
             width: 280,
             height: 200,
@@ -54,11 +73,12 @@ export function createPlayer(elementId, { onState, onError } = {}) {
             },
           });
         });
-        await creating;
-      } else {
-        if (muted) player.mute();
-        player.loadVideoById(videoId);
+        await within(whenReady, 20000);
+        return;
       }
+      await within(whenReady, 20000);
+      if (muted) player.mute();
+      player.loadVideoById(videoId);
     },
     play() { if (ready) player.playVideo(); },
     restart() { if (ready) { player.seekTo(0, true); player.playVideo(); } },
