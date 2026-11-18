@@ -775,8 +775,21 @@ function enableSound() {
     }
   }, 1500);
 }
-window.addEventListener('pointerdown', enableSound, { capture: true });
-window.addEventListener('keydown', enableSound, { capture: true });
+// iPhones only count the end of a tap (touchend, click) as permission to play
+// sound, so a touch must wait for that; a mouse can go on pointerdown.
+window.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') enableSound(); }, { capture: true });
+for (const type of ['touchend', 'click', 'keydown']) window.addEventListener(type, enableSound, { capture: true });
+
+// "No signal" isn't final: try again when the phone is back online, when the
+// page comes back into view, or when the TV screen is tapped.
+function retryNoSignal() {
+  if (current !== null || !radioOn || radioPhase !== 'error') return;
+  radioFailures = 0;
+  tuneRadio({ flash: true });
+}
+window.addEventListener('online', retryNoSignal);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) retryNoSignal(); });
+$('#tv-idle').addEventListener('click', retryNoSignal);
 
 /* ---------------- now spinning card ---------------- */
 
@@ -1141,4 +1154,5 @@ renderMenu();
 
 renderCrate();
 updateCard();
+window.roomReady?.(); // lifts the loading screen (index.html)
 loadYouTubeApi().catch(() => { /* reported when a record is played */ });

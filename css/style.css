@@ -35,6 +35,67 @@ html, body {
 .viewport.scrolls { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .scroll-spacer { width: 1px; height: 0; pointer-events: none; }
 
+/* Loading screen: the room stays hidden until js/main.js has fitted and drawn it
+   (roomReady() in index.html), so a slow phone never sees it half-built. */
+.booting .viewport { visibility: hidden; }
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  text-align: center;
+  background:
+    radial-gradient(60% 45% at 50% 42%, rgba(242, 141, 178, .16), transparent 70%),
+    linear-gradient(#2E2558, #1A1640);
+  color: #F4E9FF;
+  transition: opacity .5s ease, visibility 0s linear .5s;
+}
+html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-record {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #F28DB2 0 15%, #2A2240 16% 18%, transparent 19%),
+    repeating-radial-gradient(circle, #1B1530 0 3px, #241C3C 3px 5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45), inset 0 0 0 2px rgba(255, 255, 255, .06);
+  position: relative;
+  animation: boot-spin 1.8s linear infinite;
+}
+/* a glint so the spin shows */
+.boot-record span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg, transparent 0 8%, rgba(255, 255, 255, .14) 12%, transparent 18% 58%, rgba(255, 255, 255, .1) 62%, transparent 68%);
+}
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+.boot-text {
+  margin: 0;
+  font: 700 17px 'M PLUS Rounded 1c', 'Nunito', system-ui, sans-serif;
+  letter-spacing: .02em;
+  max-width: 280px;
+}
+.boot-retry {
+  font: 600 16px -apple-system, system-ui, sans-serif;
+  color: #2A1E2E;
+  background: #FFD38A;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 26px;
+  cursor: pointer;
+}
+.boot-retry[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .boot-record { animation: none; }
+  .boot { transition: none; }
+}
+
 .stage {
   --s: 1;
   /* The screen's edges measured in stage pixels (set in js/main.js): left, top,

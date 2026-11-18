@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="booting">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1095,6 +1095,14 @@
 <div class="scroll-spacer" id="scroll-spacer"></div>
 </main>
 
+<!-- Shown while the room loads, so a slow phone never sees a half-built room.
+     The watchdog below offers a fresh reload if the room can't start. -->
+<div class="boot" id="boot" role="status" aria-live="polite">
+  <div class="boot-record" aria-hidden="true"><span></span></div>
+  <p class="boot-text" id="boot-text">Tuning in…</p>
+  <button class="boot-retry" id="boot-retry" type="button" hidden>Try again</button>
+</div>
+
 <!-- Add a record -->
 <dialog class="ios-sheet add-dialog" id="add-dialog" aria-labelledby="add-title">
   <form id="add-form" novalidate>
@@ -1169,6 +1177,51 @@
   <div class="ios-stack"></div>
 </dialog>
 
-<script type="module" src="js/main.js"></script>
+<script>
+/* Startup watchdog. js/main.js calls roomReady() once the room is drawn.
+   If a file didn't arrive, or the phone mixed old and new files after an update,
+   reload once with every file fetched fresh; after that, offer a button. */
+(function () {
+  var root = document.documentElement, ready = false, KEY = 'record-room:boot-retry';
+  function $(id) { return document.getElementById(id); }
+  function fresh() {
+    $('boot-text').textContent = 'Fetching a fresh copy…';
+    $('boot-retry').hidden = true;
+    var urls = [location.href.split('#')[0]];
+    try {
+      performance.getEntriesByType('resource').forEach(function (r) {
+        if (r.name.indexOf(location.origin) === 0 && /\.(js|css)(\?|$)/.test(r.name)) urls.push(r.name);
+      });
+    } catch (e) {}
+    var jobs = urls.map(function (u) { return fetch(u, { cache: 'reload' }).catch(function () {}); });
+    Promise.all(jobs).then(function () { location.reload(); });
+  }
+  function offer(text) {
+    if (ready) return;
+    $('boot-text').textContent = text;
+    $('boot-retry').hidden = false;
+  }
+  var failed = false;
+  window.roomFailed = function () {
+    if (ready || failed) return;
+    failed = true;
+    var last = 0;
+    try { last = Number(sessionStorage.getItem(KEY)) || 0; sessionStorage.setItem(KEY, String(Date.now())); } catch (e) {}
+    if (Date.now() - last > 60000) fresh();
+    else offer('The room didn’t finish loading.');
+  };
+  window.roomReady = function () {
+    ready = true;
+    root.classList.remove('booting');
+  };
+  window.addEventListener('error', function (e) {
+    // Only errors from this site's own scripts before the room is up.
+    if (!ready && e instanceof ErrorEvent && (e.filename || '').indexOf(location.origin) === 0) roomFailed();
+  });
+  setTimeout(function () { offer('Still tuning in… the connection is slow.'); }, 12000);
+  $('boot-retry').addEventListener('click', fresh);
+})();
+</script>
+<script type="module" src="js/main.js" onerror="roomFailed()"></script>
 </body>
 </html>
