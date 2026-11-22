@@ -55,6 +55,7 @@ const SECTIONS = [
     { sub: 'sounds', label: 'Room sounds', icon: 'waves', color: '#64D2FF', rows: ['mixMatch', 'mixRain', 'mixFire', 'mixCafe', 'mixPurr'], value: soundsValue,
       footer: 'Soft sounds made in your browser, under the music. “Match the room” adds rain when it rains, murmur in the café and crackle by the fire.' },
     { custom: 'sleep', icon: 'zz', color: '#8E8E93' },
+    { opt: 'awake', icon: 'sun', color: '#FFB340', when: () => 'wakeLock' in navigator },
   ] },
   { title: 'Holidays', rows: [
     { sub: 'holidays', label: 'Holidays', icon: 'tree', color: '#34C759', rows: ['holiday', 'celebrate', 'hats'], value: (d) => holidayValue(d),
@@ -87,6 +88,7 @@ const ICONS = {
   sofa: '<path d="M5 11V8a2 2 0 012-2h10a2 2 0 012 2v3"/><path d="M3 11h3v3h12v-3h3v6H3z"/><path d="M5 17v2M19 17v2"/>',
   sparkle: '<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>',
   paw: '<circle class="f" cx="6.5" cy="10.5" r="1.9"/><circle class="f" cx="10" cy="6.5" r="1.9"/><circle class="f" cx="14.5" cy="6.5" r="1.9"/><circle class="f" cx="18" cy="10.5" r="1.9"/><path class="f" d="M12 11.5c-3 0-5.5 3.6-5.5 5.6S9 20 12 19.2s5.5.9 5.5-1.6-2.5-6.1-5.5-6.1z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
   moon: '<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>',
   cloud: '<path d="M7 18h10a4 4 0 00.5-8 6 6 0 00-11.3 1.5A3.3 3.3 0 007 18z"/>',
   leaf: '<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15z"/><path d="M5 19l8-8"/>',

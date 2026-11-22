@@ -128,6 +128,11 @@ export const OPTIONS = {
       flat: ['Flat-screen', '#1C1A26'],
     },
   },
+  awake: {
+    label: 'Stay awake',
+    choices: { playing: 'While playing', always: 'Always', off: 'Off' },
+    footer: 'Stops your computer or phone from dimming or going to sleep while the room is open in front of you: only while music plays, or always. When the sleep timer runs out, it’s allowed to sleep again.',
+  },
   parallax: {
     label: 'Moving city',
     choices: { on: 'On', off: 'Off' },
@@ -185,6 +190,7 @@ export const DEFAULTS = {
   coat: 'ginger',
   lamp: 'on',
   parallax: 'on',
+  awake: 'playing',
   candles: 'off',
   fire: 'off',
   rug: 'round',
