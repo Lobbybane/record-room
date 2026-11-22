@@ -19,6 +19,7 @@ import { initCafe, cafeRedrawn } from './cafe.js';
 import { initOutside } from './outside.js';
 import { drawAudience, initTheater } from './theater.js';
 import { initParallax, setParallax } from './parallax.js';
+import { updateAwake } from './awake.js';
 import { STATIONS, CHRISTMAS, stationFor, nextStation, stationsPage, showingFor, nextShowing, allShowings, showingsPage } from './radio.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -173,6 +174,7 @@ const decor = initDecor(stage, {
   onApply: (d) => {
     setSoundEnabled(d.sound === 'on');
     setParallax(d.parallax === 'on', { fromTap: Boolean(window.event && window.event.isTrusted) });
+    updateAwake({ mode: d.awake });
     // Room sounds: the sliders, plus the room's own sounds when "Match the room" is on.
     const match = d.mixMatch === 'on';
     const wet = ['rain', 'storm'].includes(d.weather);
@@ -826,6 +828,7 @@ function updateCard() {
   stage.dataset.phase = shownPhase; // the people react to this in CSS
   stage.dataset.source = current !== null ? 'record' : 'radio';
   stage.classList.toggle('is-on', shownPhase === 'playing');
+  updateAwake({ playing: shownPhase === 'playing', asleep }); // keep the screen awake while it plays
   $('#marquee-title').textContent = theater ? (station.liveTitle || station.name).slice(0, 34) : '';
   updateKnob();
 
