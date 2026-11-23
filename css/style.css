@@ -138,7 +138,6 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
   --fy: 0px;
   --fw: 1280px;
   --fh: 820px;
-  --sky: linear-gradient(180deg, #1A1640 0%, #3B2F6B 40%, #8A5A9E 68%, #F28DB2 86%, #FFB38A 100%);
   --far-city: #5A4585;
   --moon-cut: #1F1A45;
   --spill: #F7A9C8;
@@ -148,12 +147,25 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
   top: var(--cy, 50%);
   width: 1280px;
   height: 820px;
-  transform: translate(-50%, -50%) scale(var(--s));
+  --fit: scale(var(--s));
+  transform: translate(-50%, -50%) var(--fit);
   transform-origin: 50% 50%;
+}
+/* Where the browser has zoom, the room is laid out at its real size on screen instead of
+   being drawn at 1280 x 820 and shrunk: WebKit (every iPhone browser) paints a shrunk
+   layer at its full size, so on a phone the room used about 11 times the memory it shows
+   and iOS closed the page ("A problem repeatedly occurred"). Zoom also multiplies the
+   stage's own left/top, so they're divided by the scale first. Stage pixels work the same. */
+@supports (zoom: 0.5) {
+  .stage {
+    zoom: var(--s, 1);
+    --fit: scale(1);
+    left: calc(var(--cx, 640px) / var(--s, 1));
+    top: calc(var(--cy, 410px) / var(--s, 1));
+  }
 }
 
 .stage[data-sky="midnight"] {
-  --sky: linear-gradient(180deg, #0E0C24 0%, #1A1640 40%, #2A2350 72%, #43356F 100%);
   --far-city: #2A2350;
   --moon-cut: #141232;
   --spill: #8FB4FF;
@@ -161,13 +173,11 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
 }
 
 .stage[data-sky="sunrise"] {
-  --sky: linear-gradient(180deg, #2B2F6B 0%, #6B5A9E 34%, #E58FB0 62%, #FFB38A 82%, #FFE0A0 100%);
   --far-city: #6E5A96;
   --spill: #FFC9A8;
   --glow: rgba(255, 190, 150, .16);
 }
 .stage[data-sky="golden"] {
-  --sky: linear-gradient(180deg, #5A4A9E 0%, #B07AB8 30%, #F29E9E 56%, #FFC07A 80%, #FFE6A8 100%);
   --far-city: #8A6A9E;
   --spill: #FFD38A;
   --glow: rgba(255, 200, 140, .2);
@@ -522,11 +532,11 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
 .pines-front { fill: #15132B; }
 .stage:is([data-sky="sunrise"], [data-sky="golden"]) .ridge-near { fill: #5A4A80; }
 .stage:is([data-sky="sunrise"], [data-sky="golden"]) .pines-back { fill: #3B2F6B; }
-.stage:is([data-sky="sunrise"], [data-sky="golden"]) .cabin-lights { display: none; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .cabin-lights { opacity: 0; }
 
 .island { fill: var(--far-city); }
-.sea { position: absolute; left: -30px; right: -50px; top: 204px; bottom: 0; background: linear-gradient(180deg, rgba(60, 52, 120, .7), rgba(21, 19, 43, .97)); }
-.stage:is([data-sky="sunrise"], [data-sky="golden"]) .sea { background: linear-gradient(180deg, rgba(180, 120, 160, .55), rgba(59, 47, 107, .95)); }
+.sea { position: absolute; left: -30px; right: -50px; top: 204px; bottom: 0; --sea-a: rgba(60, 52, 120, .7); --sea-b: rgba(21, 19, 43, .97); background: linear-gradient(180deg, var(--sea-a), var(--sea-b)); }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .sea { --sea-a: rgba(180, 120, 160, .55); --sea-b: rgba(59, 47, 107, .95); }
 .glow-path { position: absolute; left: 380px; top: 206px; width: 48px; height: 116px; background: repeating-linear-gradient(180deg, rgba(255, 241, 214, .55) 0 2px, transparent 2px 7px); -webkit-mask-image: linear-gradient(180deg, #000, transparent); mask-image: linear-gradient(180deg, #000, transparent); animation: shimmer 2.4s ease-in-out infinite; }
 .stage[data-sky="sunrise"] .glow-path { left: 272px; }
 .stage[data-sky="golden"] .glow-path { left: 340px; background: repeating-linear-gradient(180deg, rgba(255, 214, 150, .65) 0 2px, transparent 2px 7px); }
@@ -579,7 +589,27 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
   height: 354px;
   overflow: hidden;
   border-radius: 3px;
-  background: var(--sky);
+}
+/* The sky is painted on its own layer behind the view, so when it blends only the sky
+   repaints, not the whole city in front of it. Its colour stops live right here (and on the
+   moon's crescent cut, which shows the same sky), not inherited, so a blend restyles just these. */
+.glass::before { content: ''; position: absolute; inset: 0; background: var(--sky); will-change: transform; }
+.glass::before, .moon-cut {
+  --sky-a: #1A1640; --sky-b: #3B2F6B; --sky-c: #8A5A9E; --sky-d: #F28DB2; --sky-e: #FFB38A;
+  --sky-pb: 40%; --sky-pc: 68%; --sky-pd: 86%;
+  --sky: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) var(--sky-pb), var(--sky-c) var(--sky-pc), var(--sky-d) var(--sky-pd), var(--sky-e) 100%);
+}
+.stage[data-sky="midnight"] .glass::before, .stage[data-sky="midnight"] .moon-cut {
+  --sky-a: #0E0C24; --sky-b: #1A1640; --sky-c: #2A2350; --sky-d: #43356F; --sky-e: #43356F;
+  --sky-pb: 40%; --sky-pc: 72%; --sky-pd: 100%;
+}
+.stage[data-sky="sunrise"] .glass::before, .stage[data-sky="sunrise"] .moon-cut {
+  --sky-a: #2B2F6B; --sky-b: #6B5A9E; --sky-c: #E58FB0; --sky-d: #FFB38A; --sky-e: #FFE0A0;
+  --sky-pb: 34%; --sky-pc: 62%; --sky-pd: 82%;
+}
+.stage[data-sky="golden"] .glass::before, .stage[data-sky="golden"] .moon-cut {
+  --sky-a: #5A4A9E; --sky-b: #B07AB8; --sky-c: #F29E9E; --sky-d: #FFC07A; --sky-e: #FFE6A8;
+  --sky-pb: 30%; --sky-pc: 56%; --sky-pd: 80%;
 }
 /* The scenery keeps the old window's coordinates (512 x 322), 30px in and 32px down;
    its layers reach out to fill the whole glass. */
@@ -589,12 +619,19 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
 
 .star { position: absolute; border-radius: 50%; background: #FFF1D6; }
 .moon { position: absolute; left: 376px; top: 26px; width: 56px; height: 56px; border-radius: 50%; background: #FFF1D6; box-shadow: 0 0 30px 8px rgba(255, 241, 214, .35); }
-.moon-cut { position: absolute; left: 392px; top: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--moon-cut); }
-.sun { display: none; position: absolute; width: 66px; height: 66px; border-radius: 50%; background: #FFF1C8; box-shadow: 0 0 40px 16px rgba(255, 214, 150, .55); }
-.stage[data-sky="sunrise"] .sun { display: block; left: 262px; top: 88px; }
-.stage[data-sky="golden"] .sun { display: block; left: 330px; top: 92px; }
-.stage[data-sky="sunrise"] :is(.moon, .moon-cut, #stars),
-.stage[data-sky="golden"] :is(.moon, .moon-cut, #stars) { display: none; }
+/* The disc that cuts the moon into a crescent shows the very piece of sky behind it (the glass's
+   own gradient, lined up), so it matches any sky, even halfway through a blend. */
+.moon-cut { position: absolute; left: 392px; top: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--moon-cut); background: var(--sky) -422px -52px / 592px 354px no-repeat; }
+.sun { position: absolute; left: 200px; top: 240px; width: 66px; height: 66px; border-radius: 50%; background: #FFF1C8; box-shadow: 0 0 40px 16px rgba(255, 214, 150, .55); }
+.stage[data-sky="sunrise"] .sun { left: 262px; top: 88px; }
+.stage[data-sky="golden"] .sun { left: 330px; top: 92px; }
+.stage[data-sky="dusk"] .sun { left: 420px; top: 240px; }  /* set behind the city */
+/* The sun shows by day, the moon and stars by night (wrappers, so the weather can still dim them). */
+.night-sky, .day-sky { position: absolute; inset: 0; }
+.day-sky, .stage:is([data-sky="sunrise"], [data-sky="golden"]) .night-sky { opacity: 0; }
+.stage:is([data-sky="sunrise"], [data-sky="golden"]) .day-sky { opacity: 1; }
+/* By the sea the sun rises from and sets into the water (the horizon is at y 204). */
+.stage[data-room="beach"] .day-sky { clip-path: inset(-80px -80px 118px -80px); }
 
 .shooting-star {
   display: none;
@@ -611,6 +648,41 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
   86% { opacity: 1; }
   92%, 100% { opacity: 0; transform: translate(220px, 72px) rotate(18deg); }
 }
+
+/* ---------- Time of day blends ----------
+   When the time of day changes after the room has started (the Day & night cycle, Auto at the
+   turn of the hour, or picking one in Decorate), js/decor.js adds .sky-fade for --sky-fade-t:
+   the sky, city, clouds and sea blend, the sun rises or sets, the moon and stars fade, street
+   lamps and cabin lights come on, and js/city.js lights windows one by one.
+   Speed: nothing that blends is inherited by the whole room (that restyled thousands of
+   elements every frame). Shapes blend their own fill; the few gradients that need to blend use
+   typed (registered) colour stops set right on the element: the sky's on the glass's own
+   sky layer (not inherited), the sea's and the window glow's on those leaves. */
+@property --sky-a { syntax: '<color>'; inherits: false; initial-value: #1A1640; }
+@property --sky-b { syntax: '<color>'; inherits: false; initial-value: #3B2F6B; }
+@property --sky-c { syntax: '<color>'; inherits: false; initial-value: #8A5A9E; }
+@property --sky-d { syntax: '<color>'; inherits: false; initial-value: #F28DB2; }
+@property --sky-e { syntax: '<color>'; inherits: false; initial-value: #FFB38A; }
+@property --sky-pb { syntax: '<percentage>'; inherits: false; initial-value: 40%; }
+@property --sky-pc { syntax: '<percentage>'; inherits: false; initial-value: 68%; }
+@property --sky-pd { syntax: '<percentage>'; inherits: false; initial-value: 86%; }
+@property --glow { syntax: '<color>'; inherits: true; initial-value: rgba(242, 141, 178, .16); }
+@property --sea-a { syntax: '<color>'; inherits: false; initial-value: rgba(60, 52, 120, .7); }
+@property --sea-b { syntax: '<color>'; inherits: false; initial-value: rgba(21, 19, 43, .97); }
+.stage { --sky-fade-t: 8s; }
+.stage.sky-fade .glass::before, .stage.sky-fade .moon-cut {
+  transition-property: --sky-a, --sky-b, --sky-c, --sky-d, --sky-e, --sky-pb, --sky-pc, --sky-pd;
+  transition-duration: var(--sky-fade-t);
+  transition-timing-function: ease-in-out;
+}
+.stage.sky-fade .window-glow { transition: --glow var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade .sea { transition: --sea-a var(--sky-fade-t) ease-in-out, --sea-b var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade :is(.bld, .roof-fill, .far-city, .ridge-far, .island, .forest-far, .hills-far, .ridge-near, .pines-back, .spill, .cloud-far, .cloud-near, .cloud-storm) { transition: fill var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade .roof-line { transition: stroke var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade :is(.night-sky, .cabin-lights, .street-glow, .far-light, .town-lights, .flame-glow) { transition: opacity var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade .day-sky { transition: opacity calc(var(--sky-fade-t) * .8) ease-in-out; }
+.stage.sky-fade .sun { transition: opacity 2s ease, left var(--sky-fade-t) ease-in-out, top var(--sky-fade-t) ease-in-out; }
+.stage.sky-fade .glow-path { transition: left var(--sky-fade-t) ease-in-out; }
 
 /* The city (drawn by js/city.js). Building colours follow the time of day. */
 .stage { --bld-1: #2E2558; --bld-2: #352B63; --bld-3: #2A2350; --bld-4: #3B2F6B; --roof: #221C44; }
@@ -632,7 +704,7 @@ html:not(.booting) .boot { opacity: 0; visibility: hidden; pointer-events: none;
 .stage[data-weather="storm"] .cloud-flash { display: inline; fill: #D8D4FF; opacity: 0; animation: lightning 12s infinite; mix-blend-mode: screen; }
 @keyframes cloud-drift { from { transform: translateX(-24px); } to { transform: translateX(24px); } }
 /* The moon and stars hide behind the clouds. */
-.glass :is(.moon, #stars, .sun, .shooting-star) { transition: opacity 2s ease; }
+.glass :where(.moon, #stars, .sun, .shooting-star) { transition: opacity 2s ease; }
 .stage[data-weather="rain"] .glass :is(.moon, #stars, .sun) { opacity: .4; }
 .stage:is([data-weather="storm"], [data-weather="snow"]) .glass :is(.moon, #stars, .sun) { opacity: .15; }
 /* The whole view goes grey and dim in the rain, darker in a storm. */
@@ -971,7 +1043,12 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .window-glow { position: absolute; inset: 0; z-index: 20; pointer-events: none; background: radial-gradient(ellipse 600px 420px at 640px 236px, var(--glow), transparent 70%); }
 .full-screen { position: absolute; left: var(--fx); top: var(--fy); width: var(--fw); height: var(--fh); }
 .vignette { z-index: 21; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(10, 8, 25, .55) 100%); }
-.grain { z-index: 22; pointer-events: none; mix-blend-mode: soft-light; opacity: .55; }
+/* Film grain: one small seamless noise tile (the same turbulence filter, stitched), repeated.
+   A full-screen filter cost phones far more memory. */
+.grain {
+  z-index: 22; pointer-events: none; mix-blend-mode: soft-light; opacity: .55;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 200px 200px repeat;
+}
 
 /* ---------- record crate ---------- */
 .crate {
@@ -1818,15 +1895,15 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
    the seats and everyone in them move together (the Decorate button stays still). */
 .stage[data-room="train"] { animation: car-rock 4.4s ease-in-out infinite; }
 @keyframes car-rock {
-  0%, 100% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, 0); }
-  10% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .9px); }
-  13% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .25px); }
-  16% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .8px); }
-  35% { transform: translate(-50%, -50%) scale(var(--s)) translate(.35px, .4px); }
-  58% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, 1px); }
-  61% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .3px); }
-  64% { transform: translate(-50%, -50%) scale(var(--s)) translate(0, .9px); }
-  84% { transform: translate(-50%, -50%) scale(var(--s)) translate(-.35px, .3px); }
+  0%, 100% { transform: translate(-50%, -50%) var(--fit) translate(0, 0); }
+  10% { transform: translate(-50%, -50%) var(--fit) translate(0, .9px); }
+  13% { transform: translate(-50%, -50%) var(--fit) translate(0, .25px); }
+  16% { transform: translate(-50%, -50%) var(--fit) translate(0, .8px); }
+  35% { transform: translate(-50%, -50%) var(--fit) translate(.35px, .4px); }
+  58% { transform: translate(-50%, -50%) var(--fit) translate(0, 1px); }
+  61% { transform: translate(-50%, -50%) var(--fit) translate(0, .3px); }
+  64% { transform: translate(-50%, -50%) var(--fit) translate(0, .9px); }
+  84% { transform: translate(-50%, -50%) var(--fit) translate(-.35px, .3px); }
 }
 .stage[data-room="train"] .room-controls { animation: car-steady 4.4s ease-in-out infinite; }
 @keyframes car-steady {

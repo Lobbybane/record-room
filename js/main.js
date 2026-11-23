@@ -9,7 +9,7 @@ import { sfx, setSoundEnabled, initThunder, setAmbience } from './sounds.js';
 import { confirmDialog, actionSheet } from './ui.js';
 import { sleepPage, initSleepTimer, onSleepChange, sleepMinutesLeft, setSleepTimer } from './sleep.js';
 import { initPets, initLamp, initCityLife, initFishTank, buildWeather } from './life.js';
-import { buildCity as drawCity } from './city.js';
+import { buildCity as drawCity, relightCity } from './city.js';
 import { initWeather } from './weather.js';
 import { initStudyTimer } from './study.js';
 import { lookPages } from './looks.js';
@@ -132,8 +132,10 @@ function seeded(seed) {
 }
 
 // The city outside is drawn by js/city.js; it is redrawn when the time of day changes.
-function buildCity(sky) {
-  drawCity($('#buildings'), sky);
+function buildCity(sky, { fade = 0 } = {}) {
+  // A blend keeps the buildings and switches windows on or off one by one.
+  if (fade && $('#buildings .city-svg')) relightCity($('#buildings'), sky, fade);
+  else drawCity($('#buildings'), sky);
 }
 
 function buildStars() {

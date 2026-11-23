@@ -31,10 +31,17 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const between = (a, b) => a + Math.random() * (b - a);
 
 // Stage pixels from a click.
+// Worked out from the fit (--s, --cx, --cy) and the viewport, so it's the same whether the
+// stage is zoomed or scaled (older browsers measured zoomed elements differently).
 function stagePoint(stage, event) {
-  const rect = stage.getBoundingClientRect();
-  const scale = rect.width / 1280;
-  return { x: (event.clientX - rect.left) / scale, y: (event.clientY - rect.top) / scale };
+  const scale = parseFloat(stage.style.getPropertyValue('--s')) || 1;
+  const cx = parseFloat(stage.style.getPropertyValue('--cx'));
+  const cy = parseFloat(stage.style.getPropertyValue('--cy'));
+  const host = stage.parentElement;
+  const box = host.getBoundingClientRect();
+  const left = box.left - host.scrollLeft + cx - 640 * scale;
+  const top = box.top - host.scrollTop + cy - 410 * scale;
+  return { x: (event.clientX - left) / scale, y: (event.clientY - top) / scale };
 }
 
 // For testing: petNow('cat') starts a stroll, petNow('dog') a trick.

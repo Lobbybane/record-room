@@ -56,6 +56,8 @@ const overlaps = (a, b, pad = 3) =>
   a.x < b.x + b.w + pad && a.x + a.w + pad > b.x && a.y < b.y + b.h + pad && a.y + a.h + pad > b.y;
 
 export function buildCity(container, sky) {
+  relightTimers.forEach(clearTimeout);
+  relightTimers = [];
   const rnd = seeded(11);
   const litChance = LIT[sky] ?? LIT.dusk;
   const root = svg('svg', { viewBox: '-30 -32 592 354', class: 'city-svg', 'aria-hidden': 'true' });
@@ -103,14 +105,9 @@ export function buildCity(container, sky) {
   function addWindow(group, box) {
     if (signs.some((s) => overlaps(box, s))) return;
     const r = rnd();
-    const lit = r < litChance;
-    const color = r < 0.04 ? '#6FE3F2' : r < 0.07 ? '#F7A9C8' : r < litChance * 0.5 ? '#FFE7B8' : '#FFD38A';
-    group.append(svg('rect', {
-      x: box.x, y: box.y, width: box.w, height: box.h, rx: 0.6,
-      class: lit ? 'win lit' : 'win',
-      // Inline style, so it wins over the unlit window colour in the stylesheet.
-      ...(lit ? { style: `fill: ${color}`, opacity: Math.min(1, 0.6 + r * 0.8).toFixed(2) } : {}),
-    }));
+    const win = svg('rect', { x: box.x, y: box.y, width: box.w, height: box.h, rx: 0.6, 'data-r': r.toFixed(4) });
+    lightWindow(win, r, litChance);
+    group.append(win);
   }
 
   const signLayer = svg('g', { class: 'signs' });
@@ -150,6 +147,36 @@ function addRoof(group, b) {
     }
     group.append(svg('path', { d, class: 'roof-line thin' }));
     group.append(svg('rect', { x: b.x + b.w - 20, y: b.top - 8, width: 12, height: 8, class: 'roof-fill' }));
+  }
+}
+
+// A window is lit when its own number (fixed for each window) is under the time of day's
+// share, so going from dusk to midnight only switches more windows on.
+function lightWindow(win, r, litChance) {
+  const lit = r < litChance;
+  win.setAttribute('class', lit ? 'win lit' : 'win');
+  if (lit) {
+    const color = r < 0.04 ? '#6FE3F2' : r < 0.07 ? '#F7A9C8' : r < litChance * 0.5 ? '#FFE7B8' : '#FFD38A';
+    // Inline style, so it wins over the unlit window colour in the stylesheet.
+    win.setAttribute('style', `fill: ${color}`);
+    win.setAttribute('opacity', Math.min(1, 0.6 + r * 0.8).toFixed(2));
+  } else {
+    win.removeAttribute('style');
+    win.removeAttribute('opacity');
+  }
+}
+
+// The time of day changed while the room is open: switch windows on or off one at a time
+// over `ms`, like people getting home or going to bed (the buildings stay as they are).
+let relightTimers = [];
+export function relightCity(container, sky, ms) {
+  relightTimers.forEach(clearTimeout);
+  relightTimers = [];
+  const litChance = LIT[sky] ?? LIT.dusk;
+  for (const win of container.querySelectorAll('.win')) {
+    const r = Number(win.dataset.r);
+    if (r >= litChance && !win.classList.contains('lit')) continue; // dark and staying dark
+    relightTimers.push(setTimeout(() => lightWindow(win, r, litChance), Math.random() * ms));
   }
 }
 

@@ -122,7 +122,7 @@ export const icon = (name) => `<svg class="ico" viewBox="0 0 24 24" width="18" h
 
 // Short notes under some choice lists.
 const PAGE_FOOTERS = {
-  time: 'Auto follows the time on your device.',
+  time: 'Auto follows the time on your device. Day & night goes round from sunrise to midnight, a new time every 2 minutes, blending slowly from one to the next.',
   season: 'By date uses northern-hemisphere seasons.',
   holiday: 'Preview shows a holiday’s decorations right now. Choose By date to follow the calendar.',
   celebrate: 'By date only shows the holidays switched on here.',
