@@ -32,7 +32,7 @@ export const OPTIONS = {
   },
   time: {
     label: 'Time of day',
-    choices: { auto: 'Auto', sunrise: 'Sunrise', golden: 'Golden hour', dusk: 'Dusk', midnight: 'Midnight' },
+    choices: { auto: 'Auto', cycle: 'Day & night', sunrise: 'Sunrise', golden: 'Golden hour', dusk: 'Dusk', midnight: 'Midnight' },
   },
   weather: {
     label: 'Weather',
@@ -268,6 +268,16 @@ export function seasonForDate(date) {
   return 'winter';
 }
 
+// "Day & night": a new time of day every 2 minutes, round and round. Counted from the clock,
+// so it carries on from the same place after a reload.
+export const CYCLE = ['sunrise', 'golden', 'dusk', 'midnight'];
+export const CYCLE_MS = 120_000;
+export function cycleSky(now = Date.now()) {
+  return CYCLE[Math.floor(now / CYCLE_MS) % CYCLE.length];
+}
+// How long a change of time blends (keep in step with --sky-fade-t in css/style.css).
+const SKY_FADE_MS = 8000;
+
 // "Auto" follows the visitor's own clock.
 export function skyForHour(hour) {
   if (hour >= 5 && hour < 9) return 'sunrise';
@@ -286,7 +296,8 @@ function fitNeon(sign) {
 
 /**
  * Sets up the Decorate panel and applies the saved look.
- * onSky(sky) runs whenever the time of day changes, so the city can be redrawn.
+ * onSky(sky, { fade }) runs whenever the time of day changes, so the city can be redrawn
+ * (fade: how many ms the change blends over, or 0 to switch at once).
  * Returns { get(name), set(name, value) } for things changed outside the panel (the lamp).
  */
 export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
@@ -295,9 +306,24 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
   const toggle = document.getElementById('decor-toggle');
   const sign = document.getElementById('neon-sign');
   let shownSky = null;
+  let fadeTimer = 0;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function currentSky() {
+    if (decor.time === 'auto') return skyForHour(new Date().getHours());
+    if (decor.time === 'cycle') return cycleSky();
+    return decor.time;
+  }
 
   function apply() {
-    const sky = decor.time === 'auto' ? skyForHour(new Date().getHours()) : decor.time;
+    const sky = currentSky();
+    // After the first look, a new time of day blends in slowly (.sky-fade) instead of jumping.
+    const fade = shownSky !== null && sky !== shownSky && !calm.matches;
+    if (fade) {
+      stage.classList.add('sky-fade');
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => stage.classList.remove('sky-fade'), SKY_FADE_MS + 500);
+    }
     stage.dataset.sky = sky;
     stage.dataset.room = decor.room;
     stage.dataset.crowd = decor.crowd;
@@ -336,7 +362,7 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
 
     if (sky !== shownSky) {
       shownSky = sky;
-      onSky(sky);
+      onSky(sky, { fade: fade ? SKY_FADE_MS : 0 });
     }
     onApply(decor);
     saveDecor(decor);
@@ -390,8 +416,9 @@ export function initDecor(stage, { onSky, onApply = () => {}, custom = {} }) {
     if (!ui.back()) setOpen(false);
   });
 
-  // Re-check the clock each minute for "Auto".
+  // Re-check the clock each minute for "Auto", and every few seconds for the Day & night turn.
   setInterval(() => { if ([decor.time, decor.holiday, decor.season].includes('auto')) apply(); }, 60_000);
+  setInterval(() => { if (decor.time === 'cycle' && cycleSky() !== shownSky) apply(); }, 3000);
   document.fonts?.ready.then(() => fitNeon(sign));
 
   apply();
