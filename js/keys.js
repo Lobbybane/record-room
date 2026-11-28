@@ -10,6 +10,7 @@ export const KEYS = [
   ['C', 'Candles'],
   ['R', 'Rain on or off'],
   ['B', 'Browse the records'],
+  ['W', 'Look out the window (Esc to come back)'],
   ['D', 'Decorate'],
   ['F', 'Full screen'],
   ['?', 'This list'],
@@ -24,7 +25,7 @@ function ignore(event) {
   return Boolean(document.querySelector('dialog[open]:not(.ios-panel)'));
 }
 
-/** actions: { pause, next, volume(step), mute, room(n), toggle(name), crate, decorate, fullscreen, help } */
+/** actions: { pause, next, volume(step), mute, room(n), toggle(name), crate, window, decorate, fullscreen, help } */
 export function initKeys(actions) {
   document.addEventListener('keydown', (event) => {
     if (event.defaultPrevented || event.repeat && !['ArrowUp', 'ArrowDown'].includes(event.key) || ignore(event)) return;
@@ -35,7 +36,7 @@ export function initKeys(actions) {
       ArrowUp: () => actions.volume(10), ArrowDown: () => actions.volume(-10),
       m: actions.mute,
       l: () => actions.toggle('lamp'), c: () => actions.toggle('candles'), r: () => actions.toggle('rain'),
-      b: actions.crate, d: actions.decorate, f: actions.fullscreen, '?': actions.help, '/': event.shiftKey ? actions.help : null,
+      b: actions.crate, w: actions.window, d: actions.decorate, f: actions.fullscreen, '?': actions.help, '/': event.shiftKey ? actions.help : null,
     }[key] || (/^[1-8]$/.test(key) ? () => actions.room(Number(key) - 1) : null);
     if (!run) return;
     event.preventDefault();

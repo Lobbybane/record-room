@@ -1036,6 +1036,24 @@ button:focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .pill-icon .icon-exit, .pill-icon.is-full .icon-enter { display: none; }
 .pill-icon.is-full .icon-exit { display: block; }
 #decor-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 0 16px 0 13px; }
+#window-back { display: inline-flex; align-items: center; gap: 7px; padding: 0 16px 0 13px; }
+#window-back[hidden] { display: none; }
+
+/* ---------- the window view (tap the window; js/main.js zoomTo) ----------
+   The camera zooms in until the glass fills the screen. The buttons keep their room size
+   (--ctl) and hide while the camera moves; the TV sits in a corner (--tv-t), still playing. */
+.room-controls { scale: var(--ctl, 1); transform-origin: 100% 0; transition: opacity .3s ease; }
+.stage.zooming, .stage.zooming .tv-set { will-change: transform; } /* moved as pictures while the camera moves */
+.stage.zooming .tv-set { z-index: 30; }
+.stage[data-view="window"] .grain { background-size: calc(200px * var(--ctl, 1)) calc(200px * var(--ctl, 1)); } /* same grain as in the room */
+/* Looking out, everything in the room that isn't around the window is hidden: it's off screen
+   anyway, and drawn close up it would use far too much memory on a phone. */
+.stage[data-view="window"]:not(.zooming) > :not(.wall, .curtain-rod, .curtain, .window-frame, .glass, .mullion, .lights-wire, #lights, .holiday-garland, .holiday-window, .sill, .snow-cap, .shells, .holiday-sill, .cafe-bar, .pumpkin-glow, .pumpkin, .sill-plant, .xmas-tree-layer, .pet-cat, .room-controls, .tv-set, .window-glow, .storm-flash, .room-dim, .vignette, .grain, .luggage-rack, .greenhouse-plants, .treehouse-vines, .ghost, .love-hearts, #candles, #np-status) { visibility: hidden; }
+.stage.zooming .room-controls { opacity: 0; pointer-events: none; transition-duration: .15s; }
+.stage[data-view="window"]:not([data-layout="phone"]) .tv-set { z-index: 30; transform: var(--tv-t); transform-origin: 0 0; }
+.stage[data-view="window"] .tv-antenna { display: none; }
+.stage:not([data-room="theater"]) .glass { cursor: zoom-in; }
+.stage[data-view="window"] .glass { cursor: zoom-out; }
 #decor-toggle[aria-expanded="true"] { background: rgba(255, 255, 255, .9); color: #1C1A2E; }
 .pill[aria-pressed="false"] { color: var(--text-dim); }
 
