@@ -37,37 +37,19 @@ const viewport = stage.parentElement;
 const decorPanel = $('#decor-panel');
 const spacer = $('#scroll-spacer');
 
-function fitStage() {
-  const width = viewport.clientWidth;
-  const height = viewport.clientHeight;
-  if (!width || !height) return;
-  if (width <= 600 && height >= width * 1.3) {
-    fitPhone(width, height);
-    return;
-  }
-  stage.dataset.layout = 'wide';
-  viewport.classList.remove('scrolls');
-  spacer.style.height = '0px';
-  let roomWidth = width;
-  let roomHeight = height;
-  if (decorPanel.open) {
-    const panel = decorPanel.getBoundingClientRect();
-    // A bottom sheet on phones, a floating sheet on the right elsewhere.
-    if (panel.left < 2) roomHeight = Math.max(120, panel.top);
-    else roomWidth = Math.max(200, panel.left - 8);
-  }
-  const scale = Number(Math.min(roomWidth / 1280, roomHeight / 820).toFixed(4));
-  const centerX = roomWidth / 2;
-  const centerY = roomHeight / 2;
-  const px = (n) => `${n.toFixed(1)}px`;
-  stage.style.setProperty('--s', scale);
-  stage.style.setProperty('--cx', px(centerX));
-  stage.style.setProperty('--cy', px(centerY));
-  // 2px of slack on every side so no hairline shows at the screen edges (the train rocks).
-  stage.style.setProperty('--fx', px(640 - centerX / scale - 2));
-  stage.style.setProperty('--fy', px(410 - centerY / scale - 2));
-  stage.style.setProperty('--fw', px(width / scale + 4));
-  stage.style.setProperty('--fh', px(height / scale + 4));
+// The window view (tap the window): the camera zooms in until the glass fills the room's
+// space, and the TV glides to a corner so YouTube's player stays on screen (it must always be
+// visible). A fit is worked out as numbers first ({ layout, scale, cx, cy, cover, tv }), so the
+// zoom can animate between two of them.
+const GLASS = { x: 344, y: 52, w: 592, h: 354 };
+const useZoom = CSS.supports('zoom', '0.5');
+const tvSet = $('.tv-set');
+let windowView = false;
+let zoomAnim = 0;
+let camera = null; // where the camera is mid-zoom, so a second tap turns it round smoothly
+
+function windowAllowed() {
+  return stage.dataset.room !== 'theater' && !decorPanel.open;
 }
 
 // The TV body, or the movie theater's screen.
@@ -78,40 +60,194 @@ function screenBox() {
   return { x: 14, y: 192, w: 316, h: 254, screenH: 200 };
 }
 
-function fitPhone(width, height) {
-  const px = (n) => `${n.toFixed(1)}px`;
-  const scale = Number((width / 1280).toFixed(4));
-  const top = 48; // room for the Decorate button
-  const cx = width / 2;
-  const cy = top + 410 * scale;
-  // Screen pixels <-> stage pixels.
-  const toStageX = (x) => 640 + (x - cx) / scale;
-  const toStageY = (y) => 410 + (y - cy) / scale;
-
-  // Enlarge the TV (or the theater screen) so YouTube's player is at least 200px tall, and
-  // centre it under the room. The box is in stage pixels (the antenna is hidden on phones).
-  const box = screenBox();
-  const k = Math.max((width - 24) / (box.w * scale), 206 / (box.screenH * scale));
-  const tvTop = top + 820 * scale - 6;
-  const tvX = toStageX((width - box.w * scale * k) / 2) - box.x * k;
-  const tvY = toStageY(tvTop) - box.y * k;
-  const tvBottom = tvTop + box.h * scale * k;
-
-  const contentBottom = tvBottom + 20;
-
-  stage.dataset.layout = 'phone';
-  stage.style.setProperty('--s', scale);
-  stage.style.setProperty('--cx', px(cx));
-  stage.style.setProperty('--cy', px(cy));
-  stage.style.setProperty('--tv-t', `translate(${px(tvX)}, ${px(tvY)}) scale(${k.toFixed(4)})`);
-  const fullHeight = Math.max(height, contentBottom);
-  stage.style.setProperty('--fx', px(640 - cx / scale - 2));
-  stage.style.setProperty('--fy', px(410 - cy / scale - 2));
-  stage.style.setProperty('--fw', px(width / scale + 4));
-  stage.style.setProperty('--fh', px(fullHeight / scale + 4));
-  viewport.classList.toggle('scrolls', contentBottom > height);
-  spacer.style.height = px(fullHeight);
+// The screen's edges in stage pixels for a placement (2px of slack: the train rocks).
+function coverFor(scale, cx, cy, width, height) {
+  return { fx: 640 - cx / scale - 2, fy: 410 - cy / scale - 2, fw: width / scale + 4, fh: height / scale + 4 };
 }
+
+function computeFit(view) {
+  const width = viewport.clientWidth;
+  const height = viewport.clientHeight;
+  if (!width || !height) return null;
+  const box = screenBox();
+
+  if (width <= 600 && height >= width * 1.3) {
+    // Phone held upright: the room on top, a big TV below it, the page scrolls if needed.
+    const base = Number((width / 1280).toFixed(4));
+    const top = 48; // room for the Decorate button
+    // Enlarge the TV (or the theater screen) so YouTube's player is at least 200px tall, and
+    // centre it under the room. tv is its screen rectangle: left, top and screen px per stage px.
+    const k = Math.max((width - 24) / box.w, 206 / box.screenH);
+    const tv = { x: (width - box.w * k) / 2, y: top + 820 * base - 6, k };
+    const contentBottom = tv.y + box.h * k + 20;
+    const fullHeight = Math.max(height, contentBottom);
+    // The window view fills the room's space at the top with the glass, edge to edge.
+    const scale = view ? Number((width / GLASS.w).toFixed(4)) : base;
+    const cx = width / 2;
+    const cy = view ? top + (410 - GLASS.y) * scale : top + 410 * base;
+    return { layout: 'phone', view, scale, cx, cy, tv, box, cover: coverFor(scale, cx, cy, width, fullHeight), contentBottom, fullHeight, height };
+  }
+
+  let roomWidth = width;
+  let roomHeight = height;
+  if (decorPanel.open) {
+    const panel = decorPanel.getBoundingClientRect();
+    // A bottom sheet on phones, a floating sheet on the right elsewhere.
+    if (panel.left < 2) roomHeight = Math.max(120, panel.top);
+    else roomWidth = Math.max(200, panel.left - 8);
+  }
+  if (!view) {
+    const scale = Number(Math.min(roomWidth / 1280, roomHeight / 820).toFixed(4));
+    const cx = roomWidth / 2;
+    const cy = roomHeight / 2;
+    // The TV where it stands on the wall (used as the start of the zoom).
+    const tv = { x: cx + (box.x - 640) * scale, y: cy + (box.y - 410) * scale, k: scale };
+    return { layout: 'wide', view, scale, cx, cy, tv, box, cover: coverFor(scale, cx, cy, width, height) };
+  }
+  // On a computer the glass covers the whole screen (a little is cropped off one way); on a
+  // phone or tablet the whole glass fits, framed by the window (less to draw close up, which
+  // phones need). The TV sits in the bottom-left corner with its picture at least 206px tall.
+  const fill = matchMedia('(pointer: fine)').matches ? Math.max : Math.min;
+  const scale = Number(fill(roomWidth / GLASS.w, roomHeight / GLASS.h).toFixed(4));
+  const cx = roomWidth / 2;
+  const cy = roomHeight / 2 + (410 - (GLASS.y + GLASS.h / 2)) * scale;
+  const k = Math.max(206, Math.min(250, roomHeight * 0.27)) / box.screenH;
+  const margin = Math.max(12, Math.min(24, roomWidth * 0.02));
+  const tv = { x: margin, y: roomHeight - margin - box.h * k, k };
+  return { layout: 'wide', view, scale, cx, cy, tv, box, cover: coverFor(scale, cx, cy, width, height) };
+}
+
+const px = (n) => `${n.toFixed(1)}px`;
+
+// The TV's transform inside the stage that puts it at screen rectangle tv, for a camera.
+function tvTransform(tv, box, scale, cx, cy) {
+  const k = tv.k / scale;
+  const x = 640 + (tv.x - cx) / scale - box.x * k;
+  const y = 410 + (tv.y - cy) / scale - box.y * k;
+  return `translate(${px(x)}, ${px(y)}) scale(${k.toFixed(4)})`;
+}
+
+function applyFit(fit, cover = fit.cover) {
+  stage.dataset.layout = fit.layout;
+  stage.dataset.view = fit.view ? 'window' : 'room';
+  stage.style.setProperty('--s', fit.scale);
+  stage.style.setProperty('--cx', px(fit.cx));
+  stage.style.setProperty('--cy', px(fit.cy));
+  stage.style.setProperty('--fx', px(cover.fx));
+  stage.style.setProperty('--fy', px(cover.fy));
+  stage.style.setProperty('--fw', px(cover.fw));
+  stage.style.setProperty('--fh', px(cover.fh));
+  // The buttons in the corner keep the size they have in the room.
+  const base = fit.layout === 'phone' ? viewport.clientWidth / 1280 : fit.scale;
+  stage.style.setProperty('--ctl', fit.view ? (roomScale / fit.scale).toFixed(4) : 1);
+  if (!fit.view) roomScale = base;
+  if (fit.layout === 'phone' || fit.view) stage.style.setProperty('--tv-t', tvTransform(fit.tv, fit.box, fit.scale, fit.cx, fit.cy));
+  if (fit.layout === 'phone') {
+    viewport.classList.toggle('scrolls', fit.contentBottom > fit.height);
+    spacer.style.height = px(fit.fullHeight);
+  } else {
+    viewport.classList.remove('scrolls');
+    spacer.style.height = '0px';
+  }
+}
+let roomScale = 1;
+
+function stopZoom() {
+  if (!zoomAnim) return;
+  zoomAnim.forEach((a) => a.cancel());
+  zoomAnim = 0;
+  stage.classList.remove('zooming');
+}
+
+function fitStage() {
+  if (windowView && !windowAllowed()) setWindowButton(windowView = false);
+  stopZoom();
+  const fit = computeFit(windowView);
+  if (fit) applyFit(fit);
+}
+
+// Zoom smoothly between the room and the window view. While the camera moves, the stage
+// stays laid out as the room and is magnified with a transform (laying it out close up
+// would draw the whole room at 2-3 times the size: far too much memory on a phone); the TV
+// glides between its two spots. Both run as animations the browser plays on the graphics
+// chip (sampled keyframes of one camera path). At the end the close-up is laid out for real,
+// sharp, with the room behind hidden (CSS: .stage[data-view="window"]).
+function zoomTo(view) {
+  if (view && !windowAllowed()) return;
+  if (view === windowView && !zoomAnim) return;
+  // Turning round mid-zoom starts from wherever the camera is now.
+  const from = zoomAnim && camera ? camera(zoomAnim[0].currentTime) : computeFit(windowView);
+  stopZoom();
+  windowView = view;
+  setWindowButton(view);
+  const to = computeFit(view);
+  if (!to) return;
+  if (!from || reduceMotion || from.layout !== to.layout) { applyFit(to); return; }
+  const room = computeFit(false);
+  applyFit(room);
+  stage.classList.add('zooming');
+  const anchorX = viewport.clientWidth / 2;
+  const anchorY = viewport.clientHeight / 2;
+  // The stage point under the anchor, for each fit (the camera's focus).
+  const focus = (f) => ({ x: 640 + (anchorX - f.cx) / f.scale, y: 410 + (anchorY - f.cy) / f.scale });
+  const fa = focus(from);
+  const fb = focus(to);
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+  const duration = Math.round(950 * (from.view === to.view ? 0.6 : 1));
+  // The camera at a time: the scale changes evenly in ratio, the focus slides across.
+  const at = (ms) => {
+    const e = ease(Math.max(0, Math.min(1, ms / duration)));
+    const scale = from.scale * (to.scale / from.scale) ** e;
+    const cx = anchorX + (640 - (fa.x + (fb.x - fa.x) * e)) * scale;
+    const cy = anchorY + (410 - (fa.y + (fb.y - fa.y) * e)) * scale;
+    const tv = { x: from.tv.x + (to.tv.x - from.tv.x) * e, y: from.tv.y + (to.tv.y - from.tv.y) * e, k: from.tv.k + (to.tv.k - from.tv.k) * e };
+    return { layout: to.layout, view: true, scale, cx, cy, tv, box: to.box };
+  };
+  camera = at;
+  const stageFrames = [];
+  const tvFrames = [];
+  const steps = 30;
+  for (let i = 0; i <= steps; i++) {
+    const c = at((i / steps) * duration);
+    const r = c.scale / room.scale;
+    const tx = c.cx - room.cx;
+    const ty = c.cy - room.cy;
+    stageFrames.push({ transform: useZoom
+      ? `translate(-50%, -50%) translate(${px(tx / room.scale)}, ${px(ty / room.scale)}) scale(${r.toFixed(5)})`
+      : `translate(-50%, -50%) translate(${px(tx)}, ${px(ty)}) scale(${(r * room.scale).toFixed(5)})` });
+    tvFrames.push({ transform: tvTransform(c.tv, to.box, c.scale, c.cx, c.cy) });
+  }
+  const timing = { duration, easing: 'linear', fill: 'both' };
+  zoomAnim = [stage.animate(stageFrames, timing), tvSet.animate(tvFrames, timing)];
+  const mine = zoomAnim;
+  mine[0].finished.then(() => {
+    if (zoomAnim !== mine) return;
+    // Settle on the real fit first, then drop the animations (same frame: no jump).
+    applyFit(to);
+    stopZoom();
+  }, () => {});
+}
+
+function setWindowButton(view) {
+  $('#window-back').hidden = !view;
+}
+$('#window-back').addEventListener('click', () => zoomTo(false));
+
+// Tap the glass to look out; tap it again (or Back, or Esc) to come back in.
+stage.addEventListener('click', (event) => {
+  if (event.target.closest('button, a, input, select, dialog, .tv-set, .pet, .room-controls, [role="button"]')) return;
+  const scale = parseFloat(stage.style.getPropertyValue('--s')) || 1;
+  const cx = parseFloat(stage.style.getPropertyValue('--cx'));
+  const cy = parseFloat(stage.style.getPropertyValue('--cy'));
+  const box = viewport.getBoundingClientRect();
+  const x = 640 + (event.clientX - box.left + viewport.scrollLeft - cx) / scale;
+  const y = 410 + (event.clientY - box.top + viewport.scrollTop - cy) / scale;
+  if (x < GLASS.x || x > GLASS.x + GLASS.w || y < GLASS.y || y > GLASS.y + GLASS.h) return;
+  zoomTo(!windowView);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && windowView && !decorPanel.open && !document.querySelector('dialog[open]')) zoomTo(false);
+});
 if ('ResizeObserver' in window) {
   const observer = new ResizeObserver(fitStage);
   observer.observe(viewport);
@@ -1144,6 +1280,7 @@ initKeys({
   crate() {
     if (recordsHere() && !theater) $('#crate').click();
   },
+  window: () => zoomTo(!windowView),
   decorate: () => decor.toggle(),
   fullscreen() {
     const button = $('#fullscreen-toggle');
